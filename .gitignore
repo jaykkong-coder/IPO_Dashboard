@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+docs/
+CORPCODE.xml
+poc_*.py
+poc_docs/
+poc_result.json
+debug_nulls.py
