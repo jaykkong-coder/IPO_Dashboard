@@ -199,6 +199,7 @@ def main():
             "공모주식수_M", "신주_M", "구주_M",
             "상장후주식수_M", "유통가능주식수비율",
             "인수수수료총액_억원", "인수수수료율",
+            "기관경쟁률", "의무보유확약비율", "청약경쟁률_비례",
         ]
         available = [c for c in display_cols if c in filtered.columns]
         disp = format_display_df(filtered[available])
@@ -390,6 +391,9 @@ def main():
                     ("유통가능비율", fmt_pct(c.get("유통가능주식수비율"))),
                     ("인수수수료", f"{fmt_억(c.get('인수수수료총액_억원'))} ({fmt_pct(c.get('인수수수료율'))})"
                      if c.get("인수수수료총액_억원") else "-"),
+                    ("기관경쟁률", f"{c.get('기관경쟁률'):,.1f}:1" if c.get("기관경쟁률") else "-"),
+                    ("의무보유확약", fmt_pct(c.get("의무보유확약비율"))),
+                    ("청약경쟁률(비례)", f"{c.get('청약경쟁률_비례'):,.1f}:1" if c.get("청약경쟁률_비례") else "-"),
                 ]
                 for label, val in size_rows:
                     st.markdown(f"**{label}** : {val}")

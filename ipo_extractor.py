@@ -113,12 +113,14 @@ class IPOExtractor:
         """모든 필드 추출"""
         self._extract_underwriter()
         self._extract_valuation()
+        self._extract_text_fallback()  # 테이블에서 못 찾은 것을 본문 텍스트에서 추출
         self._extract_discount_and_band()
         self._extract_confirmed_price()
         self._extract_shares()
         self._extract_float()
         self._extract_fees()
         self._extract_listing_type()
+        self._detect_spac_merger()
         self._calculate_derived()
         return self.data
 
@@ -219,11 +221,12 @@ class IPOExtractor:
             for row in rows:
                 joined = " ".join(row)
 
-                # 평가방법
+                # 평가방법: "상대가치법" 등 알려진 값만
                 if "평가방법" in joined and "평가방법" not in self.data:
                     for cell in row:
-                        if cell.strip() not in ("평가방법", "") and len(cell.strip()) < 20:
-                            self.data["평가방법"] = cell.strip()
+                        c = cell.strip()
+                        if c in ("상대가치법", "상대가치", "절대가치법", "DCF"):
+                            self.data["평가방법"] = c
                             break
 
                 # 평가모형 (PER, PSR, PBR, EV/EBITDA 등) - 알려진 값만 매칭
@@ -415,6 +418,203 @@ class IPOExtractor:
                                             break
                     if "주당평가가액" in self.data:
                         break
+
+        # 3차: 구버전 패턴 (2021~2022)
+        # ['구 분', '산출 내역', '비고'] 구조의 주당 평가가액 산출 테이블
+        # 3차는 멀티플/이익/시총/주당평가가액/주식수 중 하나라도 없으면 실행
+        needs_old = not all(k in self.data for k in ["적용멀티플", "적용이익_백만원", "주당평가가액"])
+        if needs_old:
+            for t in reversed(self.tables):
+                flat = " ".join(" ".join(r) for r in t["rows"])
+                has_per = ("적용 PER" in flat or "PER 배수" in flat or "PER배수" in flat
+                           or "적용 EV" in flat or "EV/EBITDA" in flat
+                           or "평균 PER" in flat or "PER 평균" in flat
+                           or "평균 EV" in flat
+                           or "유사회사" in flat or "비교회사" in flat
+                           or "적용 Multiple" in flat or "적용Multiple" in flat
+                           or "Multiple" in flat or "멀티플" in flat
+                           or "P/E" in flat or "P/B" in flat or "P/S" in flat)
+                has_eval = (("평가가액" in flat or "평가 가액" in flat or "적정시가총액" in flat
+                            or "기업가치" in flat)
+                           and ("시가총액" in flat or "기업가치" in flat or "주당" in flat or "EBITDA" in flat))
+                # 위험요소 테이블 제외
+                first3 = " ".join(" ".join(r) for r in t["rows"][:3])
+                is_risk = "사업위험" in first3 or "회사위험" in first3
+                # 제외할 테이블: 투자지표 설명, 비교기업 PER 산출 (여러 회사 비교)
+                is_exclude = ("투자지표의 부적합성" in flat or "제외 투자지표" in flat
+                              or "제외투자지표" in flat or "투자지표의 적합성" in flat
+                              or "발행주식총수" in flat)  # 비교기업 PER 산출 테이블 특징
+                if has_per and has_eval and len(t["rows"]) >= 4 and not is_risk and not is_exclude:
+                    mult_kws = ["적용 PER", "PER 배수", "PER배수", "적용 EV", "평균 PER",
+                                "평균 EV/EBITDA", "유사회사 평균", "비교회사 평균", "유사회사 PER",
+                                "비교기업 PER", "비교회사 PER",
+                                "EV/EBITDA 거래배수", "거래배수", "적용 PSR", "적용 PBR",
+                                "평균 PSR", "평균 PBR",
+                                "적용 Multiple", "적용Multiple",
+                                "PER 평균", "평균PER", "Multiple",
+                                "적용 멀티플", "적용멀티플", "적용 P/E", "평균 P/E",
+                                "적용 P/B", "평균 P/B", "적용 P/S", "적용P/S", "평균 P/S",
+                                "PER(배)", "PBR(배)", "PSR(배)",
+                                "유사회사 평균 PER", "평균 PER(배)"]
+                    for row in t["rows"]:
+                        joined = " ".join(row)
+
+                        # 적용 투자지표 / 평가모형
+                        if "적용 투자지표" in joined and "평가모형" not in self.data:
+                            for cell in row:
+                                cell_upper = cell.strip().upper()
+                                for model in ["PER", "PSR", "PBR", "EV/EBITDA"]:
+                                    if model in cell_upper:
+                                        self.data["평가모형"] = model
+                                        break
+
+                        if any(kw in joined for kw in mult_kws) and "적용멀티플" not in self.data:
+                            # "27.90배" 또는 "25.07" (배 없이 숫자만)
+                            match = re.search(r'([\d]+\.[\d]+|[\d]+)\s*[\(]?배?', joined)
+                            if match:
+                                val = float(match.group(1))
+                                if 1 < val < 500:
+                                    self.data["적용멀티플"] = val
+                                    if "평가모형" not in self.data:
+                                        if "PER" in joined or "P/E" in joined:
+                                            self.data["평가모형"] = "PER"
+                                        elif "EV/EBITDA" in joined or "EBITDA" in joined:
+                                            self.data["평가모형"] = "EV/EBITDA"
+                                        elif "PSR" in joined or "P/S" in joined:
+                                            self.data["평가모형"] = "PSR"
+                                        elif "PBR" in joined or "P/B" in joined:
+                                            self.data["평가모형"] = "PBR"
+
+                        # 구버전 테이블은 가장 정확한 소스 → 기존값 덮어쓰기 허용
+
+                        # 추정 당기순이익 / 적용 당기순이익 / 적용 순이익 / EBITDA
+                        earnings_kws = ["당기순이익", "EBITDA", "적용 순이익", "적용순이익", "적용 당기순이익",
+                                        "연환산 매출액", "적용 매출액", "적용매출액"]
+                        if any(ek in joined for ek in earnings_kws):
+                            skip_kw = ["현가", "현재가치", "적용주식수", "적용 주식수", "주당순이익", "주당 순이익"]
+                            if not any(sk in joined for sk in skip_kw):
+                                # 백만원 단위
+                                match = re.search(r'([\d,]+)\s*백만원', joined)
+                                if match:
+                                    self.data["적용이익_백만원"] = parse_number(match.group(1))
+                                else:
+                                    # 원 단위 (단위 없이 숫자만 or "원" 표기)
+                                    for cell in row[1:]:
+                                        num = parse_number(cell)
+                                        if num and num > 1000000000:  # 10억 이상이면 원 단위
+                                            self.data["적용이익_백만원"] = round(num / 1000000, 2)
+                                            break
+
+                        # 평가 시가총액 / 기업가치 평가액 / 적정시가총액
+                        cap_kws = ["평가 시가총액", "기업가치 평가액", "적정시가총액", "기업가치평가액",
+                                   "적용 시가총액", "적정시가총액", "평가시가총액"]
+                        if any(kw in joined for kw in cap_kws):
+                            if "적용주식수" not in joined and "기준시가" not in joined:
+                                # 백만원 단위
+                                match = re.search(r'([\d,]+)\s*백만원', joined)
+                                if match:
+                                    val = parse_number(match.group(1))
+                                    if val and val > 100:
+                                        self.data["적정시가총액_백만원"] = val
+                                        self.data["적정시가총액_억원"] = round(val / 100, 2)
+                                # 억원 단위
+                                if "적정시가총액_억원" not in self.data:
+                                    match = re.search(r'([\d,]+)\s*억원', joined)
+                                    if match:
+                                        val = parse_number(match.group(1))
+                                        if val and val > 1:
+                                            self.data["적정시가총액_억원"] = val
+
+                        # 주당 평가가액/평가가격/평가가치
+                        if ("주당 평가가액" in joined or "주당 평가 가액" in joined
+                            or "주당 평가가격" in joined or "주당평가가격" in joined
+                            or "주당 평가 가치" in joined or "주당 평가가치" in joined):
+                            match = re.search(r'([\d,]+)\s*원', joined)
+                            if match:
+                                val = parse_number(match.group(1))
+                                if val and 100 < val < 1000000:
+                                    self.data["주당평가가액"] = val
+
+                        # 적용주식수 / 공모 후 주식수
+                        if "적용주식수" in joined or "적용 주식수" in joined or "공모 후 주식수" in joined or "공모후 주식수" in joined:
+                            match = re.search(r'([\d,]+)\s*주?', joined)
+                            if match:
+                                val = parse_number(match.group(1))
+                                if val and 100000 < val < 500000000:
+                                    self.data["상장후주식수"] = val
+
+                    if "적용멀티플" in self.data:
+                        break
+
+    def _extract_text_fallback(self):
+        """4차: 테이블에서 못 찾은 값을 본문 텍스트에서 정규식으로 추출 (구버전 대응)"""
+        full_text = " ".join(t["flat"] for t in self.tables)
+        # &cr; 등 HTML 엔티티 잔여물 제거
+        full_text = full_text.replace("&cr;", " ").replace("&amp;", "&")
+
+        # 적용멀티플: 다양한 텍스트 패턴
+        if "적용멀티플" not in self.data:
+            for model, aliases in [
+                ("PER", ["PER", "P/E"]),
+                ("EV/EBITDA", ["EV/EBITDA", "EV/Capacity", "EV/Pipeline"]),
+                ("PSR", ["PSR", "P/S"]),
+                ("PBR", ["PBR", "P/B"]),
+            ]:
+                for alias in aliases:
+                    patterns = [
+                        # "적용 PER(평균) 33.7", "적용PER(배) 35.4"
+                        rf'적용\s*{re.escape(alias)}\s*[\(\(]?[평균배x]*[\)\)]?\s*([\d.]+)',
+                        # "PER 평균은 10.19배"
+                        rf'{re.escape(alias)}\s*(?:평균은?|배수는?|은|의 평균은?)\s*([\d.]+)\s*배?',
+                        # "적용 PER 배수 12.84"
+                        rf'적용\s*{re.escape(alias)}\s*배수\s*([\d.]+)',
+                        # "평균 PER(배) 12.01"
+                        rf'평균\s*{re.escape(alias)}\s*[\(\(]?배?[\)\)]?\s*([\d.]+)',
+                        # "PER 30.4배 27.0배" (2열)
+                        rf'{re.escape(alias)}\s*([\d.]+)\s*배?\s+[\d.]',
+                        # "적용 P/S 거래배수 1.59"
+                        rf'적용\s*{re.escape(alias)}\s*거래배수\s*[\(\(]?[배]?[\)\)]?\s*([\d.]+)',
+                    ]
+                    for pat in patterns:
+                        match = re.search(pat, full_text)
+                        if match:
+                            val = float(match.group(1))
+                            if 1 < val < 500:
+                                self.data["적용멀티플"] = val
+                                if "평가모형" not in self.data:
+                                    self.data["평가모형"] = model
+                                break
+                    if "적용멀티플" in self.data:
+                        break
+                if "적용멀티플" in self.data:
+                    break
+
+        # 주당 평가가액: "주당 평가가액은 XX,XXX원" 또는 "주당 평가가액에 할인율"
+        if "주당평가가액" not in self.data:
+            match = re.search(r'주당\s*평가가액\w*\s*([\d,]+)\s*원', full_text)
+            if match:
+                val = parse_number(match.group(1))
+                if val and 100 < val < 1000000:
+                    self.data["주당평가가액"] = val
+
+        # 할인율: "할인율 35.96%~26.11%" 또는 "할인율 59.78% ~ 50.52%"
+        if "할인율_하단" not in self.data:
+            match = re.search(r'할인율\s*([\d.]+)\s*%\s*~\s*([\d.]+)\s*%', full_text)
+            if match:
+                v1, v2 = float(match.group(1)), float(match.group(2))
+                if 1 < v1 < 80 and 1 < v2 < 80:
+                    self.data["할인율_하단"] = max(v1, v2)
+                    self.data["할인율_상단"] = min(v1, v2)
+
+        # 희망공모가액: "희망 공모가액 XX,XXX원 ~ XX,XXX원"
+        if "공모가밴드_하단" not in self.data:
+            match = re.search(r'희망\s*공모가액\s*([\d,]+)\s*원?\s*~\s*([\d,]+)\s*원', full_text)
+            if match:
+                v1, v2 = parse_number(match.group(1)), parse_number(match.group(2))
+                if v1 and v2 and 100 < v1 < 1000000:
+                    self.data["공모가밴드_하단"] = min(v1, v2)
+                    self.data["공모가밴드_상단"] = max(v1, v2)
+                    self.data["공모가밴드_중간값"] = (v1 + v2) / 2
 
     def _extract_discount_and_band(self):
         """할인율, 공모가밴드 - 밸류에이션 요약 테이블에서 추출"""
@@ -823,11 +1023,30 @@ class IPOExtractor:
 
         self.data["상장유형"] = None
 
+    def _detect_spac_merger(self):
+        """스팩합병상장 감지"""
+        if self.data.get("평가모형"):
+            return
+        # 앞쪽 50개 테이블에서 검색
+        front_text = " ".join(t["flat"] for t in self.tables[:50])
+        spac_kws = ["합병의 개요", "합병에 관한", "기업인수목적", "합병비율", "합병법인"]
+        if any(kw in front_text for kw in spac_kws):
+            self.data["평가모형"] = "스팩합병상장"
+            self.data["상장유형"] = "스팩합병"
+
     def _calculate_derived(self):
         """파생 필드 계산"""
         mult = self.data.get("적용멀티플")
         earnings = self.data.get("적용이익_백만원")
         model = self.data.get("평가모형", "")
+
+        # 평가모형이 없지만 멀티플이 있으면, 멀티플 크기로 유추
+        if not model and mult:
+            if mult > 5:
+                self.data["평가모형"] = "PER"  # PER은 보통 10~50배
+            elif mult < 5:
+                self.data["평가모형"] = "PBR"  # PBR은 보통 0.5~5배
+            model = self.data.get("평가모형", "")
 
         # 적정시가총액
         if mult and earnings:
@@ -881,9 +1100,25 @@ class IPOExtractor:
 
 
 def extract_ipo_data(filepath):
-    """파일 경로로부터 IPO 데이터 추출"""
-    with open(filepath, "r", encoding="utf-8", errors="replace") as f:
-        content = f.read()
+    """파일 경로로부터 IPO 데이터 추출 (인코딩 자동 감지)"""
+    with open(filepath, "rb") as f:
+        raw = f.read()
+
+    # UTF-8 먼저 시도, 실패하면 CP949/EUC-KR
+    content = None
+    for enc in ["utf-8", "cp949", "euc-kr"]:
+        try:
+            decoded = raw.decode(enc)
+            # 한글 키워드가 정상 디코딩되는지 확인
+            if any(kw in decoded for kw in ["평가", "공모", "인수", "상장", "증권"]):
+                content = decoded
+                break
+        except (UnicodeDecodeError, LookupError):
+            continue
+    if content is None:
+        # 최후 수단: errors=replace
+        content = raw.decode("utf-8", errors="replace")
+
     extractor = IPOExtractor(content)
     return extractor.extract_all()
 

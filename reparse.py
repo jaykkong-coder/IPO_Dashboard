@@ -11,11 +11,46 @@ from database import init_db, upsert_company, get_stats
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DOCS_DIR = os.path.join(BASE_DIR, "docs")
 SPAC_KEYWORDS = ["스팩", "SPAC", "기업인수목적"]
+REIT_KEYWORDS = ["리츠", "인프라", "신탁업 및 집합투자"]
 
 
 def is_spac(company):
     combined = f"{company.get('회사명', '')} {company.get('주요제품', '')} {company.get('업종', '')}"
     return any(kw in combined for kw in SPAC_KEYWORDS)
+
+
+def is_non_ipo_prospectus(company_name):
+    """다운로드된 투자설명서가 사채/유상증자용인지 확인"""
+    import re
+    doc_dir = os.path.join(DOCS_DIR, company_name)
+    if not os.path.isdir(doc_dir):
+        return False
+    for fname in os.listdir(doc_dir):
+        if not fname.endswith((".xml", ".html", ".htm")):
+            continue
+        with open(os.path.join(doc_dir, fname), "rb") as f:
+            raw = f.read(5000)
+        text = None
+        for enc in ["utf-8", "cp949", "euc-kr"]:
+            try:
+                text = raw.decode(enc)
+                if any(kw in text for kw in ["투자", "증권"]):
+                    break
+            except:
+                text = None
+        if not text:
+            break
+        clean = re.sub(r"<[^>]+>", " ", text)
+        # 사채 투자설명서
+        if "무보증사채" in clean or "이권부" in clean:
+            if "기명식 보통주" not in clean and "기명식보통주" not in clean:
+                return True
+        # 유상증자(주주배정) 투자설명서만 제외
+        # "주주배정" 유증은 IPO가 아님. 단, 일반공모/코스닥 상장 유증은 IPO에 해당
+        if "주주배정" in clean[:5000]:
+            return True
+        break
+    return False
 
 
 def is_merger(company_name):
@@ -41,12 +76,12 @@ def run():
 
     # KIND 목록
     print("[1/3] KIND 목록 수집...")
-    kosdaq = get_kind_ipo_list(start_date="2025-01-01", market_type="kosdaqMkt")
-    kospi = get_kind_ipo_list(start_date="2025-01-01", market_type="stockMkt")
+    kosdaq = get_kind_ipo_list(start_date="2016-01-01", market_type="kosdaqMkt")
+    kospi = get_kind_ipo_list(start_date="2016-01-01", market_type="stockMkt")
     all_companies = kosdaq + kospi
     print(f"  코스닥: {len(kosdaq)}건, 유가증권: {len(kospi)}건")
 
-    # SPAC & 합병상장 등록
+    # SPAC & 합병상장 & 리츠/분할 등록
     for c in all_companies:
         if is_spac(c):
             c["처리상태"] = "skipped"
@@ -56,13 +91,25 @@ def run():
             c["처리상태"] = "skipped"
             c["처리메모"] = "합병상장"
             upsert_company(c)
+        elif is_non_ipo_prospectus(c["회사명"]):
+            c["처리상태"] = "skipped"
+            c["처리메모"] = "사채/유증 투자설명서"
+            upsert_company(c)
+        elif any(kw in f"{c.get('업종', '')} {c.get('주요제품', '')}" for kw in REIT_KEYWORDS):
+            c["처리상태"] = "skipped"
+            c["처리메모"] = "리츠/인프라"
+            upsert_company(c)
 
     # 문서 재파싱
     print("[2/3] 기존 문서 재파싱...")
     success = 0
     fail = 0
 
-    non_spac = [c for c in all_companies if not is_spac(c) and not is_merger(c["회사명"])]
+    non_spac = [c for c in all_companies
+                if not is_spac(c)
+                and not is_merger(c["회사명"])
+                and not is_non_ipo_prospectus(c["회사명"])
+                and not any(kw in f"{c.get('업종', '')} {c.get('주요제품', '')}" for kw in REIT_KEYWORDS)]
     for i, company in enumerate(non_spac):
         name = company["회사명"]
         doc_dir = os.path.join(DOCS_DIR, name)

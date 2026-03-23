@@ -50,26 +50,34 @@ def load_corp_codes():
 
 
 def search_prospectus(corp_code):
-    """DART에서 투자설명서 검색"""
+    """DART에서 투자설명서 검색 (재시도 포함)"""
     url = "https://opendart.fss.or.kr/api/list.json"
     params = {
         "crtfc_key": DART_API_KEY,
         "corp_code": corp_code,
-        "bgn_de": "20240101",
+        "bgn_de": "20150101",
         "end_de": "20261231",
         "pblntf_ty": "C",
         "page_count": 100,
     }
 
-    resp = requests.get(url, params=params)
-    data = resp.json()
+    for attempt in range(3):
+        try:
+            resp = requests.get(url, params=params, timeout=15)
+            data = resp.json()
+            break
+        except (requests.ConnectionError, requests.Timeout) as e:
+            if attempt < 2:
+                time.sleep(5)
+            else:
+                return None, f"연결 에러: {str(e)[:50]}"
 
     if data.get("status") != "000":
         return None, f"API: {data.get('message', 'unknown')}"
 
     filings = data.get("list", [])
 
-    # 투자설명서 우선 (기재정정 포함), 일괄신고 제외
+    # 투자설명서 우선 (기재정정 포함), 일괄신고/채무증권 제외
     exclude = ["일괄신고", "채무증권"]
     prospectus = [
         f for f in filings
@@ -78,9 +86,19 @@ def search_prospectus(corp_code):
     ]
 
     if prospectus:
+        # IPO 투자설명서 선별: 가장 오래된 것부터 (IPO가 가장 먼저 제출됨)
+        prospectus.sort(key=lambda x: x.get("rcept_dt", ""))
+        # [기재정정] 버전이 있으면 같은 시기의 정정본 우선
+        # 가장 오래된 접수일 기준으로 해당 시기의 투자설명서 중 가장 최신(정정본)
+        oldest_date = prospectus[0].get("rcept_dt", "")[:6]  # YYYYMM
+        same_period = [p for p in prospectus if p.get("rcept_dt", "")[:6] <= oldest_date[:4] + "12"]
+        if same_period:
+            # 같은 시기 중 가장 최신 (정정본)
+            same_period.sort(key=lambda x: x.get("rcept_dt", ""), reverse=True)
+            return same_period[0], None
         return prospectus[0], None
 
-    # 증권신고서로 대체
+    # 증권신고서로 대체 (지분증권만)
     securities = [
         f for f in filings
         if "증권신고서" in f.get("report_nm", "")
@@ -114,9 +132,11 @@ def download_and_parse(rcept_no, company_name, max_retries=3):
 
                 with zipfile.ZipFile(io.BytesIO(resp.content)) as zf:
                     for name in zf.namelist():
-                        filepath = os.path.join(save_dir, name)
+                        # zip 내 파일명이 /로 시작하는 경우 제거
+                        safe_name = name.lstrip("/")
+                        filepath = os.path.join(save_dir, safe_name)
                         with open(filepath, "wb") as f:
-                            f.write(zf.read(name))
+                            f.write(zf.read(name))  # name은 원본, filepath만 safe_name 사용
                 break
             except (requests.ConnectionError, requests.Timeout, zipfile.BadZipFile) as e:
                 if attempt < max_retries - 1:
@@ -157,8 +177,8 @@ def run_pipeline(skip_spac=True):
 
     # 2. KIND에서 목록 가져오기
     print("\n[1/4] KIND 상장법인 목록 수집...")
-    kosdaq = get_kind_ipo_list(start_date="2025-01-01", market_type="kosdaqMkt")
-    kospi = get_kind_ipo_list(start_date="2025-01-01", market_type="stockMkt")
+    kosdaq = get_kind_ipo_list(start_date="2016-01-01", market_type="kosdaqMkt")
+    kospi = get_kind_ipo_list(start_date="2016-01-01", market_type="stockMkt")
     all_companies = kosdaq + kospi
     print(f"  코스닥: {len(kosdaq)}건, 유가증권: {len(kospi)}건, 합계: {len(all_companies)}건")
 
