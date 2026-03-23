@@ -208,12 +208,126 @@ class IPOExtractor:
                     return num
         return None
 
+    def _parse_earnings_value(self, joined, row):
+        """적용이익을 다양한 단위 패턴에서 추출하여 백만원으로 변환"""
+        # 패턴1: "42,995백만원" 또는 "4,644(백만원)"
+        match = re.search(r'([\d,]+)\s*[\(]?백만원', joined)
+        if match:
+            self.data["적용이익_백만원"] = parse_number(match.group(1))
+            return
+
+        # 패턴2: "111.04억원" 또는 "942 억원" → 백만원 변환
+        match = re.search(r'([\d,.]+)\s*억원', joined)
+        if match:
+            val = parse_number(match.group(1).replace(".", "").replace(",", ""))
+            # 소수점 있는 경우 (111.04억원)
+            float_match = re.search(r'([\d,]+\.[\d]+)\s*억원', joined)
+            if float_match:
+                val = float(float_match.group(1).replace(",", "")) * 100  # 억원 → 백만원
+            elif val:
+                val = val * 100  # 억원 → 백만원
+            if val and val > 0:
+                self.data["적용이익_백만원"] = round(val, 2)
+                return
+
+        # 패턴3: "4,511,714천원" 또는 "13,043,586천원"
+        match = re.search(r'([\-]?[\d,]+)\s*[\(]?천원', joined)
+        if match:
+            val = parse_number(match.group(1))
+            if val and abs(val) > 100:
+                self.data["적용이익_백만원"] = round(val / 1000, 2)
+                return
+
+        # 패턴4: "9,132,516,828원" 또는 "21,936,635,000 원" (원 단위 큰 숫자)
+        match = re.search(r'([\-]?[\d,]+)\s*원', joined)
+        if match:
+            val = parse_number(match.group(1))
+            if val and abs(val) > 10000000:  # 1천만원 이상
+                self.data["적용이익_백만원"] = round(val / 1000000, 2)
+                return
+
+        # 패턴4.5: "19,803 백만원" (숫자와 단위 사이 공백)
+        match = re.search(r'([\d,]+)\s+백만원', joined)
+        if match:
+            val = parse_number(match.group(1))
+            if val and val > 10:
+                self.data["적용이익_백만원"] = val
+                return
+
+        # 패턴5: 레이블에 단위 포함 "적용 당기순이익(백만원)" / "(단위: 백만원)" + 별도 셀에 숫자
+        label_unit = re.search(r'[\(（](백만원|천원|억원|단위:\s*백만원|단위:\s*천원|단위:\s*억원)[\)）,]', joined)
+        if label_unit:
+            unit_str = label_unit.group(1)
+            if "백만원" in unit_str:
+                unit = "백만원"
+            elif "천원" in unit_str:
+                unit = "천원"
+            else:
+                unit = "억원"
+            for cell in row:
+                num = parse_number(cell)
+                if num and num > 10:
+                    if unit == "백만원":
+                        self.data["적용이익_백만원"] = num
+                    elif unit == "천원":
+                        self.data["적용이익_백만원"] = round(num / 1000, 2)
+                    elif unit == "억원":
+                        self.data["적용이익_백만원"] = round(num * 100, 2)
+                    return
+
+        # 패턴6: 단위 "백만원" 별도 셀
+        for idx, cell in enumerate(row):
+            if cell.strip() == "백만원":
+                for offset in [1, -1]:
+                    adj = idx + offset
+                    if 0 <= adj < len(row):
+                        num = parse_number(row[adj])
+                        if num and num > 10:
+                            self.data["적용이익_백만원"] = num
+                            return
+        # 패턴7: 단위 "천원" 별도 셀
+        for idx, cell in enumerate(row):
+            if cell.strip() == "천원":
+                if idx + 1 < len(row):
+                    num = parse_number(row[idx + 1])
+                    if num and abs(num) > 100:
+                        self.data["적용이익_백만원"] = round(num / 1000, 2)
+                        return
+        # 패턴8: 단위 "원" 별도 셀
+        for idx, cell in enumerate(row):
+            if cell.strip() == "원":
+                if idx + 1 < len(row):
+                    num = parse_number(row[idx + 1])
+                    if num and abs(num) > 10000000:
+                        self.data["적용이익_백만원"] = round(num / 1000000, 2)
+                        return
+
+        # 패턴9: bare number (단위 없음) — 크기로 단위 추정
+        # 밸류에이션 테이블 컨텍스트에서만 사용
+        for cell in row:
+            num = parse_number(cell)
+            if num and num > 100:
+                # 1억 이상이면 원 단위로 추정
+                if num > 100000000:
+                    self.data["적용이익_백만원"] = round(num / 1000000, 2)
+                    return
+                # 10만 이상이면 천원 단위로 추정
+                elif num > 100000:
+                    self.data["적용이익_백만원"] = round(num / 1000, 2)
+                    return
+                # 100~10만이면 백만원 단위로 추정
+                elif num > 100:
+                    self.data["적용이익_백만원"] = num
+                    return
+
     def _extract_valuation(self):
         """평가방법, 적용멀티플, 적용이익, 주당평가가액"""
         # 공모가산정요약표 / 밸류에이션 핵심 테이블 찾기
         candidates = find_tables_with_keywords(
             self.tables,
-            ["평가방법", "평가모형", "적용산식", "주당 평가가액", "주당평가가액", "공모가 산정"]
+            ["평가방법", "평가모형", "적용산식", "주당 평가가액", "주당평가가액",
+             "주당 평가가격", "주당평가가격", "공모가 산정", "적용 당기순이익",
+             "추정 당기순이익", "적정시가총액", "적용 PER"]
         )
 
         for t, score in candidates:
@@ -280,54 +394,44 @@ class IPOExtractor:
                                 if vals:
                                     self.data["적용멀티플"] = round(sum(vals) / len(vals), 2)
 
-                # 적용이익: ① 행 (당기순이익, EBITDA, 매출액, 자본총계 등)
-                if "①" in joined:
-                    earnings_labels = ["당기순이익", "순이익", "매출액", "EBITDA", "영업이익", "자본총계"]
-                    if any(lbl in joined for lbl in earnings_labels):
-                        if "적용이익_백만원" not in self.data:
-                            # 패턴1: "42,995백만원" 또는 "4,644(백만원)"
-                            match = re.search(r'([\d,]+)\s*[\(]?백만원', joined)
-                            if match:
-                                self.data["적용이익_백만원"] = parse_number(match.group(1))
-                            # 패턴2: "4,511,714천원" → 백만원으로 변환
-                            if "적용이익_백만원" not in self.data:
-                                match = re.search(r'([\-]?[\d,]+)\s*[\(]?천원', joined)
-                                if match:
-                                    val = parse_number(match.group(1))
-                                    if val and abs(val) > 100:
-                                        self.data["적용이익_백만원"] = round(val / 1000, 2)
-                            # 패턴3: 단위 "백만원" 별도 셀
-                            if "적용이익_백만원" not in self.data:
-                                for idx, cell in enumerate(row):
-                                    if cell.strip() == "백만원":
-                                        if idx + 1 < len(row):
-                                            num = parse_number(row[idx + 1])
-                                            if num and num > 10:
-                                                self.data["적용이익_백만원"] = num
-                                                break
-                                        if idx - 1 >= 0:
-                                            num = parse_number(row[idx - 1])
-                                            if num and num > 10:
-                                                self.data["적용이익_백만원"] = num
-                                                break
-                            # 패턴4: 단위 "천원" 별도 셀
-                            if "적용이익_백만원" not in self.data:
-                                for idx, cell in enumerate(row):
-                                    if cell.strip() == "천원":
-                                        if idx + 1 < len(row):
-                                            num = parse_number(row[idx + 1])
-                                            if num and abs(num) > 100:
-                                                self.data["적용이익_백만원"] = round(num / 1000, 2)
-                                                break
-                            # 패턴5: 단위 "원" 별도 셀 (10,053,667,329원 → 백만원 변환)
-                            if "적용이익_백만원" not in self.data:
-                                for idx, cell in enumerate(row):
-                                    if cell.strip() == "원":
-                                        if idx + 1 < len(row):
-                                            num = parse_number(row[idx + 1])
-                                            if num and abs(num) > 100000000:  # 1억원 이상
-                                                self.data["적용이익_백만원"] = round(num / 1000000, 2)
-                                                break
+                # 적용이익: 다양한 패턴으로 추출
+                earnings_labels = ["당기순이익", "순이익", "매출액", "EBITDA", "영업이익",
+                                   "자본총계", "지배주주 귀속 순이익", "지배주주귀속순이익"]
+                is_earnings_row = False
+
+                # 패턴A: ① 또는 (A) + 이익 키워드
+                if ("①" in joined or re.search(r'\(A\)', joined)) and any(lbl in joined for lbl in earnings_labels):
+                    is_earnings_row = True
+                # 패턴B: "적용 당기순이익" / "추정 당기순이익" / "적용순이익" / "적용 매출액" 등 직접 레이블
+                elif any(kw in joined for kw in [
+                    "적용 당기순이익", "적용당기순이익", "적용 순이익", "적용순이익",
+                    "추정 당기순이익", "추정당기순이익",
+                    "적용 매출액", "적용매출액", "적용 EBITDA", "적용EBITDA"
+                ]):
+                    if "현재가치" not in joined and "현가" not in joined:
+                        is_earnings_row = True
+                    elif "적용이익_백만원" not in self.data:
+                        is_earnings_row = True  # 원본 없으면 현재가치/현가도 사용
+                # 패턴C: "당기순이익" 단독 레이블 (첫 셀에 이익 키워드 + 숫자 있는 행)
+                elif len(row) >= 2 and any(lbl in row[0] for lbl in earnings_labels):
+                    if re.search(r'[\d,]+\s*(?:백만원|천원|억원|원)', joined):
+                        is_earnings_row = True
+                    # 숫자만 있고 단위가 없는 경우 (레이블에 단위 포함 or 밸류에이션 테이블 컨텍스트)
+                    elif re.search(r'[\d,]{4,}', joined) and "제외" not in joined:
+                        is_earnings_row = True
+                # 패턴D: "20XX년 당기순이익" (추정/예상 없이도 매칭)
+                elif re.search(r'20\d{2}년.*(?:당기순이익|순이익|EBITDA)', joined):
+                    if "현재가치" not in joined and "현가" not in joined:
+                        is_earnings_row = True
+                    elif "적용이익_백만원" not in self.data:
+                        is_earnings_row = True
+                # 패턴E: "추정 당기순이익 현가" (현가 = 현재가치 축약형, 값으로 사용 가능)
+                elif re.search(r'추정.*순이익.*현가', joined):
+                    if "적용이익_백만원" not in self.data:
+                        is_earnings_row = True
+
+                if is_earnings_row and "적용이익_백만원" not in self.data:
+                    self._parse_earnings_value(joined, row)
 
                 # EV/EBITDA 전용: 순차입금, 비지배지분, 공모유입자금
                 ev_fields = [
@@ -506,8 +610,9 @@ class IPOExtractor:
                                             break
 
                         # 평가 시가총액 / 기업가치 평가액 / 적정시가총액
-                        cap_kws = ["평가 시가총액", "기업가치 평가액", "적정시가총액", "기업가치평가액",
-                                   "적용 시가총액", "적정시가총액", "평가시가총액"]
+                        cap_kws = ["평가 시가총액", "기업가치 평가액", "적정시가총액", "적정 시가총액",
+                                   "기업가치평가액", "적용 시가총액", "적용시가총액", "평가시가총액",
+                                   "예상 시가총액", "적용 기업가치", "적정 시총", "자기자본의 가치"]
                         if any(kw in joined for kw in cap_kws):
                             if "적용주식수" not in joined and "기준시가" not in joined:
                                 # 백만원 단위
@@ -524,6 +629,26 @@ class IPOExtractor:
                                         val = parse_number(match.group(1))
                                         if val and val > 1:
                                             self.data["적정시가총액_억원"] = val
+                                # 천원 단위
+                                if "적정시가총액_억원" not in self.data:
+                                    match = re.search(r'([\d,]+)\s*천원', joined)
+                                    if match:
+                                        val = parse_number(match.group(1))
+                                        if val and val > 100000:
+                                            self.data["적정시가총액_억원"] = round(val / 100000, 2)
+                                # 단위 별도 셀: "백만원" 셀 옆에 숫자
+                                if "적정시가총액_억원" not in self.data:
+                                    for idx, cell in enumerate(row):
+                                        if cell.strip() == "백만원" and idx + 1 < len(row):
+                                            num = parse_number(row[idx + 1])
+                                            if num and num > 100:
+                                                self.data["적정시가총액_억원"] = round(num / 100, 2)
+                                                break
+                                        elif cell.strip() == "백만원" and idx - 1 >= 0:
+                                            num = parse_number(row[idx - 1])
+                                            if num and num > 100:
+                                                self.data["적정시가총액_억원"] = round(num / 100, 2)
+                                                break
 
                         # 주당 평가가액/평가가격/평가가치
                         if ("주당 평가가액" in joined or "주당 평가 가액" in joined
@@ -735,7 +860,13 @@ class IPOExtractor:
         # 1순위: 주당 평가가액 산출 내역 테이블 (뒤에서부터 = 정정 후)
         for t in reversed(self.tables):
             flat = " ".join(" ".join(r) for r in t["rows"])
-            if "공모주식수" in flat and ("신주모집" in flat or "공모 후" in flat):
+            # 텍스트 과다 테이블 필터링 (평균 행 길이 500자 이상이면 스킵)
+            avg_row_len = sum(len(" ".join(r)) for r in t["rows"]) / max(len(t["rows"]), 1)
+            if avg_row_len > 500:
+                continue
+            # 신주모집/모집주식수/공모 신주발행 등 키워드 확장
+            share_kws = ["신주모집", "모집주식수", "공모 신주발행", "신주발행주식수", "공모 후"]
+            if "공모주식수" in flat and any(kw in flat for kw in share_kws):
                 for row in t["rows"]:
                     joined = " ".join(row)
                     # 공모주식수
@@ -743,8 +874,8 @@ class IPOExtractor:
                         nums = [parse_number(c) for c in row if parse_number(c) and 1000 < parse_number(c) < 500000000]
                         if nums:
                             self.data["공모주식수"] = nums[0]
-                    # 신주모집주식수
-                    if "신주모집" in joined:
+                    # 신주모집주식수 (확장된 키워드)
+                    if any(kw in joined for kw in ["신주모집", "모집주식수", "공모 신주발행", "신주발행주식수"]):
                         nums = [parse_number(c) for c in row if parse_number(c) and 1000 < parse_number(c) < 500000000]
                         if nums:
                             self.data["신주"] = nums[0]
@@ -870,13 +1001,26 @@ class IPOExtractor:
         """유통가능주식수"""
         candidates = find_tables_with_keywords(
             self.tables,
-            ["유통가능", "상장일 유통"]
+            ["유통가능", "상장일 유통", "유통 가능", "유통물량"]
         )
 
         for t, score in candidates:
             for row in t["rows"]:
                 joined = " ".join(row)
+                # 기존: "상장일" + "유통"
+                # 확장: "합계"/"총계"/"상장 직후"/"공모 후 합계" 등 요약 행도 매칭
+                float_row = False
                 if "상장일" in joined and "유통" in joined:
+                    float_row = True
+                elif ("합계" in joined or "총계" in joined or "소계" in joined) and "유통" not in joined:
+                    # 합계 행에서 퍼센트 있으면 유통비율 행일 수 있음
+                    pcts = [parse_percentage(c) for c in row if parse_percentage(c)]
+                    if pcts:
+                        float_row = True
+                elif "상장 직후" in joined or "공모 후 합계" in joined:
+                    float_row = True
+
+                if float_row:
                     nums = [parse_number(c) for c in row if parse_number(c)]
                     pcts = [parse_percentage(c) for c in row if parse_percentage(c)]
                     if nums:

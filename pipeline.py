@@ -1,6 +1,6 @@
 """
 IPO Dashboard - 일괄 처리 파이프라인
-KIND 목록 → DART 투자설명서 검색 → 파싱 → DB 저장
+KIND 신규상장기업현황 → DART 투자설명서 검색 → 파싱 → DB 저장
 """
 
 import os
@@ -9,7 +9,6 @@ import time
 import requests
 import zipfile
 import io
-import json
 from lxml import etree
 
 from kind_scraper import get_kind_ipo_list
@@ -20,12 +19,9 @@ DART_API_KEY = "359212a47d6222104789f5d610aa3896471f8227"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DOCS_DIR = os.path.join(BASE_DIR, "docs")
 
-# SPAC 필터링 키워드
-SPAC_KEYWORDS = ["스팩", "SPAC", "기업인수목적"]
-
 
 def load_corp_codes():
-    """DART 고유번호 파일 로드 (이름 → corp_code 매핑)"""
+    """DART 고유번호 파일 로드 (이름 → corp_code 매핑 + stock_code → corp_code 매핑)"""
     corp_code_file = os.path.join(BASE_DIR, "CORPCODE.xml")
 
     if not os.path.exists(corp_code_file):
@@ -38,19 +34,22 @@ def load_corp_codes():
     tree = etree.parse(corp_code_file)
     root = tree.getroot()
 
-    mapping = {}
+    name_map = {}
+    stock_map = {}
     for corp in root.findall(".//list"):
         name = corp.findtext("corp_name", "")
         code = corp.findtext("corp_code", "")
-        stock = corp.findtext("stock_code", "")
+        stock = corp.findtext("stock_code", "").strip()
         if name and code:
-            mapping[name] = {"corp_code": code, "stock_code": stock}
+            name_map[name] = {"corp_code": code, "stock_code": stock}
+        if stock and code:
+            stock_map[stock] = {"corp_code": code, "corp_name": name}
 
-    return mapping
+    return name_map, stock_map
 
 
 def search_prospectus(corp_code):
-    """DART에서 투자설명서 검색 (재시도 포함)"""
+    """DART에서 투자설명서 검색 — 다운로드 가능한 것만 반환"""
     url = "https://opendart.fss.or.kr/api/list.json"
     params = {
         "crtfc_key": DART_API_KEY,
@@ -86,17 +85,14 @@ def search_prospectus(corp_code):
     ]
 
     if prospectus:
-        # IPO 투자설명서 선별: 가장 오래된 것부터 (IPO가 가장 먼저 제출됨)
         prospectus.sort(key=lambda x: x.get("rcept_dt", ""))
-        # [기재정정] 버전이 있으면 같은 시기의 정정본 우선
-        # 가장 오래된 접수일 기준으로 해당 시기의 투자설명서 중 가장 최신(정정본)
-        oldest_date = prospectus[0].get("rcept_dt", "")[:6]  # YYYYMM
+        oldest_date = prospectus[0].get("rcept_dt", "")[:6]
         same_period = [p for p in prospectus if p.get("rcept_dt", "")[:6] <= oldest_date[:4] + "12"]
         if same_period:
-            # 같은 시기 중 가장 최신 (정정본)
+            # 같은 시기 중 가장 최신 (정정본) 우선, 다운로드 불가 시 다음 후보
             same_period.sort(key=lambda x: x.get("rcept_dt", ""), reverse=True)
-            return same_period[0], None
-        return prospectus[0], None
+            return same_period, None
+        return [prospectus[0]], None
 
     # 증권신고서로 대체 (지분증권만)
     securities = [
@@ -106,67 +102,75 @@ def search_prospectus(corp_code):
     ]
 
     if securities:
-        return securities[0], None
+        return [securities[0]], None
 
     return None, "투자설명서/증권신고서 없음"
 
 
-def download_and_parse(rcept_no, company_name, max_retries=3):
-    """공시서류 다운로드 → 파싱 (이미 다운로드된 문서 재활용)"""
+def download_and_parse(filing_candidates, company_name, max_retries=2):
+    """공시서류 다운로드 → 파싱 (다운로드 실패 시 다음 후보로 fallback)"""
     save_dir = os.path.join(DOCS_DIR, company_name)
     os.makedirs(save_dir, exist_ok=True)
 
     # 이미 다운로드된 파일이 있으면 재활용
     existing_files = [f for f in os.listdir(save_dir) if f.endswith((".xml", ".html", ".htm"))] if os.path.exists(save_dir) else []
 
-    if not existing_files:
-        # 다운로드 (재시도 포함)
+    if existing_files:
+        filepath = os.path.join(save_dir, existing_files[0])
+        try:
+            data = extract_ipo_data(filepath)
+            return data, filing_candidates[0]["rcept_no"], None
+        except Exception as e:
+            return None, None, f"파싱 에러: {str(e)[:100]}"
+
+    # 후보 순서대로 다운로드 시도
+    for filing in filing_candidates:
+        rcept_no = filing["rcept_no"]
+
         for attempt in range(max_retries):
             try:
                 url = "https://opendart.fss.or.kr/api/document.xml"
                 params = {"crtfc_key": DART_API_KEY, "rcept_no": rcept_no}
                 resp = requests.get(url, params=params, timeout=30)
 
-                if b"<?xml" in resp.content[:100] and b"err_code" in resp.content[:500]:
-                    return None, f"다운로드 에러: {resp.content[:200].decode('utf-8', errors='replace')}"
+                # DART 에러 응답 (XML) — 다음 후보로
+                if resp.content[:4] != b"PK\x03\x04":
+                    break
 
                 with zipfile.ZipFile(io.BytesIO(resp.content)) as zf:
                     for name in zf.namelist():
-                        # zip 내 파일명이 /로 시작하는 경우 제거
                         safe_name = name.lstrip("/")
                         filepath = os.path.join(save_dir, safe_name)
                         with open(filepath, "wb") as f:
-                            f.write(zf.read(name))  # name은 원본, filepath만 safe_name 사용
-                break
+                            f.write(zf.read(name))
+
+                # 파싱
+                for fname in os.listdir(save_dir):
+                    if fname.endswith((".xml", ".html", ".htm")):
+                        filepath = os.path.join(save_dir, fname)
+                        try:
+                            data = extract_ipo_data(filepath)
+                            return data, rcept_no, None
+                        except Exception as e:
+                            return None, rcept_no, f"파싱 에러: {str(e)[:100]}"
+
+                return None, rcept_no, "파싱 가능한 파일 없음"
+
             except (requests.ConnectionError, requests.Timeout, zipfile.BadZipFile) as e:
                 if attempt < max_retries - 1:
                     time.sleep(3)
                 else:
-                    return None, f"다운로드 실패: {str(e)[:80]}"
+                    break  # 다음 후보로
 
-    # XML/HTML 파일 찾아서 파싱
-    for fname in os.listdir(save_dir):
-        if fname.endswith((".xml", ".html", ".htm")):
-            filepath = os.path.join(save_dir, fname)
-            try:
-                data = extract_ipo_data(filepath)
-                return data, None
-            except Exception as e:
-                return None, f"파싱 에러: {str(e)[:100]}"
+        # 이 후보 실패 — 다음 후보 시도 전 정리
+        for f in os.listdir(save_dir):
+            os.remove(os.path.join(save_dir, f))
+        time.sleep(0.5)
 
-    return None, "파싱 가능한 파일 없음"
+    return None, None, "모든 후보 다운로드 실패"
 
 
-def is_spac(company):
-    """SPAC 여부 판단"""
-    name = company.get("회사명", "")
-    product = company.get("주요제품", "")
-    sector = company.get("업종", "")
-    combined = f"{name} {product} {sector}"
-    return any(kw in combined for kw in SPAC_KEYWORDS)
-
-
-def run_pipeline(skip_spac=True):
+def run_pipeline():
     """전체 파이프라인 실행"""
     print("=" * 60)
     print("IPO Dashboard 파이프라인 시작")
@@ -175,33 +179,23 @@ def run_pipeline(skip_spac=True):
     # 1. DB 초기화
     init_db()
 
-    # 2. KIND에서 목록 가져오기
-    print("\n[1/4] KIND 상장법인 목록 수집...")
+    # 2. KIND 신규상장기업현황에서 목록 수집 (SPAC/리츠 이미 제외됨)
+    print("\n[1/4] KIND 신규상장기업현황 수집...")
     kosdaq = get_kind_ipo_list(start_date="2016-01-01", market_type="kosdaqMkt")
     kospi = get_kind_ipo_list(start_date="2016-01-01", market_type="stockMkt")
     all_companies = kosdaq + kospi
     print(f"  코스닥: {len(kosdaq)}건, 유가증권: {len(kospi)}건, 합계: {len(all_companies)}건")
 
-    # 3. SPAC 필터링 & DB 등록
-    spac_count = 0
-    registered = 0
+    # 3. DB 등록 (모두 pending)
     for company in all_companies:
-        if skip_spac and is_spac(company):
-            spac_count += 1
-            company["처리상태"] = "skipped"
-            company["처리메모"] = "SPAC"
-        else:
-            company["처리상태"] = "pending"
-
+        company["처리상태"] = "pending"
         upsert_company(company)
-        registered += 1
+    print(f"  DB 등록: {len(all_companies)}건")
 
-    print(f"  DB 등록: {registered}건 (SPAC 제외: {spac_count}건)")
-
-    # 4. DART 고유번호 로드
+    # 4. DART 고유번호 로드 (이름 매핑 + 종목코드 매핑)
     print("\n[2/4] DART 고유번호 매핑...")
-    corp_codes = load_corp_codes()
-    print(f"  총 {len(corp_codes)}개 법인 코드 로드")
+    name_map, stock_map = load_corp_codes()
+    print(f"  이름 매핑: {len(name_map)}개, 종목코드 매핑: {len(stock_map)}개")
 
     # 5. 미처리 회사 처리
     pending = get_pending_companies()
@@ -215,58 +209,74 @@ def run_pipeline(skip_spac=True):
         name = company["회사명"]
         print(f"\n  [{i+1}/{len(pending)}] {name} ({company.get('상장일', '')})")
 
-        # DART 고유번호 찾기
-        corp_info = corp_codes.get(name)
-        if not corp_info:
-            # 부분 매칭 시도
-            matches = [(k, v) for k, v in corp_codes.items() if name in k or k in name]
-            if matches:
-                corp_info = matches[0][1]
-                print(f"    부분 매칭: {matches[0][0]}")
-            else:
-                print(f"    ❌ DART 고유번호 없음")
-                upsert_company({**company, "처리상태": "failed", "처리메모": "DART 고유번호 없음"})
-                fail += 1
-                continue
+        # DART 고유번호 찾기: ① 이름 매칭 → ② 종목코드 매칭 → ③ 부분 매칭
+        corp_code = None
 
-        company["dart_corp_code"] = corp_info["corp_code"]
+        # ① 정확한 이름 매칭
+        corp_info = name_map.get(name)
+        if corp_info:
+            corp_code = corp_info["corp_code"]
+
+        # ② KIND 종목코드 → DART stock_code (KIND코드 × 10)
+        if not corp_code and company.get("종목코드"):
+            dart_stock = (str(company["종목코드"]) + "0").zfill(6)
+            stock_info = stock_map.get(dart_stock)
+            if stock_info:
+                corp_code = stock_info["corp_code"]
+                print(f"    종목코드 매칭: {stock_info['corp_name']}")
+
+        # ③ 부분 매칭
+        if not corp_code:
+            matches = [(k, v) for k, v in name_map.items() if name in k or k in name]
+            if matches:
+                corp_code = matches[0][1]["corp_code"]
+                print(f"    부분 매칭: {matches[0][0]}")
+
+        if not corp_code:
+            print(f"    DART 고유번호 없음")
+            upsert_company({**company, "처리상태": "failed", "처리메모": "DART 고유번호 없음"})
+            fail += 1
+            continue
+
+        company["dart_corp_code"] = corp_code
 
         # 투자설명서 검색
-        filing, error = search_prospectus(corp_info["corp_code"])
+        filing_candidates, error = search_prospectus(corp_code)
         if error:
-            print(f"    ❌ {error}")
+            print(f"    {error}")
             upsert_company({**company, "처리상태": "failed", "처리메모": error})
             fail += 1
             time.sleep(0.5)
             continue
 
-        company["dart_rcept_no"] = filing["rcept_no"]
-        print(f"    📄 {filing['report_nm']} ({filing['rcept_dt']})")
+        print(f"    {filing_candidates[0]['report_nm']} ({filing_candidates[0]['rcept_dt']})")
 
-        # 다운로드 & 파싱
-        ipo_data, error = download_and_parse(filing["rcept_no"], name)
+        # 다운로드 & 파싱 (실패 시 다음 후보로 fallback)
+        ipo_data, used_rcept_no, error = download_and_parse(filing_candidates, name)
         if error:
-            print(f"    ❌ {error}")
+            print(f"    {error}")
             upsert_company({**company, "처리상태": "failed", "처리메모": error})
             fail += 1
             time.sleep(0.5)
             continue
 
-        # DB 저장 - KIND 데이터(시장구분, 상장유형 등)를 extractor가 덮어쓰지 않도록 처리
-        # extractor의 시장구분/상장유형 제거 (KIND 데이터가 정확함)
-        ipo_data.pop("시장구분", None)
-        ipo_data.pop("상장유형", None)
+        company["dart_rcept_no"] = used_rcept_no
+
+        # DB 저장 — KIND 데이터가 정확하므로 extractor가 덮어쓰지 않도록 제거
+        for kind_field in ["시장구분", "상장유형", "확정공모가", "확정공모금액_억원", "대표주관회사"]:
+            ipo_data.pop(kind_field, None)
+
         merged = {**company, **ipo_data}
         merged["처리상태"] = "completed"
-        merged["처리메모"] = filing["report_nm"]
+        merged["처리메모"] = filing_candidates[0]["report_nm"]
         upsert_company(merged)
 
         extracted_count = sum(1 for k, v in ipo_data.items() if v is not None and v != 0)
-        print(f"    ✅ {extracted_count}개 필드 추출")
+        print(f"    {extracted_count}개 필드 추출")
         success += 1
 
-        # API 속도 제한 (분당 1000건)
-        time.sleep(1)
+        # API 속도 제한 (안전 마진)
+        time.sleep(1.5)
 
     # 6. 결과 요약
     stats = get_stats()
@@ -276,7 +286,6 @@ def run_pipeline(skip_spac=True):
     print(f"  전체: {stats['total']}건")
     print(f"  성공: {stats['completed']}건")
     print(f"  실패: {stats['failed']}건")
-    print(f"  SPAC 제외: {stats['skipped']}건")
     print(f"  미처리: {stats['pending']}건")
 
 
