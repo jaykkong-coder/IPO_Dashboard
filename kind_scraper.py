@@ -27,18 +27,13 @@ def parse_number(text):
             return None
 
 
-def get_kind_ipo_list(start_date="2016-01-01", end_date="2026-12-31", market_type="kosdaqMkt"):
+def get_kind_ipo_list(start_date="2016-01-01", end_date="2026-12-31", market_type=None):
     """
     KIND 신규상장기업현황에서 신규상장 기업 목록 조회
-
-    market_type: "kosdaqMkt"(코스닥) / "stockMkt"(유가증권)
-    내부적으로 KIND API의 marketType 값으로 변환: 1(유가증권) / 2(코스닥)
+    전체 시장 한번에 조회 (시장구분은 아이콘으로 자동 판별)
+    market_type 파라미터는 하위 호환용 (무시됨)
     """
     url = "https://kind.krx.co.kr/listinvstg/listingcompany.do"
-
-    # market_type 변환 (기존 호출부 호환)
-    market_code = "2" if market_type == "kosdaqMkt" else "1"
-    market_label = "코스닥" if market_type == "kosdaqMkt" else "유가증권"
 
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -53,7 +48,7 @@ def get_kind_ipo_list(start_date="2016-01-01", end_date="2026-12-31", market_typ
         "pageIndex": "1",
         "orderMode": "1",
         "orderStat": "D",
-        "marketType": market_code,
+        "marketType": "",  # 전체 시장
         "searchCorpName": "",
         "country": "",
         "industry": "",

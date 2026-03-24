@@ -181,9 +181,9 @@ def run_pipeline():
 
     # 2. KIND 신규상장기업현황에서 목록 수집 (SPAC/리츠 이미 제외됨)
     print("\n[1/4] KIND 신규상장기업현황 수집...")
-    kosdaq = get_kind_ipo_list(start_date="2016-01-01", market_type="kosdaqMkt")
-    kospi = get_kind_ipo_list(start_date="2016-01-01", market_type="stockMkt")
-    all_companies = kosdaq + kospi
+    all_companies = get_kind_ipo_list(start_date="2016-01-01")
+    kosdaq = [c for c in all_companies if c.get("시장구분") == "코스닥"]
+    kospi = [c for c in all_companies if c.get("시장구분") == "유가증권"]
     print(f"  코스닥: {len(kosdaq)}건, 유가증권: {len(kospi)}건, 합계: {len(all_companies)}건")
 
     # 3. DB 등록 (모두 pending)

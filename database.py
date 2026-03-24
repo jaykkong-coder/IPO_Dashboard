@@ -64,6 +64,8 @@ def init_db():
             기관경쟁률 REAL,
             의무보유확약비율 REAL,
             청약경쟁률_비례 REAL,
+            -- 상장트랙 (일반/기술특례/기술특례(성장성)/이익미실현/SPAC)
+            상장트랙 TEXT,
             -- 주가 수익률 (KIND 공모가대비주가추이)
             상장일시가 INTEGER,
             상장일시가등락률 REAL,
@@ -85,6 +87,19 @@ def init_db():
             UNIQUE(회사명, 상장일)
         );
     """)
+    conn.commit()
+
+    # 마이그레이션: 신규 컬럼 추가 (이미 존재하면 무시)
+    migrations = [
+        "ALTER TABLE ipo_companies ADD COLUMN 상장트랙 TEXT",
+        "ALTER TABLE ipo_companies ADD COLUMN 수요예측_참여기관수 INTEGER",
+    ]
+    for sql in migrations:
+        try:
+            conn.execute(sql)
+        except sqlite3.OperationalError:
+            pass  # 이미 존재하는 컬럼
+
     conn.commit()
     conn.close()
 
@@ -110,6 +125,8 @@ def upsert_company(data):
         "기관경쟁률",
         "의무보유확약비율",
         "청약경쟁률_비례",
+        "수요예측_참여기관수",
+        "상장트랙",
         "상장일시가", "상장일시가등락률",
         "상장일종가", "상장일종가등락률",
         "개월1_주가", "개월1_등락률",
