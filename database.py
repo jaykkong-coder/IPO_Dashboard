@@ -93,6 +93,10 @@ def init_db():
     migrations = [
         "ALTER TABLE ipo_companies ADD COLUMN 상장트랙 TEXT",
         "ALTER TABLE ipo_companies ADD COLUMN 수요예측_참여기관수 INTEGER",
+        "ALTER TABLE ipo_companies ADD COLUMN 우리사주조합_배정비율 REAL",
+        "ALTER TABLE ipo_companies ADD COLUMN 기관투자자_배정비율 REAL",
+        "ALTER TABLE ipo_companies ADD COLUMN 일반투자자_배정비율 REAL",
+        "ALTER TABLE ipo_companies ADD COLUMN 산업분류 TEXT",
     ]
     for sql in migrations:
         try:
@@ -127,6 +131,10 @@ def upsert_company(data):
         "청약경쟁률_비례",
         "수요예측_참여기관수",
         "상장트랙",
+        "우리사주조합_배정비율",
+        "기관투자자_배정비율",
+        "일반투자자_배정비율",
+        "산업분류",
         "상장일시가", "상장일시가등락률",
         "상장일종가", "상장일종가등락률",
         "개월1_주가", "개월1_등락률",

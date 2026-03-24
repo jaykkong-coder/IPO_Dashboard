@@ -6,3 +6,4 @@ poc_*.py
 poc_docs/
 poc_result.json
 debug_nulls.py
+ipo_data_backup_*.db

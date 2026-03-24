@@ -298,6 +298,175 @@ def update_db_with_price_data(db_path=None):
     return matched, unmatched
 
 
+def get_kind_group_allocation(start_date="2016-01-01", end_date="2026-12-31"):
+    """
+    KIND 신규상장기업 공모정보 상세 > 그룹별배정 수집.
+    각 회사의 우리사주조합/기관투자자/일반투자자 배정 비율(%)을 반환.
+
+    Returns: list of dicts with keys:
+        회사명, 상장일, 우리사주조합_배정비율, 기관투자자_배정비율, 일반투자자_배정비율
+    """
+    # Step 1: 목록에서 isurCd/bzProcsNo 수집
+    companies = get_kind_ipo_list(start_date=start_date, end_date=end_date)
+
+    list_url = "https://kind.krx.co.kr/listinvstg/listingcompany.do"
+    list_headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Referer": "https://kind.krx.co.kr/listinvstg/listingcompany.do?method=searchListingTypeMain",
+        "X-Requested-With": "XMLHttpRequest",
+    }
+    list_data = {
+        "method": "searchListingTypeSub",
+        "forward": "listingtype_sub",
+        "currentPageSize": "3000",
+        "pageIndex": "1",
+        "orderMode": "1",
+        "orderStat": "D",
+        "marketType": "",
+        "searchCorpName": "",
+        "country": "",
+        "industry": "",
+        "repMajAgntDesignAdvserComp": "",
+        "repMajAgntComp": "",
+        "designAdvserComp": "",
+        "listTypeArrStr": "01|",
+        "choicTypeArrStr": "01|02|03|04|05|",
+        "secuGrpArrStr": "0|ST|FS|MF|SC|RT|IF|DR|",
+        "fromDate": start_date,
+        "toDate": end_date,
+    }
+    resp = requests.post(list_url, data=list_data, headers=list_headers, timeout=30)
+    resp.encoding = "utf-8"
+    soup = BeautifulSoup(resp.text, "lxml")
+    rows = soup.select("table tbody tr")
+
+    # Build name -> (isurCd, bzProcsNo) map
+    detail_ids = {}
+    for row in rows:
+        cells = row.find_all("td")
+        if len(cells) < 12:
+            continue
+        name = cells[0].get_text(strip=True)
+        if not name:
+            continue
+        onclick = row.get("onclick", "")
+        match = re.search(r"fnDetailView\('([^']+)','([^']+)'\)", onclick)
+        if match:
+            detail_ids[name] = (match.group(1), match.group(2))
+
+    # Step 2: 각 회사 공모정보 상세 조회
+    detail_url = "https://kind.krx.co.kr/listinvstg/listcomdetail.do"
+    detail_headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Referer": "https://kind.krx.co.kr/listinvstg/listcomdetail.do?method=searchListComDetailMain",
+        "X-Requested-With": "XMLHttpRequest",
+    }
+    session = requests.Session()
+    session.headers.update(detail_headers)
+
+    results = []
+    for i, name in enumerate(detail_ids):
+        isur_cd, bz_procs_no = detail_ids[name]
+        data = {
+            "method": "searchListComPubofrDetail",
+            "menuIndex": "2",
+            "marketType": "",
+            "isurCd": isur_cd,
+            "bzProcsNo": bz_procs_no,
+            "scrnGb": "new",
+        }
+        try:
+            resp = session.post(detail_url, data=data, timeout=30)
+            resp.encoding = "utf-8"
+            alloc = _parse_group_allocation(resp.text)
+            if alloc:
+                results.append({
+                    "회사명": name,
+                    "우리사주조합_배정비율": alloc.get("우리사주조합"),
+                    "기관투자자_배정비율": alloc.get("기관투자자"),
+                    "일반투자자_배정비율": alloc.get("일반투자자"),
+                })
+        except Exception:
+            pass
+        time.sleep(0.35)
+
+        if (i + 1) % 100 == 0:
+            print(f"  그룹별배정 수집 진행: {i+1}/{len(detail_ids)}")
+
+    return results
+
+
+def _parse_group_allocation(html):
+    """공모정보 상세 HTML에서 그룹별배정 비율 파싱."""
+    soup = BeautifulSoup(html, "lxml")
+    result = {}
+    for table in soup.find_all("table"):
+        th = table.find("th", string=re.compile("그룹별배정"))
+        if not th:
+            continue
+        for row in table.find_all("tr"):
+            th_cell = row.find("th", scope="row")
+            if not th_cell:
+                continue
+            label = th_cell.get_text(strip=True)
+            tds = row.find_all("td")
+            if len(tds) >= 3:
+                ratio_text = tds[2].get_text(strip=True)
+                try:
+                    if ratio_text and ratio_text != "-":
+                        result[label] = float(ratio_text)
+                    else:
+                        result[label] = 0.0  # "-" = 배정 없음 = 0%
+                except ValueError:
+                    result[label] = 0.0
+    return result
+
+
+def update_db_with_group_allocation(db_path=None):
+    """
+    KIND 그룹별배정 데이터를 스크래핑하여 DB에 업데이트.
+    회사명으로 매칭하여 배정비율 컬럼만 갱신.
+    """
+    import sqlite3
+    import os
+
+    if db_path is None:
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ipo_data.db")
+
+    print("  KIND 그룹별배정 수집 중...")
+    records = get_kind_group_allocation()
+    print(f"  총 수집: {len(records)}건")
+
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    db_companies = conn.execute("SELECT id, 회사명 FROM ipo_companies").fetchall()
+    db_name_map = {row["회사명"]: row["id"] for row in db_companies}
+
+    alloc_fields = ["우리사주조합_배정비율", "기관투자자_배정비율", "일반투자자_배정비율"]
+    update_sql = f"""
+        UPDATE ipo_companies SET
+            {', '.join(f'{f} = ?' for f in alloc_fields)},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+    """
+
+    matched = 0
+    for rec in records:
+        name = rec["회사명"]
+        if name in db_name_map:
+            values = [rec.get(f) for f in alloc_fields]
+            values.append(db_name_map[name])
+            conn.execute(update_sql, values)
+            matched += 1
+
+    conn.commit()
+    conn.close()
+
+    unmatched = len(records) - matched
+    print(f"  DB 매칭: {matched}건 업데이트, {unmatched}건 미매칭")
+    return matched, unmatched
+
+
 if __name__ == "__main__":
     print("=" * 70)
     print("KIND 신규상장기업현황 크롤링 테스트")
