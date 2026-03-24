@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPO Report Design System</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+  :root {
+    --navy-900: #0B1D3A; --navy-800: #0F2847; --navy-700: #163560; --navy-600: #1B4178; --navy-500: #2558A3;
+    --accent-blue: #3B82C4; --accent-teal: #2BA5A5; --accent-gold: #D4A843;
+    --meritz-orange: #EF3B24; --meritz-gray: #6D6E71;
+    --gray-900: #1A1A1A; --gray-700: #404040; --gray-600: #525252; --gray-500: #6B6B6B; --gray-400: #8E8E8E;
+    --gray-300: #B8B8B8; --gray-200: #D6D6D6; --gray-100: #ECECEC; --gray-50: #F7F7F7; --white: #FFFFFF;
+    --positive: #1A8754; --negative: #C53030; --warning: #D4A843; --info: #3B82C4;
+    --chart-1: #2558A3; --chart-2: #2BA5A5; --chart-3: #D4A843; --chart-4: #7B61A6; --chart-5: #C53030; --chart-6: #8E8E8E;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Pretendard',-apple-system,'Segoe UI',sans-serif;background:#f4f5f7;color:var(--gray-900);line-height:1.6}
+  .ds-container{max-width:1100px;margin:0 auto;padding:40px 24px}
+  .ds-header{text-align:center;margin-bottom:60px}
+  .ds-header h1{font-size:36pt;font-weight:800;color:var(--navy-900);letter-spacing:-1px}
+  .ds-header p{font-size:14pt;color:var(--gray-500);margin-top:8px}
+  .ds-section{margin-bottom:50px}
+  .ds-section h2{font-size:20pt;font-weight:700;color:var(--navy-800);margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid var(--navy-800);position:relative}
+  .ds-section h2::after{content:'';position:absolute;bottom:-2px;left:0;width:50px;height:2px;background:var(--meritz-orange)}
+  .ds-section h3{font-size:14pt;font-weight:600;color:var(--gray-700);margin:20px 0 10px}
+  .ds-grid{display:grid;gap:16px}
+  .ds-grid--2{grid-template-columns:1fr 1fr}
+  .ds-grid--3{grid-template-columns:1fr 1fr 1fr}
+  .ds-grid--4{grid-template-columns:1fr 1fr 1fr 1fr}
+  .ds-card{background:white;border-radius:8px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  .ds-code{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:4px;padding:12px;font-family:'Consolas','Monaco',monospace;font-size:10pt;color:var(--gray-700);margin-top:8px;overflow-x:auto;white-space:pre-wrap}
+
+  /* ===== 리포트에서 가져온 컴포넌트 ===== */
+  .page-header{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:8px;border-bottom:2.5px solid var(--navy-800);margin-bottom:12px;position:relative}
+  .page-header::after{content:'';position:absolute;bottom:-2.5px;left:0;width:60px;height:2.5px;background:var(--meritz-orange)}
+  .page-header__logo{display:flex;align-items:center;gap:10px}
+  .page-header__logo-mark{display:flex;align-items:center}
+  .page-header__logo-mark svg{height:18px;width:auto}
+  .page-header__company{font-size:12pt;font-weight:600;color:var(--meritz-gray);padding-left:10px;border-left:1px solid var(--gray-200)}
+  .page-header__meta{text-align:right;font-size:11pt;color:var(--gray-500);line-height:1.4}
+  .page-header__confidential{font-size:9pt;font-weight:600;color:var(--negative);text-transform:uppercase;letter-spacing:1px}
+
+  .slide-title{margin-bottom:10px}
+  .slide-title__main{font-size:18pt;font-weight:800;color:var(--navy-900);line-height:1.3;letter-spacing:-.3px;margin-bottom:2px}
+  .slide-title__sub{font-size:12pt;color:var(--gray-500);font-weight:400}
+
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+  .kpi-card{background:var(--gray-50);border:1px solid var(--gray-100);border-radius:4px;padding:10px 12px}
+  .kpi-card--highlight{background:var(--navy-900);border-color:var(--navy-900);border-top:2.5px solid var(--meritz-orange)}
+  .kpi-card--highlight .kpi-card__label,.kpi-card--highlight .kpi-card__value,.kpi-card--highlight .kpi-card__delta{color:var(--white)}
+  .kpi-card__label{font-size:10pt;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .kpi-card__value{font-size:26pt;font-weight:800;color:var(--navy-900);line-height:1.1}
+  .kpi-card__delta{font-size:11pt;font-weight:600;margin-top:3px}
+  .kpi-card__delta--positive{color:var(--positive)}
+  .kpi-card__delta--negative{color:var(--negative)}
+  .kpi-card--highlight .kpi-card__delta--positive{color:#6EE7B7}
+
+  .panel{border:1px solid var(--gray-200);border-radius:4px;padding:10px;display:flex;flex-direction:column}
+  .panel__title{font-size:12pt;font-weight:700;color:var(--navy-800);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:baseline}
+  .panel__title-unit{font-size:10pt;font-weight:400;color:var(--gray-400)}
+  .panel__chart{flex:1;position:relative;min-height:200px}
+
+  .data-table{width:100%;border-collapse:collapse;font-size:11pt;line-height:1.4}
+  .data-table thead th{background:var(--navy-800);color:var(--white);font-weight:600;padding:5px 6px;text-align:left;font-size:10pt;white-space:nowrap}
+  .data-table thead th:first-child{border-radius:3px 0 0 0}
+  .data-table thead th:last-child{border-radius:0 3px 0 0}
+  .data-table tbody td{padding:4px 6px;border-bottom:1px solid var(--gray-100)}
+  .data-table tbody tr:nth-child(even){background:var(--gray-50)}
+  .data-table .num{text-align:right;font-variant-numeric:tabular-nums}
+  .data-table .bold{font-weight:700}
+  .data-table .positive{color:var(--positive);font-weight:600}
+  .data-table .negative{color:var(--negative);font-weight:600}
+
+  .callout{background:#F0F5FA;border-left:3px solid var(--navy-600);padding:12px 16px;border-radius:0 4px 4px 0;margin-top:6px}
+  .callout__label{font-size:10pt;font-weight:700;color:var(--navy-600);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px}
+  .callout__text{font-size:12pt;color:var(--navy-900);line-height:1.5;font-weight:500}
+
+  .commentary{list-style:none;padding:0}
+  .commentary li{font-size:11pt;line-height:1.5;padding:3px 0 3px 12px;position:relative;color:var(--gray-700);border-bottom:1px solid var(--gray-100)}
+  .commentary li:last-child{border-bottom:none}
+  .commentary li::before{content:'';position:absolute;left:0;top:11px;width:5px;height:5px;background:var(--navy-600);border-radius:50%}
+
+  .legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:5px}
+  .legend__item{display:flex;align-items:center;gap:4px;font-size:10pt;color:var(--gray-600)}
+  .legend__dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+  .page-footer{padding-top:6px;border-top:1px solid var(--gray-200);display:flex;justify-content:space-between;align-items:flex-end}
+  .page-footer__source{font-size:10pt;color:var(--gray-400);line-height:1.4;max-width:70%}
+  .page-footer__page{font-size:10pt;font-weight:700;color:var(--meritz-orange)}
+
+  @media (max-width:768px){.ds-grid--2,.ds-grid--3,.ds-grid--4{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="ds-container">
+
+<!-- Header -->
+<div class="ds-header">
+  <h1>IPO Report Design System</h1>
+  <p>메리츠증권 IPO Analysis 리포트 디자인 컴포넌트 레퍼런스</p>
+</div>
+
+<!-- ===== 1. Colors ===== -->
+<div class="ds-section">
+  <h2>1. Colors</h2>
+
+  <h3>Brand</h3>
+  <div class="ds-grid ds-grid--4">
+    <div class="ds-card">
+      <div style="height:60px;border-radius:4px;background:#EF3B24;margin-bottom:8px"></div>
+      <strong>Meritz Orange</strong><br><code>#EF3B24</code>
+    </div>
+    <div class="ds-card">
+      <div style="height:60px;border-radius:4px;background:#0B1D3A;margin-bottom:8px"></div>
+      <strong>Navy 900</strong><br><code>#0B1D3A</code>
+    </div>
+    <div class="ds-card">
+      <div style="height:60px;border-radius:4px;background:#0F2847;margin-bottom:8px"></div>
+      <strong>Navy 800</strong><br><code>#0F2847</code>
+    </div>
+    <div class="ds-card">
+      <div style="height:60px;border-radius:4px;background:#6D6E71;margin-bottom:8px"></div>
+      <strong>Meritz Gray</strong><br><code>#6D6E71</code>
+    </div>
+  </div>
+
+  <h3>Chart Palette (6색)</h3>
+  <div class="ds-grid ds-grid--3" style="grid-template-columns:repeat(6,1fr)">
+    <div class="ds-card" style="padding:12px;text-align:center"><div style="height:40px;border-radius:4px;background:#2558A3;margin-bottom:6px"></div><code style="font-size:9pt">#2558A3</code><br><small>Chart-1</small></div>
+    <div class="ds-card" style="padding:12px;text-align:center"><div style="height:40px;border-radius:4px;background:#2BA5A5;margin-bottom:6px"></div><code style="font-size:9pt">#2BA5A5</code><br><small>Chart-2</small></div>
+    <div class="ds-card" style="padding:12px;text-align:center"><div style="height:40px;border-radius:4px;background:#D4A843;margin-bottom:6px"></div><code style="font-size:9pt">#D4A843</code><br><small>Chart-3</small></div>
+    <div class="ds-card" style="padding:12px;text-align:center"><div style="height:40px;border-radius:4px;background:#7B61A6;margin-bottom:6px"></div><code style="font-size:9pt">#7B61A6</code><br><small>Chart-4</small></div>
+    <div class="ds-card" style="padding:12px;text-align:center"><div style="height:40px;border-radius:4px;background:#C53030;margin-bottom:6px"></div><code style="font-size:9pt">#C53030</code><br><small>Chart-5</small></div>
+    <div class="ds-card" style="padding:12px;text-align:center"><div style="height:40px;border-radius:4px;background:#8E8E8E;margin-bottom:6px"></div><code style="font-size:9pt">#8E8E8E</code><br><small>Chart-6</small></div>
+  </div>
+
+  <h3>Semantic</h3>
+  <div class="ds-grid ds-grid--4">
+    <div class="ds-card"><div style="height:40px;border-radius:4px;background:#1A8754;margin-bottom:6px"></div><strong>Positive</strong> <code>#1A8754</code></div>
+    <div class="ds-card"><div style="height:40px;border-radius:4px;background:#C53030;margin-bottom:6px"></div><strong>Negative</strong> <code>#C53030</code></div>
+    <div class="ds-card"><div style="height:40px;border-radius:4px;background:#D4A843;margin-bottom:6px"></div><strong>Warning</strong> <code>#D4A843</code></div>
+    <div class="ds-card"><div style="height:40px;border-radius:4px;background:#3B82C4;margin-bottom:6px"></div><strong>Info</strong> <code>#3B82C4</code></div>
+  </div>
+
+  <h3>Gray Scale</h3>
+  <div class="ds-grid" style="grid-template-columns:repeat(9,1fr)">
+    <div class="ds-card" style="padding:8px;text-align:center"><div style="height:30px;border-radius:4px;background:#1A1A1A;margin-bottom:4px"></div><small>900</small></div>
+    <div class="ds-card" style="padding:8px;text-align:center"><div style="height:30px;border-radius:4px;background:#404040;margin-bottom:4px"></div><small>700</small></div>
+    <div class="ds-card" style="padding:8px;text-align:center"><div style="height:30px;border-radius:4px;background:#525252;margin-bottom:4px"></div><small>600</small></div>
+    <div class="ds-card" style="padding:8px;text-align:center"><div style="height:30px;border-radius:4px;background:#6B6B6B;margin-bottom:4px"></div><small>500</small></div>
+    <div class="ds-card" style="padding:8px;text-align:center"><div style="height:30px;border-radius:4px;background:#8E8E8E;margin-bottom:4px"></div><small>400</small></div>
+    <div class="ds-card" style="padding:8px;text-align:center"><div style="height:30px;border-radius:4px;background:#D6D6D6;margin-bottom:4px"></div><small>200</small></div>
+    <div class="ds-card" style="padding:8px;text-align:center"><div style="height:30px;border-radius:4px;background:#ECECEC;margin-bottom:4px"></div><small>100</small></div>
+    <div class="ds-card" style="padding:8px;text-align:center"><div style="height:30px;border-radius:4px;background:#F7F7F7;border:1px solid #eee;margin-bottom:4px"></div><small>50</small></div>
+    <div class="ds-card" style="padding:8px;text-align:center"><div style="height:30px;border-radius:4px;background:#FFFFFF;border:1px solid #eee;margin-bottom:4px"></div><small>White</small></div>
+  </div>
+</div>
+
+<!-- ===== 2. Typography ===== -->
+<div class="ds-section">
+  <h2>2. Typography</h2>
+  <div class="ds-card">
+    <p style="font-size:10pt;color:var(--gray-400);margin-bottom:12px">Font: Pretendard Variable</p>
+    <table style="width:100%;border-collapse:collapse;font-size:11pt">
+      <thead><tr style="border-bottom:2px solid var(--navy-800)"><th style="text-align:left;padding:6px">용도</th><th style="text-align:left;padding:6px">Class</th><th style="text-align:right;padding:6px">Size</th><th style="text-align:right;padding:6px">Weight</th><th style="text-align:left;padding:6px 6px 6px 20px">Preview</th></tr></thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:8px 6px">슬라이드 제목</td><td style="padding:8px 6px"><code>.slide-title__main</code></td><td style="text-align:right;padding:8px 6px">18pt</td><td style="text-align:right;padding:8px 6px">800</td><td style="padding:8px 6px 8px 20px;font-size:18pt;font-weight:800;color:var(--navy-900)">IPO 시장 현황</td></tr>
+        <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:8px 6px">슬라이드 부제</td><td style="padding:8px 6px"><code>.slide-title__sub</code></td><td style="text-align:right;padding:8px 6px">12pt</td><td style="text-align:right;padding:8px 6px">400</td><td style="padding:8px 6px 8px 20px;font-size:12pt;font-weight:400;color:var(--gray-500)">2016-2025 분석</td></tr>
+        <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:8px 6px">KPI 값</td><td style="padding:8px 6px"><code>.kpi-card__value</code></td><td style="text-align:right;padding:8px 6px">26pt</td><td style="text-align:right;padding:8px 6px">800</td><td style="padding:8px 6px 8px 20px;font-size:26pt;font-weight:800;color:var(--navy-900)">738건</td></tr>
+        <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:8px 6px">KPI 라벨</td><td style="padding:8px 6px"><code>.kpi-card__label</code></td><td style="text-align:right;padding:8px 6px">10pt</td><td style="text-align:right;padding:8px 6px">600</td><td style="padding:8px 6px 8px 20px;font-size:10pt;font-weight:600;color:var(--gray-500);text-transform:uppercase">누적 상장건수</td></tr>
+        <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:8px 6px">패널 제목</td><td style="padding:8px 6px"><code>.panel__title</code></td><td style="text-align:right;padding:8px 6px">12pt</td><td style="text-align:right;padding:8px 6px">700</td><td style="padding:8px 6px 8px 20px;font-size:12pt;font-weight:700;color:var(--navy-800)">연도별 상장건수</td></tr>
+        <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:8px 6px">본문</td><td style="padding:8px 6px"><code>body</code></td><td style="text-align:right;padding:8px 6px">13pt</td><td style="text-align:right;padding:8px 6px">400</td><td style="padding:8px 6px 8px 20px;font-size:13pt">기본 본문 텍스트</td></tr>
+        <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:8px 6px">테이블</td><td style="padding:8px 6px"><code>.data-table</code></td><td style="text-align:right;padding:8px 6px">11pt</td><td style="text-align:right;padding:8px 6px">400</td><td style="padding:8px 6px 8px 20px;font-size:11pt">테이블 셀 텍스트</td></tr>
+        <tr><td style="padding:8px 6px">출처</td><td style="padding:8px 6px"><code>.page-footer__source</code></td><td style="text-align:right;padding:8px 6px">10pt</td><td style="text-align:right;padding:8px 6px">400</td><td style="padding:8px 6px 8px 20px;font-size:10pt;color:var(--gray-400)">Source: KRX KIND</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== 3. Page Layout ===== -->
+<div class="ds-section">
+  <h2>3. Page Layout</h2>
+  <div class="ds-card">
+    <div class="ds-grid ds-grid--2">
+      <div>
+        <h3 style="margin-top:0">Page Spec</h3>
+        <table style="font-size:11pt;border-collapse:collapse;width:100%">
+          <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:6px;font-weight:600">Size</td><td style="padding:6px">A4 Landscape (297mm × 210mm)</td></tr>
+          <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:6px;font-weight:600">Margin Top</td><td style="padding:6px">14mm</td></tr>
+          <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:6px;font-weight:600">Margin Bottom</td><td style="padding:6px">12mm</td></tr>
+          <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:6px;font-weight:600">Margin Left/Right</td><td style="padding:6px">16mm</td></tr>
+          <tr><td style="padding:6px;font-weight:600">Print</td><td style="padding:6px">page-break-after: always</td></tr>
+        </table>
+      </div>
+      <div>
+        <h3 style="margin-top:0">Page Structure (flex column)</h3>
+        <div style="border:2px solid var(--navy-800);border-radius:4px;padding:8px;font-size:10pt;display:flex;flex-direction:column;gap:4px;height:260px">
+          <div style="background:var(--gray-100);padding:6px;border-radius:2px;text-align:center;flex-shrink:0">Header (flex-shrink:0)</div>
+          <div style="background:var(--gray-100);padding:6px;border-radius:2px;text-align:center;flex-shrink:0">Slide Title (flex-shrink:0)</div>
+          <div style="background:var(--gray-100);padding:4px;border-radius:2px;text-align:center;flex-shrink:0">KPI Row (optional, flex-shrink:0)</div>
+          <div style="background:#dbeafe;padding:6px;border-radius:2px;text-align:center;flex:1;display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--navy-800)">Content Grid (flex:1) — 차트/테이블</div>
+          <div style="background:#fef3c7;padding:6px;border-radius:2px;text-align:center;flex-shrink:0">Key Insight Callout (flex-shrink:0)</div>
+          <div style="background:var(--gray-100);padding:6px;border-radius:2px;text-align:center;flex-shrink:0">Footer (margin-top:auto)</div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-code">.page {
+  width: 297mm; height: 210mm;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.content-grid { flex: 1; min-height: 0; display: grid; gap: 10px; }
+.content-grid--2col { grid-template-columns: 1fr 1fr; }
+.content-grid--3col { grid-template-columns: 1fr 1fr 1fr; }
+.content-grid--60-40 { grid-template-columns: 3fr 2fr; }
+.content-grid--2x3 { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; }</div>
+  </div>
+</div>
+
+<!-- ===== 4. Components ===== -->
+<div class="ds-section">
+  <h2>4. Components</h2>
+
+  <!-- 4-1 Header -->
+  <h3>4-1. Page Header</h3>
+  <div class="ds-card">
+    <div class="page-header">
+      <div class="page-header__logo">
+        <div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div>
+        <span class="page-header__company">IPO Analysis</span>
+      </div>
+      <div class="page-header__meta">
+        <div class="page-header__confidential">Confidential</div>
+        <div>2026.03 | IPO Market Review</div>
+      </div>
+    </div>
+    <div class="ds-code">&lt;div class="page-header"&gt;
+  &lt;div class="page-header__logo"&gt;
+    &lt;div class="page-header__logo-mark"&gt;[SVG]&lt;/div&gt;
+    &lt;span class="page-header__company"&gt;IPO Analysis&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="page-header__meta"&gt;
+    &lt;div class="page-header__confidential"&gt;Confidential&lt;/div&gt;
+    &lt;div&gt;2026.03 | IPO Market Review&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+  </div>
+
+  <!-- 4-2 Slide Title -->
+  <h3>4-2. Slide Title</h3>
+  <div class="ds-card">
+    <div class="slide-title">
+      <div class="slide-title__main">메인 타이틀은 핵심 인사이트를 한 문장으로 전달</div>
+      <div class="slide-title__sub">서브 타이틀에는 데이터 범위, 기간, 분석 조건 등을 명시</div>
+    </div>
+    <div class="ds-code">&lt;div class="slide-title"&gt;
+  &lt;div class="slide-title__main"&gt;핵심 메시지&lt;/div&gt;
+  &lt;div class="slide-title__sub"&gt;데이터 범위 / 조건&lt;/div&gt;
+&lt;/div&gt;</div>
+  </div>
+
+  <!-- 4-3 KPI Cards -->
+  <h3>4-3. KPI Cards</h3>
+  <div class="ds-card">
+    <div class="kpi-row">
+      <div class="kpi-card kpi-card--highlight">
+        <div class="kpi-card__label">하이라이트 KPI</div>
+        <div class="kpi-card__value">738건</div>
+        <div class="kpi-card__delta kpi-card__delta--positive">▲ 22% YoY</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__label">일반 KPI</div>
+        <div class="kpi-card__value">73.9조</div>
+        <div class="kpi-card__delta">설명 텍스트</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__label">Positive</div>
+        <div class="kpi-card__value">+22%</div>
+        <div class="kpi-card__delta kpi-card__delta--positive">▲ 상승</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__label">Negative</div>
+        <div class="kpi-card__value">-5.9%</div>
+        <div class="kpi-card__delta kpi-card__delta--negative">▼ 하락</div>
+      </div>
+    </div>
+    <p style="font-size:10pt;color:var(--gray-500)">kpi-row--5 클래스 추가 시 5열 그리드</p>
+    <div class="ds-code">&lt;div class="kpi-row"&gt;  &lt;!-- kpi-row--5 for 5 columns --&gt;
+  &lt;div class="kpi-card kpi-card--highlight"&gt;  &lt;!-- 강조 카드: navy bg + orange top --&gt;
+    &lt;div class="kpi-card__label"&gt;라벨&lt;/div&gt;
+    &lt;div class="kpi-card__value"&gt;값&lt;/div&gt;
+    &lt;div class="kpi-card__delta kpi-card__delta--positive"&gt;변화량&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+  </div>
+
+  <!-- 4-4 Panel + Chart -->
+  <h3>4-4. Panel (Chart Container)</h3>
+  <div class="ds-card">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="panel">
+        <div class="panel__title">차트 제목<span class="panel__title-unit">단위</span></div>
+        <div class="legend">
+          <div class="legend__item"><div class="legend__dot" style="background:var(--chart-1)"></div>범례 1</div>
+          <div class="legend__item"><div class="legend__dot" style="background:var(--chart-2)"></div>범례 2</div>
+        </div>
+        <div class="panel__chart"><canvas id="demo-chart"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="panel__title">차트 제목<span class="panel__title-unit">단위</span></div>
+        <div class="panel__chart"><canvas id="demo-scatter"></canvas></div>
+        <div style="font-size:10pt;color:var(--gray-500);margin-top:5px;padding-top:4px;border-top:1px solid var(--gray-100);font-style:italic">panel__bumper: 차트 하단 한 줄 코멘트</div>
+      </div>
+    </div>
+    <div class="ds-code">&lt;div class="panel"&gt;
+  &lt;div class="panel__title"&gt;제목&lt;span class="panel__title-unit"&gt;단위&lt;/span&gt;&lt;/div&gt;
+  &lt;div class="legend"&gt;...&lt;/div&gt;
+  &lt;div class="panel__chart"&gt;&lt;canvas id="..."&gt;&lt;/canvas&gt;&lt;/div&gt;
+  &lt;div class="panel__bumper"&gt;하단 코멘트 (optional)&lt;/div&gt;
+&lt;/div&gt;</div>
+  </div>
+
+  <!-- 4-5 Data Table -->
+  <h3>4-5. Data Table</h3>
+  <div class="ds-card">
+    <table class="data-table">
+      <thead><tr><th>구분</th><th class="num">'21</th><th class="num">'22</th><th class="num">'23</th><th class="num">'24</th><th class="num">'25</th></tr></thead>
+      <tbody>
+        <tr><td class="bold">PER</td><td class="num">88%</td><td class="num">96%</td><td class="num">90%</td><td class="num">86%</td><td class="num">79%</td></tr>
+        <tr><td class="bold">Positive</td><td class="num positive">+22%</td><td class="num positive">+15%</td><td class="num">0%</td><td class="num negative">-6%</td><td class="num positive">+72%</td></tr>
+      </tbody>
+    </table>
+    <div class="ds-code">&lt;table class="data-table"&gt;
+  &lt;thead&gt;&lt;tr&gt;&lt;th&gt;헤더&lt;/th&gt;&lt;th class="num"&gt;숫자열&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;td class="bold"&gt;굵은 셀&lt;/td&gt;
+    &lt;td class="num positive"&gt;+22%&lt;/td&gt;  &lt;!-- 양수: 초록 --&gt;
+    &lt;td class="num negative"&gt;-6%&lt;/td&gt;   &lt;!-- 음수: 빨강 --&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</div>
+  </div>
+
+  <!-- 4-6 Key Insight Callout -->
+  <h3>4-6. Key Insight (Callout + Commentary)</h3>
+  <div class="ds-card">
+    <div class="callout">
+      <div class="callout__label">Key Insight</div>
+      <ul class="commentary" style="margin-top:4px">
+        <li><strong>첫 번째 인사이트:</strong> 핵심 데이터와 함께 한 문장으로 전달</li>
+        <li><strong>두 번째 인사이트:</strong> 트렌드나 변화를 수치와 함께 설명</li>
+        <li><strong>세 번째 인사이트:</strong> 시사점이나 향후 전망 제시</li>
+      </ul>
+    </div>
+    <div class="ds-code">&lt;div class="callout"&gt;
+  &lt;div class="callout__label"&gt;Key Insight&lt;/div&gt;
+  &lt;ul class="commentary"&gt;
+    &lt;li&gt;&lt;strong&gt;볼드 라벨:&lt;/strong&gt; 설명 텍스트&lt;/li&gt;
+    &lt;li&gt;...&lt;/li&gt;
+    &lt;li&gt;...&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</div>
+  </div>
+
+  <!-- 4-7 Footer -->
+  <h3>4-7. Page Footer</h3>
+  <div class="ds-card">
+    <div class="page-footer">
+      <div class="page-footer__source">Source: KRX KIND, DART 투자설명서. SPAC/합병상장 제외.</div>
+      <div class="page-footer__page">1</div>
+    </div>
+    <div class="ds-code">&lt;div class="page-footer"&gt;
+  &lt;div class="page-footer__source"&gt;Source: ...&lt;/div&gt;
+  &lt;div class="page-footer__page"&gt;1&lt;/div&gt;
+&lt;/div&gt;</div>
+  </div>
+</div>
+
+<!-- ===== 5. Chart.js Config ===== -->
+<div class="ds-section">
+  <h2>5. Chart.js Configuration</h2>
+  <div class="ds-card">
+    <div class="ds-code">// 필수 플러그인
+&lt;script src="chart.js@4.4.1"&gt;&lt;/script&gt;
+&lt;script src="chartjs-plugin-datalabels@2.2.0"&gt;&lt;/script&gt;
+
+Chart.register(ChartDataLabels);
+Chart.defaults.devicePixelRatio = 3;          // PDF 출력 시 선명도
+Chart.defaults.font.family = "'Pretendard', -apple-system, sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.color = '#6B6B6B';
+Chart.defaults.plugins.legend.display = false; // 범례는 HTML로 별도 구현
+Chart.defaults.plugins.datalabels = { display: false };  // 기본 비활성
+Chart.defaults.scale.grid = { color: '#ECECEC', lineWidth: 0.8 };
+Chart.defaults.scale.border = { display: false };
+Chart.defaults.elements.bar.borderRadius = 2;
+Chart.defaults.elements.line.tension = 0.3;
+
+// Data Label 프리셋
+const DL_BAR = {   // 막대 위 숫자
+  display: true, anchor: 'end', align: 'end',
+  font: { size: 10, weight: '600' }, color: '#404040'
+};
+const DL_STACK = { // 스택 막대 안 숫자
+  display: true, anchor: 'center', align: 'center',
+  font: { size: 9, weight: '600' }, color: '#fff',
+  formatter: v => v === 0 ? '' : v
+};
+const DL_LINE = {  // 꺾은선 위 숫자
+  display: true, anchor: 'end', align: 'top',
+  font: { size: 10 }, color: '#404040', offset: 2
+};</div>
+  </div>
+</div>
+
+<!-- ===== 6. Cover Page ===== -->
+<div class="ds-section">
+  <h2>6. Cover Page Template</h2>
+  <div class="ds-card">
+    <div style="width:100%;height:300px;background:linear-gradient(160deg, #0B1D3A 0%, #0F2847 40%, #1B4178 100%);border-radius:8px;position:relative;overflow:hidden;display:flex;align-items:center;padding:30px 40px">
+      <div style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:.06;background:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(255,255,255,.1) 40px,rgba(255,255,255,.1) 42px)"></div>
+      <div style="position:relative;z-index:1">
+        <div style="width:50px;height:3px;background:#EF3B24;margin-bottom:16px"></div>
+        <div style="font-size:28pt;font-weight:800;color:white;line-height:1.2;margin-bottom:8px">IPO 시장 현황</div>
+        <div style="font-size:14pt;color:rgba(255,255,255,.5)">2016 — 2025 신규상장 종합 분석</div>
+        <div style="display:flex;gap:24px;margin-top:24px">
+          <div style="border-left:2px solid #EF3B24;padding-left:12px">
+            <div style="font-size:9pt;color:rgba(255,255,255,.4);font-weight:600">분석 대상</div>
+            <div style="font-size:13pt;color:white;font-weight:700">738건</div>
+          </div>
+          <div style="border-left:2px solid #EF3B24;padding-left:12px">
+            <div style="font-size:9pt;color:rgba(255,255,255,.4);font-weight:600">누적 공모규모</div>
+            <div style="font-size:13pt;color:white;font-weight:700">73.9조원</div>
+          </div>
+        </div>
+      </div>
+      <div style="position:absolute;top:20px;right:30px;text-align:right;z-index:1">
+        <svg viewBox="0 0 180 45" xmlns="http://www.w3.org/2000/svg" style="height:28px"><text x="0" y="36" font-family="'Pretendard',Arial,sans-serif" font-size="40" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg>
+        <div style="font-size:10pt;color:rgba(255,255,255,.6);font-weight:600;margin-top:2px">IPO Analysis</div>
+      </div>
+      <div style="position:absolute;bottom:16px;left:40px;right:40px;display:flex;justify-content:space-between;z-index:1">
+        <div style="font-size:9pt;color:rgba(255,255,255,.35)">Confidential</div>
+        <div style="font-size:10pt;color:rgba(255,255,255,.5);font-weight:600">2026. 03</div>
+      </div>
+    </div>
+    <p style="margin-top:12px;font-size:10pt;color:var(--gray-500)">네이비 그라데이션 배경 + Meritz Orange 악센트 + KPI 카드</p>
+  </div>
+</div>
+
+</div><!-- /ds-container -->
+
+<script>
+  Chart.register(ChartDataLabels);
+  Chart.defaults.font.family="'Pretendard',-apple-system,'Segoe UI',sans-serif";
+  Chart.defaults.font.size=12;Chart.defaults.color='#6B6B6B';
+  Chart.defaults.plugins.legend.display=false;
+  Chart.defaults.plugins.datalabels={display:false};
+  Chart.defaults.scale.grid={color:'#ECECEC',lineWidth:.8};
+  Chart.defaults.scale.border={display:false};
+  Chart.defaults.elements.bar.borderRadius=2;
+
+  new Chart(document.getElementById('demo-chart'),{type:'bar',data:{labels:['2021','2022','2023','2024','2025'],datasets:[{label:'A',data:[86,70,82,79,76],backgroundColor:'#2558A3'},{label:'B',data:[24,45,37,40,25],backgroundColor:'#2BA5A5'}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true}}}});
+  new Chart(document.getElementById('demo-scatter'),{type:'scatter',data:{datasets:[{label:'Demo',data:[{x:100,y:50},{x:300,y:80},{x:500,y:120},{x:800,y:60},{x:1200,y:200},{x:400,y:30},{x:900,y:150},{x:600,y:90}],backgroundColor:'#2558A360',borderColor:'#2558A3',borderWidth:.8,pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{title:{display:true,text:'X축',font:{size:10}}},y:{title:{display:true,text:'Y축',font:{size:10}}}}}});
+</script>
+</body>
+</html>
