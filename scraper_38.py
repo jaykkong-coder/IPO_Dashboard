@@ -11,6 +11,19 @@ import re
 import time
 
 
+def _fix_competition_rate(raw):
+    """경쟁률 문자열을 float로 변환. '799,76' 같은 콤마-소수점 오타도 처리."""
+    # 콤마가 하나이고 뒤가 2자리 이하면 소수점 오타로 판단 (e.g. "799,76")
+    if re.match(r"^\d+,\d{1,2}$", raw):
+        raw = raw.replace(",", ".")
+    else:
+        raw = raw.replace(",", "")
+    try:
+        return float(raw)
+    except ValueError:
+        return None
+
+
 def get_38_demand_forecast_results(pages=55):
     """38커뮤니케이션 수요예측 결과(o=r1) 리스트에서 기관경쟁률/의무보유확약 일괄 수집.
 
@@ -172,24 +185,21 @@ def get_38_detail(no):
                     data["의무보유확약비율"] = float(match.group(1))
 
             # 청약경쟁률: "청약경쟁률 390:1 (비례 780:1)"
+            # 주의: 38커뮤니케이션에서 "799,76:1" 같이 소수점을 콤마로 오기하는 케이스 있음
             if "청약경쟁률" in joined:
                 # 비례 경쟁률 우선
                 match_prop = re.search(r"비례\s*([\d,.]+)\s*:\s*1", joined)
                 if match_prop:
-                    val = match_prop.group(1).replace(",", "")
-                    try:
-                        data["청약경쟁률_비례"] = float(val)
-                    except ValueError:
-                        pass
+                    val = _fix_competition_rate(match_prop.group(1))
+                    if val is not None:
+                        data["청약경쟁률_비례"] = val
 
                 # 전체 경쟁률
                 match_total = re.search(r"청약경쟁률\s*([\d,.]+)\s*:\s*1", joined)
                 if match_total:
-                    val = match_total.group(1).replace(",", "")
-                    try:
-                        data["청약경쟁률"] = float(val)
-                    except ValueError:
-                        pass
+                    val = _fix_competition_rate(match_total.group(1))
+                    if val is not None:
+                        data["청약경쟁률"] = val
 
             # 수요예측 참여기관수: look for "참여건수" or "참여기관" patterns
             if "참여" in joined and ("건수" in joined or "기관" in joined):
