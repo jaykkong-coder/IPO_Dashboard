@@ -186,11 +186,24 @@ def run_pipeline():
     kospi = [c for c in all_companies if c.get("시장구분") == "유가증권"]
     print(f"  코스닥: {len(kosdaq)}건, 유가증권: {len(kospi)}건, 합계: {len(all_companies)}건")
 
-    # 3. DB 등록 (모두 pending)
+    # 3. DB 등록 (신규만 pending, 기존 completed는 보호)
+    import sqlite3
+    db_path = os.path.join(BASE_DIR, "ipo_data.db")
+    conn = sqlite3.connect(db_path)
+    existing = set()
+    for row in conn.execute("SELECT 회사명, 상장일 FROM ipo_companies WHERE 처리상태='completed'").fetchall():
+        existing.add((row[0], row[1]))
+    conn.close()
+
+    new_count = 0
     for company in all_companies:
+        key = (company.get("회사명"), company.get("상장일"))
+        if key in existing:
+            continue  # 이미 completed → 건드리지 않음
         company["처리상태"] = "pending"
         upsert_company(company)
-    print(f"  DB 등록: {len(all_companies)}건")
+        new_count += 1
+    print(f"  DB 등록: {new_count}건 신규 (기존 completed {len(existing)}건 보호)")
 
     # 4. DART 고유번호 로드 (이름 매핑 + 종목코드 매핑)
     print("\n[2/4] DART 고유번호 매핑...")
