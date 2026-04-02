@@ -31,7 +31,7 @@
   .page-header__logo-mark svg{height:24px;width:auto}
   .page-header__company{font-size:12pt;font-weight:600;color:var(--meritz-gray);padding-left:10px;border-left:1px solid var(--gray-200)}
   .page-header__meta{text-align:right;font-size:11pt;color:var(--gray-500);line-height:1.4}
-  .page-header__confidential{font-size:9pt;font-weight:600;color:var(--negative);text-transform:uppercase;letter-spacing:1px}
+  .page-header__confidential{font-size:11pt;font-weight:400;color:var(--negative);letter-spacing:0}
   .slide-title{margin-bottom:8px;flex-shrink:0}
   .slide-title__main{font-size:18pt;font-weight:800;color:var(--navy-900);line-height:1.3;letter-spacing:-.3px;margin-bottom:2px}
   .slide-title__sub{font-size:12pt;color:var(--gray-500);font-weight:400}
@@ -79,7 +79,7 @@
       <div style="border-left:2px solid var(--white);padding-left:14px;">
         <div style="font-size:11pt;color:rgba(255,255,255,.6);font-weight:600;margin-bottom:2px;">분석 대상</div>
         <div style="font-size:15pt;color:var(--white);font-weight:700;">738건</div>
-        <div style="font-size:10pt;color:rgba(255,255,255,.7);">코스피 85 · 코스닥 653</div>
+        <div style="font-size:10pt;color:rgba(255,255,255,.7);">유가증권시장 85 · 코스닥시장 653</div>
       </div>
       <div style="border-left:2px solid var(--white);padding-left:14px;">
         <div style="font-size:11pt;color:rgba(255,255,255,.6);font-weight:600;margin-bottom:2px;">누적 공모규모</div>
@@ -95,79 +95,109 @@
 </div>
 <div class="page">
   <div class="page-header"><div class="page-header__logo"><div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div><span class="page-header__company">IPO Market Overview</span></div><div class="page-header__meta"><div class="page-header__confidential">Confidential</div><div>2026.03 | IPO Market Review</div></div></div>
-  <div class="slide-title"><div class="slide-title__main">대형딜 중심의 코스피 시장과, 기술상장 기업 중심의 코스닥 시장</div><div class="slide-title__sub">2016-2025 코스피/코스닥 시장별 공모규모(막대), 상장건수·평균 공모규모(꺾은선) (SPAC 제외)</div></div>
+  <div class="slide-title"><div class="slide-title__main">대기업 중심의 유가증권시장 vs 기술상장기업 중심의 코스닥시장</div><div class="slide-title__sub">2016-2025 유가증권시장/코스닥시장별 공모규모(막대), 상장건수·평균 공모규모(꺾은선) (SPAC 제외)</div></div>
   <div class="content-grid content-grid--2col">
-    <div class="panel"><div class="panel__title">코스피<span class="panel__title-unit">억원 / 건</span></div><div class="panel__chart"><canvas id="c1a"></canvas></div></div>
-    <div class="panel"><div class="panel__title">코스닥<span class="panel__title-unit">조원 / 건</span></div><div class="panel__chart"><canvas id="c1b"></canvas></div></div>
+    <div class="panel"><div class="panel__title">유가증권시장</div><div class="panel__chart"><canvas id="c1a"></canvas></div></div>
+    <div class="panel"><div class="panel__title">코스닥시장</div><div class="panel__chart"><canvas id="c1b"></canvas></div></div>
   </div>
-  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>코스피 대형딜 편중:</strong> 2021-22년 카카오뱅크·LG에너지솔루션으로 평균 공모규모 1.2~3.3조 기록. 2023년 이후 0.2조 수준으로 정상화</li><li><strong>코스닥 안정적 물량:</strong> 연 49-76건, 평균 공모규모 270~620억으로 변동 적음. IPO 시장의 안정적 기반 역할</li><li><strong>2025년 양 시장 동반 회복:</strong> 코스피 7건·2.2조, 코스닥 69건·2.3조. 건수는 소폭 감소했으나 딜 사이즈 확대</li></ul></div>
+  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>유가증권시장 대형딜 편중:</strong> 2021-22년 카카오뱅크·LG에너지솔루션으로 평균 공모규모 1.2~3.3조 기록. 2023년 이후 0.2조 수준으로 정상화</li><li><strong>코스닥시장 안정적 물량:</strong> 연 49-76건, 평균 공모규모 270~620억으로 변동 적음. IPO 시장의 안정적 기반 역할</li><li><strong>2025년 양 시장 동반 회복:</strong> 유가증권시장 7건·2.2조, 코스닥시장 69건·2.3조. 건수는 소폭 감소했으나 딜 사이즈 확대</li></ul></div>
   <div class="page-footer"><div class="page-footer__source">Source: KRX KIND, DART 투자설명서. SPAC/합병상장 제외(별도 명시 시 포함).</div><div class="page-footer__page">1</div></div>
 </div><div class="page">
   <div class="page-header"><div class="page-header__logo"><div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div><span class="page-header__company">IPO Market Overview</span></div><div class="page-header__meta"><div class="page-header__confidential">Confidential</div><div>2026.03 | IPO Market Review</div></div></div>
-  <div class="slide-title"><div class="slide-title__main">기술특례 비중이 50%에 육박, 특례 상장이 바이오·IT 중심으로 코스닥 성장 견인</div><div class="slide-title__sub">2016-2025 코스닥 상장트랙별 건수·평균공모규모 / 트랙별 업종 비중 추이 (SPAC 제외)</div></div>
+  <div class="slide-title"><div class="slide-title__main">바이오 및 IT서비스 중심의 특례상장 비중이 50% 육박하며 코스닥시장 성장 견인</div><div class="slide-title__sub">2016-2025 코스닥시장 상장트랙별 건수·평균공모규모 / 트랙별 업종 비중 추이 (SPAC 제외)</div></div>
   <div class="content-grid content-grid--2col">
-    <div class="panel"><div class="panel__title">코스닥 트랙별 건수<span class="panel__title-unit">건(%)</span></div><div class="legend"><div class="legend__item"><div class="legend__dot" style="background:#E8E4DE"></div>일반</div><div class="legend__item"><div class="legend__dot" style="background:#2558A3"></div>혁신기술기업</div><div class="legend__item"><div class="legend__dot" style="background:#6AAFE0"></div>사업모델기업</div><div class="legend__item"><div class="legend__dot" style="background:#B8D9F0"></div>이익미실현</div></div><div class="panel__chart"><canvas id="c2a"></canvas></div></div>
-    <div class="panel"><div class="panel__title">'25년 트랙별 주요 업종 비중<span class="panel__title-unit">건(%)</span></div><div class="legend"><div class="legend__item"><div class="legend__dot" style="background:#2558A3"></div>바이오</div><div class="legend__item"><div class="legend__dot" style="background:#6AAFE0"></div>IT</div><div class="legend__item"><div class="legend__dot" style="background:#B8D9F0"></div>IT제조</div><div class="legend__item"><div class="legend__dot" style="background:#58534D"></div>소부장</div><div class="legend__item"><div class="legend__dot" style="background:#E8E4DE"></div>기타</div></div><div class="panel__chart" style="max-height:60%;margin-top:auto;margin-bottom:auto"><canvas id="c2b"></canvas></div></div>
+    <div class="panel"><div class="panel__title">코스닥시장 트랙별 건수<span class="panel__title-unit">건(%)</span></div><div class="legend"><div class="legend__item"><div class="legend__dot" style="background:#E8E4DE"></div>일반</div><div class="legend__item"><div class="legend__dot" style="background:#2558A3"></div>혁신기술기업</div><div class="legend__item"><div class="legend__dot" style="background:#6AAFE0"></div>사업모델기업</div><div class="legend__item"><div class="legend__dot" style="background:#B8D9F0"></div>이익미실현</div></div><div class="panel__chart"><canvas id="c2a"></canvas></div></div>
+    <div class="panel"><div class="panel__title">'25년 트랙별 주요 업종 비중<span class="panel__title-unit">건(%)</span></div><div class="legend"><div class="legend__item"><div class="legend__dot" style="background:#2558A3"></div>바이오</div><div class="legend__item"><div class="legend__dot" style="background:#6AAFE0"></div>IT서비스</div><div class="legend__item"><div class="legend__dot" style="background:#B8D9F0"></div>IT제조</div><div class="legend__item"><div class="legend__dot" style="background:#58534D"></div>소부장</div><div class="legend__item"><div class="legend__dot" style="background:#E8E4DE"></div>기타</div></div><div class="panel__chart" style="max-height:60%;margin-top:auto;margin-bottom:auto"><canvas id="c2b"></canvas></div></div>
   </div>
-  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>특례 비중 급등:</strong> 일반 42건→29건 감소 vs 특례(혁신+사업모델+이익미) 7건→41건 급증. 2024년 특례가 일반 추월</li><li><strong>특례 = 바이오·IT 통로:</strong> 특례 상장의 60%+가 바이오/IT. 일반 트랙은 소부장 중심의 전통 제조업 비중이 높음</li><li><strong>특례 다변화:</strong> 혁신기술기업이 주류이나, 사업모델기업·이익미실현 트랙도 '19년 이후 활성화. 바이오·IT 외 진입 경로 확대</li></ul></div>
+  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>특례상장 비중 증가:</strong> '16년 특례상장 제도 도입 후 특례상장 비중 꾸준히 확대, '24년 일반상장 추월</li><li><strong>신성장 사업 중심의 특례상장:</strong> 특례상장의 60% 이상이 바이오/IT서비스 신성장 사업. 일반상장은 기계/장비/화학/소재 등 전통 제조업 중심</li><li><strong>평균 공모규모 수렴:</strong> 특례상장 공모규모 대형화 추세를 보이며 평균 공모금액(일반상장 300~520억원, 특례상장 280~450억원) 격차 축소</li></ul></div>
   <div class="page-footer"><div class="page-footer__source">Source: KRX KIND, DART 투자설명서. SPAC/합병상장 제외(별도 명시 시 포함).</div><div class="page-footer__page">2</div></div>
 </div><div class="page">
   <div class="page-header"><div class="page-header__logo"><div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div><span class="page-header__company">IPO Market Overview</span></div><div class="page-header__meta"><div class="page-header__confidential">Confidential</div><div>2026.03 | IPO Market Review</div></div></div>
-  <div class="slide-title"><div class="slide-title__main">시류에 따라 주목받는 산업이 존재하며, 최근 AI 급부상</div><div class="slide-title__sub">2016-2025 전방산업 기준 업종별 상장 건수 추이 — 시기별 주목 업종 표기 (SPAC 제외)</div></div>
+  <div class="slide-title"><div class="slide-title__main">업종별 상장 추이는 산업별 성장모멘텀 및 투자자 선호도 변화를 반영</div><div class="slide-title__sub">2016-2025 전방산업 기준 업종별 상장 건수 추이 — 시기별 주목 업종 표기 (SPAC 제외)</div></div>
   <div class="content-grid content-grid--60-40">
-    <div class="panel"><div class="panel__title">업종별 상장건수 추이<span class="panel__title-unit">건</span></div><div class="legend"><div class="legend__item"><div class="legend__dot" style="background:#2558A3"></div>바이오</div><div class="legend__item"><div class="legend__dot" style="background:#6AAFE0"></div>IT</div><div class="legend__item"><div class="legend__dot" style="background:#B8D9F0"></div>IT제조</div><div class="legend__item"><div class="legend__dot" style="background:#58534D"></div>소부장</div><div class="legend__item"><div class="legend__dot" style="background:#E8E4DE"></div>기타</div></div><div class="panel__chart"><canvas id="c3"></canvas></div></div>
+    <div class="panel"><div class="panel__title">업종별 상장건수 추이<span class="panel__title-unit">건</span></div><div class="legend"><div class="legend__item"><div class="legend__dot" style="background:#2558A3"></div>바이오</div><div class="legend__item"><div class="legend__dot" style="background:#6AAFE0"></div>IT서비스</div><div class="legend__item"><div class="legend__dot" style="background:#B8D9F0"></div>IT제조</div><div class="legend__item"><div class="legend__dot" style="background:#58534D"></div>소부장</div><div class="legend__item"><div class="legend__dot" style="background:#E8E4DE"></div>기타</div></div><div class="panel__chart"><canvas id="c3"></canvas></div></div>
     <div class="panel"><div class="panel__title">시기별 주목 업종<span class="panel__title-unit">테마 트렌드</span></div>
       <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;">
         <div style="background:#E4EFF9;border-left:3px solid #2558A3;padding:6px 10px;border-radius:0 4px 4px 0"><div style="font-size:9pt;font-weight:700;color:#2558A3">2016 기술특례 도입</div><div style="font-size:9pt;color:var(--gray-700)">바이오 IPO 급증, 2018년 25건 역대 최다</div></div>
-        <div style="background:#E8F4FC;border-left:3px solid #6AAFE0;padding:6px 10px;border-radius:0 4px 4px 0"><div style="font-size:9pt;font-weight:700;color:#2A6BA0">2021 IT 전성기</div><div style="font-size:9pt;color:var(--gray-700)">카카오뱅크·크래프톤 등 IT 대형 IPO 25건 상장</div></div>
+        <div style="background:#E8F4FC;border-left:3px solid #6AAFE0;padding:6px 10px;border-radius:0 4px 4px 0"><div style="font-size:9pt;font-weight:700;color:#2A6BA0">2021 IT서비스 전성기</div><div style="font-size:9pt;color:var(--gray-700)">카카오뱅크·크래프톤 등 IT서비스 대형 IPO 25건 상장</div></div>
         <div style="background:#ECEAE7;border-left:3px solid #58534D;padding:6px 10px;border-radius:0 4px 4px 0"><div style="font-size:9pt;font-weight:700;color:#58534D">2022-2024 소부장 강세</div><div style="font-size:9pt;color:var(--gray-700)">2차전지·반도체 장비 밸류체인 상장 가속</div></div>
         <div style="background:#ECEAE7;border-left:3px solid #3C3935;padding:6px 10px;border-radius:0 4px 4px 0"><div style="font-size:9pt;font-weight:700;color:#3C3935">2024-2025 방산·AI</div><div style="font-size:9pt;color:var(--gray-700)">지정학 리스크 + AI 붐</div></div>
       </div>
+      <div style="font-size:10pt;font-weight:700;color:#58534D;margin-bottom:2px;">AI, 방산관련 상장 건수 추이</div>
       <div style="flex:1;min-height:0;"><canvas id="c3b"></canvas></div>
     </div>
   </div>
-  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>바이오 부동의 1위:</strong> 10년간 155건(21%), 기술특례 제도의 최대 수혜. 연 10-24건 안정적 상장</li><li><strong>시류 반영 빠른 시장:</strong> IT(2021)→2차전지(2022-24)→AI·방산(2025)으로 테마 순환. 산업 트렌드가 IPO 파이프라인에 즉시 반영</li><li><strong>AI 급부상:</strong> 2025년 AI 관련 상장 7건(역대 최다). IT 업종 내 AI 비중 50% 돌파, 향후 독립 카테고리화 전망</li></ul></div>
+  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>산업성장 모멘텀 및 선호도 반영:</strong> 바이오(2016~)→IT서비스(2021)→소부장(2022-24)→AI·방산(2025)으로 테마 순환. 산업 트렌드가 IPO 파이프라인에 즉시 반영</li><li><strong>바이오 상장 지속:</strong> 10년간 164건(21%)으로 부동의 1위. 기술특례 제도의 최대 수혜 업종으로 연 8~25건 안정적 상장</li><li><strong>AI 급부상:</strong> 2025년 AI 관련 상장 14건(역대 최다). IT서비스 업종 내 AI 비중 50% 돌파, 향후 독립 카테고리화 전망</li></ul></div>
   <div class="page-footer"><div class="page-footer__source">Source: KRX KIND, DART 투자설명서. SPAC/합병상장 제외(별도 명시 시 포함).</div><div class="page-footer__page">3</div></div>
 </div><div class="page">
   <div class="page-header"><div class="page-header__logo"><div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div><span class="page-header__company">Pricing</span></div><div class="page-header__meta"><div class="page-header__confidential">Confidential</div><div>2026.03 | IPO Market Review</div></div></div>
-  <div class="slide-title"><div class="slide-title__main">PER이 사실상 표준이나 비중 하락 중, 멀티플·할인율은 5개년 안정적 밴드 유지</div><div class="slide-title__sub">2021-2025 평가방법별 건수, PER 멀티플 밴드(25-75th percentile), 할인율 추이</div></div>
+  <div class="slide-title"><div class="slide-title__main">PER 위주 가치평가 下, 멀티플 및 할인율 증가추세</div><div class="slide-title__sub">2021-2025 평가방법별 건수, PER 멀티플 밴드(25-75th percentile), 할인율 추이</div></div>
   <div class="content-grid content-grid--3col">
     <div class="panel"><div class="panel__title">평가방법별 건수<span class="panel__title-unit">건(%)</span></div><div class="legend"><div class="legend__item"><div class="legend__dot" style="background:#2558A3"></div>PER</div><div class="legend__item"><div class="legend__dot" style="background:#6AAFE0"></div>EV/EBITDA</div><div class="legend__item"><div class="legend__dot" style="background:#B8D9F0"></div>PBR</div><div class="legend__item"><div class="legend__dot" style="background:#58534D"></div>PSR</div><div class="legend__item"><div class="legend__dot" style="background:#E8E4DE"></div>기타</div></div><div class="panel__chart"><canvas id="c4a"></canvas></div></div>
     <div class="panel"><div class="panel__title">PER 멀티플 밴드<span class="panel__title-unit">배(x), P25-P75</span></div><div class="legend"><div class="legend__item"><div class="legend__dot" style="background:rgba(88,83,77,.3)"></div>P25~P75</div><div class="legend__item"><div class="legend__dot" style="background:#2558A3"></div>평균</div></div><div class="panel__chart"><canvas id="c4b"></canvas></div></div>
     <div class="panel"><div class="panel__title">할인율 추이 (평균)<span class="panel__title-unit">%</span></div><div class="legend"><div class="legend__item"><div class="legend__dot" style="background:var(--chart-5)"></div>할인율 하단</div><div class="legend__item"><div class="legend__dot" style="background:var(--chart-1)"></div>할인율 상단</div></div><div class="panel__chart"><canvas id="c4c"></canvas></div></div>
   </div>
-  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>PER 비중 하락:</strong> 2022년 96% → 2025년 79%. EV/EBITDA가 12%로 확대(인프라/에너지 기업). 평가방법 다변화 진행 중</li><li><strong>멀티플 안정 밴드:</strong> PER 평균 22-26x, P25=17-21x, P75=27-31x. 5개년 변동 ±3x 이내로 시장 밸류에이션 컨센서스 형성</li><li><strong>할인율 안정:</strong> 하단 34-36%, 상단 22-26%로 일정. 2025년 상단 26.3%로 소폭 상승, 시장 불확실성 반영</li></ul></div>
+  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>PER 평가 절대다수:</strong> '25년 PER 비중 79%로 평가방법 중 대부분 차지</li><li><strong>멀티플 밴드:</strong> '23년 이후, IPO 시장 제도 개편 및 Secondary Market 호황으로 가치평가 상향조정</li><li><strong>할인율:</strong> 공격적 Comparable 산출 대비 상대적으로 높은 할인율로 투자자 관심도 고취</li></ul></div>
   <div class="page-footer"><div class="page-footer__source">Source: KRX KIND, DART 투자설명서. SPAC/합병상장 제외(별도 명시 시 포함).</div><div class="page-footer__page">4</div></div>
 </div><div class="page">
   <div class="page-header"><div class="page-header__logo"><div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div><span class="page-header__company">Book Building</span></div><div class="page-header__meta"><div class="page-header__confidential">Confidential</div><div>2026.03 | IPO Market Review</div></div></div>
-  <div class="slide-title"><div class="slide-title__main">참여기관 4배 증가에도 기관경쟁률은 정체, 2024년 공모가 과열 후 정상화</div><div class="slide-title__sub">2016-2025 수요예측 참여기관·기관경쟁률 / 일반청약경쟁률 / 밴드 대비 확정공모가 비율</div></div>
+  <div class="slide-title"><div class="slide-title__main">'23년 제도개편 이후 수요예측 안정화로 기업금융 변동성 축소</div><div class="slide-title__sub">2016-2025 수요예측 참여기관·기관경쟁률 / 일반청약경쟁률 / 밴드 대비 확정공모가 비율</div></div>
   <div class="content-grid content-grid--3col">
     <div class="panel"><div class="panel__title">참여기관 / 경쟁률<span class="panel__title-unit">막대:개사 / 선::1</span></div><div class="panel__chart"><canvas id="c5a"></canvas></div></div>
     <div class="panel"><div class="panel__title">일반청약경쟁률 추이<span class="panel__title-unit">::1</span></div><div class="panel__chart"><canvas id="c5b"></canvas></div></div>
     <div class="panel"><div class="panel__title">밴드 대비 확정공모가<span class="panel__title-unit">%, 100%=밴드중간값</span></div><div class="panel__chart"><canvas id="c5c"></canvas></div></div>
   </div>
-  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>기관 수 급증 vs 경쟁률 정체:</strong> 참여기관 488→2,028개(4배↑)에도 경쟁률 300~1,181:1. 공급 확대가 수요 증가를 상쇄</li><li><strong>청약경쟁률 우상향:</strong> 2016년 469:1 → 2025년 2,295:1. 개인투자자 IPO 관심 지속 확대</li><li><strong>2024년 과열 후 정상화:</strong> 밴드 대비 129%까지 상승(역대 최고) → 2025년 104%로 복귀. 산포도에서 극단값 감소 확인</li></ul></div>
+  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>기관 수 급증 vs 경쟁률 안정화:</strong> 참여기관 증가에도 불구하고 수요예측제도 개편으로 경쟁률 안정화</li><li><strong>청약경쟁률 우상향:</strong> 일반청약 확대 및 IPO투자의 양호한 수익률로 일반청약 경쟁률 확대</li><li><strong>2024년 초기변동성 확대 후 안정화:</strong> 밴드 대비 120%까지 상승(역대 최고) → 2025년 104%로 복귀. 산포도에서 극단값 감소 확인</li></ul></div>
   <div class="page-footer"><div class="page-footer__source">Source: KRX KIND, DART 투자설명서. SPAC/합병상장 제외(별도 명시 시 포함).</div><div class="page-footer__page">5</div></div>
 </div><div class="page">
   <div class="page-header"><div class="page-header__logo"><div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div><span class="page-header__company">IPO Market Analysis</span></div><div class="page-header__meta"><div class="page-header__confidential">Confidential</div><div>2026.03 | IPO Market Review</div></div></div>
-  <div class="slide-title"><div class="slide-title__main">상장일에는 단기 수급으로 변동성이 크지만, 장기적으로는 기준시가로 수렴하는 경향</div><div class="slide-title__sub">2021-2025 확정공모가 대비 시초가/종가/1개월/3개월/6개월 수익률 — 전체/코스피/코스닥</div></div>
+  <div class="slide-title"><div class="slide-title__main">상장일에는 단기 수급으로 변동성이 크지만, 장기적으로는 기준시가로 수렴하는 경향</div><div class="slide-title__sub">2021-2025 확정공모가 대비 시초가/종가/1개월/3개월/6개월 수익률 — 전체/유가증권시장/코스닥시장</div></div>
   <div class="content-grid content-grid--3col">
     <div class="panel"><div class="panel__title">전체 구간 수익률<span class="panel__title-unit">%, 평균</span></div><div class="panel__chart"><canvas id="c6a"></canvas></div></div>
-    <div class="panel"><div class="panel__title">코스피 구간 수익률<span class="panel__title-unit">%, 평균</span></div><div class="panel__chart"><canvas id="c6c"></canvas></div></div>
-    <div class="panel"><div class="panel__title">코스닥 구간 수익률<span class="panel__title-unit">%, 평균</span></div><div class="panel__chart"><canvas id="c6b"></canvas></div></div>
+    <div class="panel"><div class="panel__title">유가증권시장 구간 수익률<span class="panel__title-unit">%, 평균</span></div><div class="panel__chart"><canvas id="c6c"></canvas></div></div>
+    <div class="panel"><div class="panel__title">코스닥시장 구간 수익률<span class="panel__title-unit">%, 평균</span></div><div class="panel__chart"><canvas id="c6b"></canvas></div></div>
   </div>
-  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>단기 변동 → 장기 수렴:</strong> 상장일 시초가는 수급에 의해 30~91%까지 급등하지만, 3~6개월 후에는 절반 이하로 축소되며 본질 가치로 회귀하는 패턴</li><li><strong>코스피 '22년 — 시장 과열기 대형딜 부진:</strong> 공모시장 과열 당시 대규모 딜의 공모가 과열이 중장기 수익률에 악영향. 종가 18%, 6개월 -18%</li><li><strong>코스닥 '24년 — 제도 변화 후 경쟁 심화:</strong> 허수성 청약 제한 등 제도 변화로 경쟁이 치열해지면서 공모가 과열, 3개월 -10%, 6개월 -10%</li></ul></div>
+  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>단기 변동 → 장기 수렴:</strong> 상장일 시초가는 수급에 의해 30~91%까지 급등하지만, 3~6개월 후에는 절반 이하로 축소되며 본질 가치로 회귀하는 패턴</li><li><strong>유가증권시장 '22년 — 시장 과열기 대형딜 부진:</strong> 공모시장 과열 당시 대규모 딜의 공격적 Pricing이 중장기 수익률에 부정적 영향</li><li><strong>코스닥시장 '24년 — 제도 변화 후 경쟁 심화:</strong> 허수성 청약 제한 등 제도 변화로 경쟁이 치열해지면서 공모가 과열, 3개월 -10%, 6개월 -10%</li></ul></div>
   <div class="page-footer"><div class="page-footer__source">Source: KRX KIND, DART 투자설명서. SPAC/합병상장 제외(별도 명시 시 포함).</div><div class="page-footer__page">6</div></div>
 </div><div class="page">
   <div class="page-header"><div class="page-header__logo"><div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div><span class="page-header__company">IPO Market Analysis</span></div><div class="page-header__meta"><div class="page-header__confidential">Confidential</div><div>2026.03 | IPO Market Review</div></div></div>
-  <div class="slide-title"><div class="slide-title__main">기관경쟁률은 공모가의 선행지표이자 청약경쟁률과 동조화, 종가수익률은 청약경쟁률과 높은 상관관계</div><div class="slide-title__sub">2023.07 이후 기관경쟁률·일반청약경쟁률 vs 밴드대비 공모가·종가수익률·상호 상관 (제도변경 이후, n=195~198)</div></div>
+  <div class="slide-title"><div class="slide-title__main">기관경쟁률은 확정공모가 및 일반청약경쟁률과 동조화, 일반청약경쟁률은 종가수익률과 높은 상관관계</div><div class="slide-title__sub">2023.07 이후 기관경쟁률·일반청약경쟁률 vs 밴드대비 공모가·종가수익률·상호 상관 (제도변경 이후, n=195~198)</div></div>
   <div class="content-grid content-grid--3col">
     <div class="panel"><div class="panel__title">기관경쟁률 vs 밴드대비 공모가<span class="panel__title-unit">R²=0.130</span></div><div class="panel__chart"><canvas id="c7a"></canvas></div></div>
     <div class="panel"><div class="panel__title">기관경쟁률 vs 일반청약경쟁률<span class="panel__title-unit">R²=0.396</span></div><div class="panel__chart"><canvas id="c7c"></canvas></div></div>
     <div class="panel"><div class="panel__title">일반청약경쟁률 vs 종가수익률<span class="panel__title-unit">R²=0.278</span></div><div class="panel__chart"><canvas id="c8b"></canvas></div></div>
   </div>
-  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>기관경쟁률 → 공모가 선행지표:</strong> R²=0.13. 경쟁률 1,000:1 초과 시 밴드 상단 120%+ 확정 확률 급상승. 500:1 미만은 밴드 하단 확정 집중</li><li><strong>기관-개인 수요 동조화:</strong> R²=0.40. 기관 흥행이 개인 청약 쏠림을 유발. 기관 1,000:1 이상 시 청약 2,000:1+ 집중</li><li><strong>청약경쟁률 → 종가 수익률 최고 예측력:</strong> R²=0.278로 기관경쟁률(0.065) 대비 4배. 개인 수요가 상장일 성과를 가장 잘 설명</li></ul></div>
+  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>선행지표로서 기관경쟁률:</strong> 확정공모가 및 일반청약경쟁률 결과는 기관경쟁률에 의해 좌우됨</li><li><strong>청약경쟁률과 주가의 상관관계:</strong> 일반청약경쟁률에 의해 좌우되는 상장 후 주가</li><li><strong>기관 대상 IR 중요성:</strong> 기관경쟁률이 확정공모가 및 주가 수익률에 큰 영향을 미침에 따라 기관 대상 사전 IR 중요성 부각</li></ul></div>
   <div class="page-footer"><div class="page-footer__source">Source: KRX KIND, DART 투자설명서. SPAC/합병상장 제외(별도 명시 시 포함).</div><div class="page-footer__page">7</div></div>
+</div><div class="page">
+  <div class="page-header"><div class="page-header__logo"><div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div><span class="page-header__company">IPO Market Analysis</span></div><div class="page-header__meta"><div class="page-header__confidential">Confidential</div><div>2026.03 | IPO Market Review</div></div></div>
+  <div class="slide-title"><div class="slide-title__main">사전 조사분석 리포트 통한 기관 IR로 IPO 흥행 유도 가능</div><div class="slide-title__sub">'21년 이후 유가증권시장 기준시총 1조원+ 대형 IPO 21건 대상, 사전 리포트 발간군 vs 미발간군 비교</div></div>
+  <div class="content-grid content-grid--2col">
+    <div class="panel"><div class="panel__title">상장 전 리포트 수 vs 수요예측 경쟁률<span class="panel__title-unit">★사전발간 ●미발간</span></div><div class="panel__chart"><canvas id="c8r"></canvas></div></div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:6px;">
+      <div><div class="panel__title">사전 리포트 발간군 vs 미발간군<span class="panel__title-unit">제도강화 이후</span></div>
+        <table class="data-table" style="font-size:9.5pt;margin-top:4px">
+          <thead><tr><th style="background:#E8E4DE"></th><th style="background:#E8E4DE;text-align:center;color:#3C3935;font-weight:700">발간군</th><th style="background:#E8E4DE;text-align:center;color:#3C3935;font-weight:700">미발간군</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:600">상장 전 리포트 수</td><td style="text-align:center;color:#2558A3;font-weight:700">8.7건</td><td style="text-align:center">4.9건</td></tr>
+            <tr><td style="font-weight:600">수요예측 경쟁률</td><td style="text-align:center;color:#2558A3;font-weight:700">378.8:1</td><td style="text-align:center">212.3:1</td></tr>
+            <tr><td style="font-weight:600">청약 경쟁률</td><td style="text-align:center;color:#2558A3;font-weight:700">758.6:1</td><td style="text-align:center">256.3:1</td></tr>
+            <tr><td style="font-weight:600">공모가 산정률</td><td style="text-align:center;color:#2558A3;font-weight:700">+20.4%</td><td style="text-align:center">+4.4%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="flex:1"><div class="panel__title">사전 리포트 발간 대표 사례<span class="panel__title-unit">PDIE</span></div>
+        <div style="display:flex;flex-direction:column;gap:3px;margin-top:3px">
+          <div style="background:#E4EFF9;border-left:3px solid #2558A3;padding:4px 8px;border-radius:0 4px 4px 0"><div style="font-size:8.5pt;font-weight:700;color:#2558A3">카카오뱅크</div><div style="font-size:8pt;color:var(--gray-700)">은행업 → '금융 플랫폼' 재정의. 3M 상대수익률 +60.9%</div></div>
+          <div style="background:#E4EFF9;border-left:3px solid #2558A3;padding:4px 8px;border-radius:0 4px 4px 0"><div style="font-size:8.5pt;font-weight:700;color:#2558A3">두산로보틱스</div><div style="font-size:8pt;color:var(--gray-700)">기계제조 → 'SW 협동로봇 솔루션'. 3M +311.4%</div></div>
+          <div style="background:#E4EFF9;border-left:3px solid #2558A3;padding:4px 8px;border-radius:0 4px 4px 0"><div style="font-size:8.5pt;font-weight:700;color:#2558A3">에이피알</div><div style="font-size:8pt;color:var(--gray-700)">화장품 → '뷰티 테크' 카테고리 이동. 3M +40.9%</div></div>
+          <div style="background:#E4EFF9;border-left:3px solid #2558A3;padding:4px 8px;border-radius:0 4px 4px 0"><div style="font-size:8.5pt;font-weight:700;color:#2558A3">HD현대마린솔루션</div><div style="font-size:8pt;color:var(--gray-700)">수리조선 → '환경규제 엔지니어링'. 3M +48.5%</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>사전 PDIE의 압도적 성과:</strong> 제도강화 이후 사전 리포트 발간군의 청약경쟁률 758.6:1로 미발간군(256.3:1) 대비 3배, 공모가 산정률도 +20.4% vs +4.4%</li><li><strong>선순환 구조:</strong> 사전 리포트 발간 → 시장의 산업 이해도 제고 → 상장 전 리포트 다수 발간(8.7건 vs 4.9건) → 기관 수요 확대 → IPO 흥행</li><li><strong>산업 카테고리 재정의 효과:</strong> 4개 사전 리포트 발간 기업 모두 기존 산업 분류를 벗어나 신규 카테고리를 정의, 밸류에이션 정당성 확보에 성공</li></ul></div>
+  <div class="page-footer"><div class="page-footer__source">Source: 메리츠증권 IB, 금융투자협회. '21년 이후 유가증권시장 기준시총 1조원+ 대형 IPO 21건 대상.</div><div class="page-footer__page">8</div></div>
 </div><div class="page">
   <div class="page-header"><div class="page-header__logo"><div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div><span class="page-header__company">ROI Analysis</span></div><div class="page-header__meta"><div class="page-header__confidential">Confidential</div><div>2026.03 | IPO Market Review</div></div></div>
   <div class="slide-title"><div class="slide-title__main">IPO 시장에 뚜렷한 계절성 존재 — 4~6월 비수기에 가격 측면에서 유리한 조건 형성</div><div class="slide-title__sub">2021-2025 월별 IPO 건수(막대), 밴드대비 확정공모가·수요예측 경쟁률 평균(꺾은선), 분기별 평균(점선)</div></div>
@@ -176,7 +206,7 @@
     <div class="panel"><div class="panel__title">월별 IPO 건수 + 수요예측 경쟁률<span class="panel__title-unit">건 / :1</span></div><div class="panel__chart"><canvas id="c9b"></canvas></div></div>
   </div>
   <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>4~6월 비수기 = 발행사에게 유리:</strong> 상장건수가 적어 시장의 관심이 집중되며, 밴드대비 공모가가 상대적으로 높게 형성(평균 115%). 수요예측 경쟁률도 높아 발행사에 유리한 가격 확보 가능</li><li><strong>10~12월 과밀 구간:</strong> 연말 상장 수요 집중(11월 62건 최다)으로 경쟁률 하락, 밴드대비 공모가도 낮아지는 경향</li><li><strong>계절성 활용 전략:</strong> 비수기(4~6월) 공모는 수요 집중 효과로 가격 측면에서 유리, 성수기(10~12월)는 물량 과다로 할인 가능성 상승</li></ul></div>
-  <div class="page-footer"><div class="page-footer__source">Source: KRX KIND, DART 투자설명서. SPAC/합병상장 제외(별도 명시 시 포함).</div><div class="page-footer__page">8</div></div>
+  <div class="page-footer"><div class="page-footer__source">Source: KRX KIND, DART 투자설명서. SPAC/합병상장 제외(별도 명시 시 포함).</div><div class="page-footer__page">9</div></div>
 </div><div class="page">
   <div class="page-header"><div class="page-header__logo"><div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div><span class="page-header__company">ROI Analysis</span></div><div class="page-header__meta"><div class="page-header__confidential">Confidential</div><div>2026.03 | IPO Market Review</div></div></div>
   <div class="slide-title"><div class="slide-title__main">유통비율 20-30%대가 최적 구간(평균 84%), 공모규모 소형주에서 수익률 최고</div><div class="slide-title__sub">유통주식 비율 및 공모규모 구간별 종가 수익률 분석 (2021-2025)</div></div>
@@ -184,13 +214,13 @@
     <div class="panel"><div class="panel__title">유통비율 vs 종가 수익률<span class="panel__title-unit">X:%, Y:%</span></div><div class="panel__chart"><canvas id="c10"></canvas></div></div>
     <div class="panel"><div class="panel__title">공모규모 vs 종가 수익률<span class="panel__title-unit">X:억원(log), Y:%</span></div><div class="panel__chart"><canvas id="c11"></canvas></div></div>
   </div>
-  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>유통비율 20-30%가 최적:</strong> 평균 수익률 84.3%(중위값 72.0%)로 압도적. 희소성 프리미엄이 수익률 견인</li><li><strong>유통비율 40%+ 주의:</strong> 유통비율 높아질수록 수익률 급감. 50%+ 구간 평균 28.7%, 수급 부담 반영</li><li><strong>공모규모 무관:</strong> 규모별 수익률 편차 작음. 1,000억+ 대형딜도 평균 54%로 양호. 규모보다 유통비율이 핵심 변수</li></ul></div>
-  <div class="page-footer"><div class="page-footer__source">Source: KRX KIND, DART 투자설명서. SPAC/합병상장 제외(별도 명시 시 포함).</div><div class="page-footer__page">9</div></div>
+  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px"><li><strong>유통비율 20-30%가 최적:</strong> 평균 수익률 84.3%(중위값 72.0%)로 압도적. 희소성 프리미엄이 수익률 견인</li><li><strong>유통비율 40%+ 주의:</strong> 유통비율 높아질수록 수익률 급감. 50%+ 구간 평균 28.7%, 수급 부담 반영</li><li><strong>공모규모:</strong> 시장규모 증가로 과거 대비 공모규모와 수익률 간 상관도 축소</li></ul></div>
+  <div class="page-footer"><div class="page-footer__source">Source: KRX KIND, DART 투자설명서. SPAC/합병상장 제외(별도 명시 시 포함).</div><div class="page-footer__page">10</div></div>
 </div>
 <script>
   Chart.register(ChartDataLabels);
   // R² annotation plugin
-  const r2Plugin={id:'r2anno',afterDraw(chart){if(!chart.config._r2)return;const{ctx,chartArea:{right,top}}=chart;ctx.save();ctx.font='bold 12px Pretendard';ctx.fillStyle='#404040';ctx.textAlign='right';ctx.fillText('R²='+chart.config._r2,right-4,top+16);ctx.restore()}};
+  const r2Plugin={id:'r2anno',afterDraw(chart){const{ctx,chartArea:{right,top}}=chart;ctx.save();ctx.font='bold 12px Pretendard';ctx.fillStyle='#404040';ctx.textAlign='right';if(chart.config._r2){ctx.fillText('R²='+chart.config._r2,right-4,top+16);}if(chart.config._eq){ctx.fillText(chart.config._eq,right-4,top+16);}ctx.restore()}};
   Chart.register(r2Plugin);
 
   Chart.defaults.devicePixelRatio=3;
@@ -207,19 +237,19 @@
   const Y5=['2021','2022','2023','2024','2025'];
   const DL_V={display:true,anchor:'end',align:'end',font:{size:12,weight:'700'},color:'#404040',formatter:v=>v===0?'':v};
 
-  // ===== P1a: 코스피 =====
+  // ===== P1a: 유가증권시장 =====
   const p1SizeMax=18;
   new Chart(document.getElementById('c1a'),{type:'bar',data:{labels:Y10,datasets:[
-    {label:'공모규모(조)',data:[4.3,4.4,0.7,1.1,2.1,15.9,13.1,1.1,1.8,2.2],backgroundColor:C1+'90',order:2,datalabels:{display:true,anchor:'end',align:'end',font:{size:12,weight:'700'},color:C1,formatter:v=>v<0.5?'':v.toFixed(1)}},
-    {type:'line',label:'상장건수',data:[14,9,8,9,5,13,4,6,9,7],borderColor:'#2558A3',backgroundColor:'#2558A3',pointRadius:5,pointBackgroundColor:'#2558A3',borderWidth:2.5,yAxisID:'y1',order:1,datalabels:{display:true,anchor:'start',align:'bottom',font:{size:12,weight:'700'},color:'#2558A3',formatter:v=>v}},
-    {type:'line',label:'평균공모(억)',data:[3071,4889,875,1222,4200,12231,32750,1833,2000,3143],borderColor:C5,backgroundColor:C5,pointRadius:4,pointBackgroundColor:C5,borderWidth:2,borderDash:[4,3],yAxisID:'y2',order:0,datalabels:{display:true,font:{size:10,weight:'700'},color:'#7A6C4A',anchor:'end',align:'top',offset:2,formatter:v=>v>=1000?Math.round(v).toLocaleString():Math.round(v)}}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'start',labels:{usePointStyle:true,boxWidth:4,font:{size:10},padding:8,generateLabels:function(chart){return chart.data.datasets.map((ds,i)=>({text:ds.label,fillStyle:ds.backgroundColor||ds.borderColor,strokeStyle:ds.borderColor||ds.backgroundColor,lineWidth:0,pointStyle:ds.type==='line'?'circle':'rect',datasetIndex:i}))}}}},scales:{x:{grid:{display:false},ticks:{padding:12,color:'#666'}},y:{display:false,min:0,max:p1SizeMax},y1:{display:false,min:-5,max:122},y2:{display:false,min:-30000,max:42000,position:'right'}}}});
+    {label:'공모규모(조원)',data:[4.3,4.4,0.7,1.1,2.1,15.9,13.1,1.1,1.8,2.2],backgroundColor:'#E8E4DE',order:2,datalabels:{display:true,anchor:'end',align:'end',font:{size:12,weight:'700'},color:'#78736C',formatter:v=>v<0.5?'':v.toFixed(1)}},
+    {type:'line',label:'상장건수(건)',data:[14,9,8,9,5,13,4,6,9,7],borderColor:'#2558A3',backgroundColor:'#2558A3',pointRadius:5,pointBackgroundColor:'#2558A3',borderWidth:2.5,yAxisID:'y1',order:1,datalabels:{display:true,anchor:'end',align:'top',font:{size:12,weight:'700'},color:'#2558A3',formatter:v=>v}},
+    {type:'line',label:'평균공모(억원)',data:[3071,4889,875,1222,4200,12231,32750,1833,2000,3143],borderColor:C5,backgroundColor:C5,pointRadius:4,pointBackgroundColor:C5,borderWidth:2,borderDash:[4,3],yAxisID:'y2',order:0,datalabels:{display:true,font:{size:12,weight:'700'},color:'#7A6C4A',anchor:'end',align:'top',offset:2,formatter:v=>v>=1000?Math.round(v).toLocaleString():Math.round(v)}}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'start',labels:{usePointStyle:true,boxWidth:4,font:{size:10},padding:8,generateLabels:function(chart){return chart.data.datasets.map((ds,i)=>({text:ds.label,fillStyle:ds.backgroundColor||ds.borderColor,strokeStyle:ds.borderColor||ds.backgroundColor,lineWidth:0,pointStyle:ds.type==='line'?'circle':'rect',datasetIndex:i}))}}}},scales:{x:{grid:{display:false},ticks:{padding:12,color:'#666'}},y:{display:false,min:0,max:p1SizeMax},y1:{display:false,min:-30,max:80},y2:{display:false,min:-50000,max:45000,position:'right'}}}});
 
-  // ===== P1b: 코스닥 =====
+  // ===== P1b: 코스닥시장 =====
   new Chart(document.getElementById('c1b'),{type:'bar',data:{labels:Y10,datasets:[
-    {label:'공모규모(조)',data:[2.0,3.2,1.9,2.1,2.2,3.3,2.5,2.2,2.0,2.3],backgroundColor:C2+'90',order:2,datalabels:{display:true,anchor:'end',align:'end',font:{size:12,weight:'700'},color:C2,formatter:v=>v<0.5?'':v.toFixed(1)}},
-    {type:'line',label:'상장건수',data:[49,51,70,64,62,73,66,76,70,69],borderColor:'#2558A3',backgroundColor:'#2558A3',pointRadius:5,pointBackgroundColor:'#2558A3',borderWidth:2.5,yAxisID:'y1',order:1,datalabels:{display:true,anchor:'end',align:'top',font:{size:12,weight:'700'},color:'#2558A3',formatter:v=>v}},
-    {type:'line',label:'평균공모(억)',data:[408,628,271,328,355,452,379,289,286,333],borderColor:C5,backgroundColor:C5,pointRadius:4,pointBackgroundColor:C5,borderWidth:2,borderDash:[4,3],yAxisID:'y2',order:0,datalabels:{display:true,font:{size:12,weight:'700'},color:'#7A6C4A',anchor:'end',align:'top',offset:2,formatter:v=>Math.round(v)}}
+    {label:'공모규모(조원)',data:[2.0,3.2,1.9,2.1,2.2,3.3,2.5,2.2,2.0,2.3],backgroundColor:'#E8E4DE',order:2,datalabels:{display:true,anchor:'end',align:'end',font:{size:12,weight:'700'},color:'#78736C',formatter:v=>v<0.5?'':v.toFixed(1)}},
+    {type:'line',label:'상장건수(건)',data:[49,51,70,64,62,73,66,76,70,69],borderColor:'#2558A3',backgroundColor:'#2558A3',pointRadius:5,pointBackgroundColor:'#2558A3',borderWidth:2.5,yAxisID:'y1',order:1,datalabels:{display:true,anchor:'end',align:'top',font:{size:12,weight:'700'},color:'#2558A3',formatter:v=>v}},
+    {type:'line',label:'평균공모(억원)',data:[408,628,271,328,355,452,379,289,286,333],borderColor:C5,backgroundColor:C5,pointRadius:4,pointBackgroundColor:C5,borderWidth:2,borderDash:[4,3],yAxisID:'y2',order:0,datalabels:{display:true,font:{size:12,weight:'700'},color:'#7A6C4A',anchor:'end',align:'top',offset:2,formatter:v=>Math.round(v)}}
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'start',labels:{usePointStyle:true,boxWidth:4,font:{size:10},padding:8,generateLabels:function(chart){return chart.data.datasets.map((ds,i)=>({text:ds.label,fillStyle:ds.backgroundColor||ds.borderColor,strokeStyle:ds.borderColor||ds.backgroundColor,lineWidth:0,pointStyle:ds.type==='line'?'circle':'rect',datasetIndex:i}))}}}},scales:{x:{grid:{display:false},ticks:{padding:12,color:'#666'}},y:{display:false,min:0,max:p1SizeMax},y1:{display:false,min:0,max:80},y2:{display:false,min:-450,max:1850,position:'right'}}}});
 
   // ===== P2: 트랙별 + 업종비중 =====
@@ -243,7 +273,7 @@
   const p2bTotal2=[31,38];
   new Chart(document.getElementById('c2b'),{type:'bar',data:{labels:['일반','특례'],datasets:[
     {label:'바이오',data:[16,37],backgroundColor:'#2558A3',datalabels:p2bDL},
-    {label:'IT',data:[3,29],backgroundColor:'#6AAFE0',datalabels:p2bDL},
+    {label:'IT서비스',data:[3,29],backgroundColor:'#6AAFE0',datalabels:p2bDL},
     {label:'IT제조',data:[13,8],backgroundColor:'#B8D9F0',datalabels:p2bDLmuted},
     {label:'소부장',data:[52,24],backgroundColor:'#58534D',datalabels:p2bDL},
     {label:'기타',data:[16,3],backgroundColor:'#E8E4DE',datalabels:p2bDLmuted}
@@ -251,19 +281,18 @@
 
   // ===== P3: 업종별 건수 (5분류 + AI/방산 오버레이) =====
   const P3_TOTALS=[63,60,77,73,66,86,70,82,79,76];
-  const p3DL={display:true,anchor:'center',align:'center',font:{size:9,weight:'600'},color:'#fff',formatter:function(v,ctx){if(v<4)return '';const pct=Math.round(v/P3_TOTALS[ctx.dataIndex]*100);return v+' ('+pct+'%)';}};
-  const p3DLmuted={display:true,anchor:'center',align:'center',font:{size:9,weight:'600'},color:'#666',formatter:function(v,ctx){if(v<4)return '';const pct=Math.round(v/P3_TOTALS[ctx.dataIndex]*100);return v+' ('+pct+'%)';}};
+  function p3DLfn(defaultColor,hlIdxs){return{display:true,anchor:'center',align:'center',font:{size:9,weight:'600'},color:function(ctx){return hlIdxs.includes(ctx.dataIndex)?'#EF3B24':defaultColor},formatter:function(v,ctx){if(v<4)return '';const pct=Math.round(v/P3_TOTALS[ctx.dataIndex]*100);return v+' ('+pct+'%)';}};}
   new Chart(document.getElementById('c3'),{type:'bar',data:{labels:Y10,datasets:[
-    {label:'바이오',data:[13,8,25,17,22,17,12,12,18,20],backgroundColor:'#2558A3',datalabels:p3DL},
-    {label:'IT',data:[5,8,10,14,6,25,10,16,10,13],backgroundColor:'#6AAFE0',datalabels:p3DL},
-    {label:'IT제조',data:[7,6,2,7,11,8,7,14,10,7],backgroundColor:'#B8D9F0',datalabels:p3DLmuted},
-    {label:'소부장',data:[13,27,18,18,18,19,28,29,31,28],backgroundColor:'#58534D',datalabels:p3DL},
-    {label:'기타',data:[25,11,22,17,9,17,13,11,10,8],backgroundColor:'#E8E4DE',datalabels:p3DLmuted}
+    {label:'바이오',data:[13,8,25,17,22,17,12,12,18,20],backgroundColor:'#2558A3',datalabels:p3DLfn('#fff',[0,1,2,3,4])},
+    {label:'IT서비스',data:[5,8,10,14,6,25,10,16,10,13],backgroundColor:'#6AAFE0',datalabels:p3DLfn('#fff',[5])},
+    {label:'IT제조',data:[7,6,2,7,11,8,7,14,10,7],backgroundColor:'#B8D9F0',datalabels:p3DLfn('#666',[5])},
+    {label:'소부장',data:[13,27,18,18,18,19,28,29,31,28],backgroundColor:'#58534D',datalabels:p3DLfn('#fff',[6,7,8])},
+    {label:'기타',data:[25,11,22,17,9,17,13,11,10,8],backgroundColor:'#E8E4DE',datalabels:p3DLfn('#666',[])}
   ]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,display:false}}}});
   // P3b: AI/방산 소형 차트 (오른쪽 패널 하단)
   new Chart(document.getElementById('c3b'),{type:'line',data:{labels:Y10,datasets:[
     {label:'AI',data:[0,0,1,3,4,11,8,12,11,14],borderColor:'#4A8EC2',backgroundColor:'#4A8EC2',pointRadius:4,pointBackgroundColor:'#4A8EC2',pointStyle:'triangle',borderWidth:2.5,fill:false,datalabels:{display:true,anchor:'end',align:'top',font:{size:10,weight:'700'},color:'#4A8EC2',formatter:v=>v===0?'':v}},
-    {label:'방산',data:[0,1,0,1,1,3,0,1,6,4],borderColor:'#3C3935',backgroundColor:'#3C3935',pointRadius:3,pointBackgroundColor:'#3C3935',pointStyle:'rect',borderWidth:2,fill:false,datalabels:{display:true,anchor:'start',align:'bottom',font:{size:10,weight:'700'},color:'#3C3935',formatter:v=>v===0?'':v}}
+    {label:'방산',data:[0,1,0,1,1,3,0,1,6,4],borderColor:'#3C3935',backgroundColor:'#3C3935',pointRadius:3,pointBackgroundColor:'#3C3935',pointStyle:'rect',borderWidth:2,fill:false,datalabels:{display:true,anchor:'end',align:'top',offset:2,font:{size:10,weight:'700'},color:'#3C3935',formatter:v=>v===0?'':v}}
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:10},padding:6}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{display:false,min:0,max:18}}}});
 
   // ===== P4 =====
@@ -290,20 +319,20 @@
       ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 8.5px Pretendard';ctx.fillText(text,x,by+12);ctx.fillText(text2,x,by+24);ctx.restore()}}]});
   new Chart(document.getElementById('c4c'),{type:'line',data:{labels:Y5,datasets:[
     {label:'하단',data:[34.5,36.4,34.6,34.4,35.5],borderColor:C5,backgroundColor:'rgba(158,140,99,.08)',fill:true,pointRadius:4,pointBackgroundColor:C5,borderWidth:2,datalabels:{display:true,anchor:'end',align:'top',font:{size:12,weight:'700'},color:C5,formatter:v=>v+'%'}},
-    {label:'상단',data:[23.3,24.3,22.5,22.5,26.3],borderColor:C1,backgroundColor:'rgba(88,83,77,.08)',fill:true,pointRadius:4,pointBackgroundColor:C1,borderWidth:2,datalabels:{display:true,anchor:'end',align:'bottom',font:{size:12,weight:'700'},color:C1,formatter:v=>v+'%'}}
+    {label:'상단',data:[23.3,24.3,22.5,22.5,26.3],borderColor:C1,backgroundColor:'rgba(88,83,77,.08)',fill:true,pointRadius:4,pointBackgroundColor:C1,borderWidth:2,datalabels:{display:true,anchor:'start',align:'bottom',font:{size:12,weight:'700'},color:C1,formatter:v=>v+'%'}}
   ]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{min:15,max:45,display:false}}}});
 
   // ===== P5 =====
   new Chart(document.getElementById('c5a'),{type:'bar',data:{labels:Y10,datasets:[
     {label:'참여기관수',data:[488,545,567,709,1007,1165,955,1508,1847,2028],backgroundColor:C2,order:2,datalabels:{display:true,anchor:'end',align:'end',font:{size:10,weight:'700'},color:'#404040',formatter:v=>v.toLocaleString()}},
-    {type:'line',label:'기관경쟁률',data:[305,302,442,588,869,1181,836,939,771,902],borderColor:C5,backgroundColor:C5,pointRadius:4,pointBackgroundColor:C5,borderWidth:2.5,yAxisID:'y1',order:1,datalabels:{display:true,anchor:'end',align:'top',font:{size:10,weight:'700'},color:C5,formatter:v=>v.toLocaleString()}}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'end',labels:{boxWidth:10,font:{size:10},padding:8}}},scales:{x:{grid:{display:false}},y:{display:false},y1:{display:false,min:-400,max:1300}}},plugins:[{id:'p5aBubble',afterDraw(chart){const meta=chart.getDatasetMeta(0);const bar=meta.data[7]; // '23년 = index 7
+    {type:'line',label:'기관경쟁률',data:[305,302,442,588,869,1181,836,939,771,902],borderColor:'#2558A3',backgroundColor:'#2558A3',pointRadius:4,pointBackgroundColor:'#2558A3',borderWidth:2.5,yAxisID:'y1',order:1,datalabels:{display:true,anchor:'end',align:'top',font:{size:10,weight:'700'},color:'#2558A3',formatter:v=>v.toLocaleString()}}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'start',labels:{boxWidth:10,font:{size:10},padding:8}}},scales:{x:{grid:{display:false}},y:{display:false},y1:{display:false,min:-400,max:1300}}},plugins:[{id:'p5aBubble',afterDraw(chart){const meta=chart.getDatasetMeta(0);const bar=meta.data[7]; // '23년 = index 7
       if(!bar)return;const ctx=chart.ctx;const x=bar.x;const t1="'23.7 허수성 청약 제한을 위한";const t2="주금납입능력 확인 제도화";ctx.save();ctx.font='bold 8.5px Pretendard';const tw=Math.max(ctx.measureText(t1).width,ctx.measureText(t2).width)+16;const th=30;const r=4;const by=chart.chartArea.top+5;const bx=x-tw/2;
       ctx.fillStyle='rgba(88,83,77,0.75)';ctx.beginPath();ctx.moveTo(bx+r,by);ctx.lineTo(bx+tw-r,by);ctx.quadraticCurveTo(bx+tw,by,bx+tw,by+r);ctx.lineTo(bx+tw,by+th-r);ctx.quadraticCurveTo(bx+tw,by+th,bx+tw-r,by+th);ctx.lineTo(bx+r,by+th);ctx.quadraticCurveTo(bx,by+th,bx,by+th-r);ctx.lineTo(bx,by+r);ctx.quadraticCurveTo(bx,by,bx+r,by);ctx.closePath();ctx.fill();
       ctx.beginPath();ctx.moveTo(x-5,by+th);ctx.lineTo(x,by+th+6);ctx.lineTo(x+5,by+th);ctx.closePath();ctx.fill();
       ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 8px Pretendard';ctx.fillText(t1,x,by+12);ctx.fillText(t2,x,by+24);ctx.restore()}}]});
   new Chart(document.getElementById('c5b'),{type:'line',data:{labels:Y10,datasets:[
-    {label:'청약',data:[469,474,519,506,979,1177,1473,1951,2051,2295],borderColor:C5,backgroundColor:C5,pointRadius:5,pointBackgroundColor:C5,borderWidth:2.5,datalabels:{display:true,anchor:'end',align:'top',font:{size:11,weight:'700'},color:C5,formatter:v=>v===0?'':v.toLocaleString()}}
+    {label:'청약',data:[469,474,519,506,979,1177,1473,1951,2051,2295],borderColor:'#2558A3',backgroundColor:'#2558A3',pointRadius:5,pointBackgroundColor:'#2558A3',borderWidth:2.5,datalabels:{display:true,anchor:'end',align:'top',font:{size:11,weight:'700'},color:'#2558A3',formatter:v=>v===0?'':v.toLocaleString()}}
   ]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{display:false,min:-800,max:2500}}},plugins:[{id:'p5bBubble',afterDraw(chart){const meta=chart.getDatasetMeta(0);const bar=meta.data[4]; // '20년 = index 4
       if(!bar)return;const ctx=chart.ctx;const x=bar.x;const y=bar.y-80;const t1="'20.11";const t2="① 일반청약 배정비율 25%로 확대";const t3="② 균등배정 방식 도입";ctx.save();ctx.font='bold 8px Pretendard';const tw=Math.max(ctx.measureText(t1).width,ctx.measureText(t2).width,ctx.measureText(t3).width)+16;const th=42;const r=4;const bx=x-tw/2;const by=y-th/2;
       ctx.fillStyle='rgba(88,83,77,0.75)';ctx.beginPath();ctx.moveTo(bx+r,by);ctx.lineTo(bx+tw-r,by);ctx.quadraticCurveTo(bx+tw,by,bx+tw,by+r);ctx.lineTo(bx+tw,by+th-r);ctx.quadraticCurveTo(bx+tw,by+th,bx+tw-r,by+th);ctx.lineTo(bx+r,by+th);ctx.quadraticCurveTo(bx,by+th,bx,by+th-r);ctx.lineTo(bx,by+r);ctx.quadraticCurveTo(bx,by,bx+r,by);ctx.closePath();ctx.fill();
@@ -332,10 +361,10 @@
   const P6HL='#2558A3'; // 강조 연도 색상
   const P6PS=['circle','rect','triangle','rectRot','star'];
   function makeReturnLine(id, yearData, avgData, hlIdx){
-    const avgDs={label:'전체평균',data:avgData,borderColor:P6AVG,backgroundColor:P6AVG,pointRadius:6,pointBackgroundColor:P6AVG,pointStyle:'rectRot',borderWidth:2.5,datalabels:{display:true,anchor:'end',align:'top',font:{size:9,weight:'700'},color:P6AVG,formatter:v=>v.toFixed(0)},order:-1};
+    const avgDs={label:'전체평균',data:avgData,borderColor:P6AVG,backgroundColor:P6AVG,pointRadius:6,pointBackgroundColor:P6AVG,pointStyle:'rectRot',borderWidth:2.5,datalabels:{display:true,anchor:'end',align:'top',font:{size:11,weight:'700'},color:P6AVG,formatter:v=>v.toFixed(0)+'%'},order:-1};
     const ds=yearData.map((d,i)=>{
       const isHL=i===hlIdx;
-      return {label:P6YR[i],data:d,borderColor:isHL?P6HL:P6CLR,backgroundColor:isHL?P6HL:P6CLR,pointRadius:5,pointBackgroundColor:isHL?P6HL:P6CLR,pointStyle:P6PS[i],borderWidth:isHL?2.5:1.5,datalabels:{display:false}};
+      return {label:P6YR[i],data:d,borderColor:isHL?P6HL:P6CLR,backgroundColor:isHL?P6HL:P6CLR,pointRadius:5,pointBackgroundColor:isHL?P6HL:P6CLR,pointStyle:P6PS[i],borderWidth:isHL?2.5:1.5,datalabels:{display:isHL,anchor:'end',align:'top',font:{size:11,weight:'700'},color:P6HL,formatter:v=>v.toFixed(0)+'%'}};
     });
     const allDs=avgData?[avgDs,...ds]:ds;
     new Chart(document.getElementById(id),{type:'line',data:{labels:P6X,datasets:allDs},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,boxWidth:5,font:{size:9},padding:10}}},scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>v+'%'}}}}});
@@ -360,6 +389,34 @@
     regLine(2.203,316.3,0,2000,C5)
   ]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{title:{display:true,text:'기관경쟁률(:1)',font:{size:10}}},y:{title:{display:true,text:'일반청약경쟁률(:1)',font:{size:10}}}}}});ch.config._r2='0.396';ch.update()})();
 
+  // ===== P8 리포트: 상장전 리포트수 vs 수요예측 경쟁률 =====
+  (()=>{
+    // 제도강화 이전: 회색 계열, 이후: 파란 계열. 사전발간=별, 미발간=원
+    const pre=[
+      {x:5,y:1275.5,nm:'SK바이오사이언스',pre:false},{x:4,y:1882.9,nm:'SK아이이테크놀로지',pre:false},
+      {x:6,y:1143.8,nm:'에스디바이오센서',pre:false},{x:7,y:1732.8,nm:'카카오뱅크',pre:true},
+      {x:5,y:243.2,nm:'크래프톤',pre:false},{x:4,y:217.6,nm:'롯데렌탈',pre:false},
+      {x:4,y:1471.0,nm:'일진하이솔루스',pre:false},{x:3,y:1835.9,nm:'HD현대중공업',pre:false},
+      {x:6,y:40.0,nm:'케이카',pre:false},{x:4,y:1714.5,nm:'카카오페이',pre:false},
+      {x:14,y:2023.4,nm:'LG에너지솔루션',pre:false}
+    ];
+    const post=[
+      {x:10,y:272.0,nm:'두산로보틱스',pre:true},{x:4,y:17.2,nm:'에코프로머티',pre:false},
+      {x:13,y:663.2,nm:'에이피알',pre:true},{x:3,y:201.1,nm:'HD현대마린솔루션',pre:true},
+      {x:7,y:225.9,nm:'시프트업',pre:false},{x:7,y:413.9,nm:'산일전기',pre:false},
+      {x:4,y:114.4,nm:'LG씨엔에스',pre:false},{x:4,y:240.8,nm:'서울보증보험',pre:false},
+      {x:4,y:275.7,nm:'대한조선',pre:false},{x:4,y:198.5,nm:'케이뱅크',pre:false}
+    ];
+    const ds=[];
+    // 제도강화 이전 — 사전발간
+    const preY=pre.filter(d=>d.pre);const preN=pre.filter(d=>!d.pre);
+    const postY=post.filter(d=>d.pre);const postN=post.filter(d=>!d.pre);
+    ds.push({label:'사전발간',data:preY.concat(postY),pointStyle:'star',pointRadius:8,backgroundColor:function(ctx){return ctx.dataIndex<preY.length?'#9E8C6380':'#2558A380'},borderColor:function(ctx){return ctx.dataIndex<preY.length?'#9E8C63':'#2558A3'},borderWidth:1.5});
+    ds.push({label:'미발간  (수요예측제도 이후 사례는 푸른색)',data:preN.concat(postN),pointStyle:'circle',pointRadius:5,backgroundColor:function(ctx){return ctx.dataIndex<preN.length?'#CCC7BF80':'#6AAFE080'},borderColor:function(ctx){return ctx.dataIndex<preN.length?'#CCC7BF':'#6AAFE0'},borderWidth:1});
+    const rl=regLine(42.43,7.7,2,15,'#2558A3');rl.label='_regression';ds.push(rl);
+    const ch=new Chart(document.getElementById('c8r'),{type:'scatter',data:{datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,boxWidth:6,font:{size:9},padding:6,filter:item=>!item.text.startsWith('_')}},tooltip:{callbacks:{label:ctx=>ctx.raw.nm+' (리포트:'+ctx.raw.x+'건, 경쟁률:'+ctx.raw.y+':1)'}}},scales:{x:{title:{display:true,text:'상장 전 리포트 수(건)',font:{size:10}},min:0,max:16},y:{title:{display:true,text:'수요예측 경쟁률(:1)',font:{size:10}},min:0}}}});ch.config._r2='0.627';ch.update();
+  })();
+
   // ===== P7 세번째: 일반청약경쟁률 vs 종가수익률 =====
   function mkScatterReg(id,xK,yK,color,xLabel,yLabel,slope,intercept,xMax,r2){
     const ch=new Chart(document.getElementById(id),{type:'scatter',data:{datasets:[
@@ -381,31 +438,35 @@
       const quarters=[[0,1,2],[3,4,5],[6,7,8],[9,10,11]];
       ctx.save();
       // 막대(건수) 분기별 평균 점선 — 메리츠 오렌지
-      ctx.setLineDash([4,3]);ctx.lineWidth=1.5;ctx.strokeStyle='rgba(239,59,36,0.6)';
+      ctx.setLineDash([4,3]);ctx.lineWidth=1.5;ctx.strokeStyle='rgba(192,57,43,0.6)';
       quarters.forEach(q=>{
         const avg=q.reduce((s,i)=>s+P9_BAR[i],0)/3;
         const yScale=chart.scales.y;const y=yScale.getPixelForValue(avg);
         const x1=barMeta.data[q[0]].x-15;const x2=barMeta.data[q[2]].x+15;
         ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x2,y);ctx.stroke();
-        ctx.setLineDash([]);ctx.font='bold 9px Pretendard';ctx.fillStyle='#EF3B24';ctx.textAlign='center';
+        ctx.setLineDash([]);ctx.font='bold 9px Pretendard';ctx.fillStyle='#C0392B';ctx.textAlign='center';
         ctx.fillText(Math.round(avg)+'건',(x1+x2)/2,y+14);ctx.setLineDash([4,3]);
       });
-      // 꺾은선 분기별 평균 점선 — 메리츠 오렌지
-      ctx.strokeStyle='rgba(239,59,36,0.6)';
-      quarters.forEach(q=>{
+      // 꺾은선 분기별 평균 점선
+      ctx.strokeStyle='rgba(192,57,43,0.6)';
+      quarters.forEach((q,qi)=>{
         const avg=q.reduce((s,i)=>s+lineData[i],0)/3;
         const yScale=chart.scales.y1;const y=yScale.getPixelForValue(avg);
         const x1=lineMeta.data[q[0]].x-15;const x2=lineMeta.data[q[2]].x+15;
         ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x2,y);ctx.stroke();
-        ctx.setLineDash([]);ctx.font='bold 9px Pretendard';ctx.fillStyle='#EF3B24';ctx.textAlign='center';
-        ctx.fillText(Math.round(avg),(x1+x2)/2,y+14);ctx.setLineDash([4,3]);
+        ctx.setLineDash([]);ctx.font='bold 9px Pretendard';ctx.fillStyle='#C0392B';
+        const isPercent=lineData[0]<500;const lbl=Math.round(avg)+(isPercent?'%':'');
+        if(qi===2){ctx.textAlign='center';ctx.fillText(lbl,lineMeta.data[q[0]].x,y+14);}
+        else if(qi===3&&!isPercent){ctx.textAlign='center';ctx.fillText(lbl,(x1+x2)/2,y-6);}
+        else{ctx.textAlign='center';ctx.fillText(lbl,(x1+x2)/2,y+14);}
+        ctx.setLineDash([4,3]);
       });
       // 10~12월 점선 박스 + 워딩
       const q4=quarters[3];const bx1=barMeta.data[q4[0]].x-20;const bx2=barMeta.data[q4[2]].x+20;
       const by1=chart.chartArea.top;const by2=chart.chartArea.bottom-5;
-      ctx.setLineDash([5,4]);ctx.lineWidth=2;ctx.strokeStyle='#EF3B24';
+      ctx.setLineDash([5,4]);ctx.lineWidth=2;ctx.strokeStyle='#C0392B';
       ctx.strokeRect(bx1,by1,bx2-bx1,by2-by1);
-      ctx.setLineDash([]);ctx.font='bold 11px Pretendard';ctx.fillStyle='#EF3B24';ctx.textAlign='center';
+      ctx.setLineDash([]);ctx.font='bold 11px Pretendard';ctx.fillStyle='#C0392B';ctx.textAlign='center';
       ctx.fillText('발행사 불리 구간',(bx1+bx2)/2,by1+12);ctx.font='bold 10px Pretendard';
       ctx.fillText('10~12월 공모 회피 권고',(bx1+bx2)/2,by1+25);
       ctx.restore();
@@ -415,7 +476,7 @@
     const lineMax=Math.max(...lineData)*1.15;
     new Chart(document.getElementById(id),{type:'bar',data:{labels:M9,datasets:[
       {label:'건수',data:P9_BAR,backgroundColor:C1+'70',order:2,datalabels:DL_V},
-      {type:'line',label:lineLabel,data:lineData,borderColor:lineColor,pointRadius:4,pointBackgroundColor:lineColor,borderWidth:2.5,yAxisID:'y1',order:1,datalabels:{display:true,anchor:'end',align:'top',font:{size:10,weight:'700'},color:lineColor,formatter:lineFmt||function(v){return v+'%'}}}
+      {type:'line',label:lineLabel,data:lineData,borderColor:lineColor,pointRadius:4,pointBackgroundColor:lineColor,borderWidth:2.5,yAxisID:'y1',order:1,datalabels:{display:true,anchor:'end',align:'top',offset:3,font:{size:9,weight:'700'},color:lineColor,formatter:lineFmt||function(v){return v+'%'}}}
     ]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{display:false,max:P9_BAR_MAX},y1:{display:false,max:lineMax}}},plugins:[qAvgPlugin(lineData)]});
   }
   makeP9('c9a',[102.5,108.8,111.6,118.1,113.8,114.5,117.2,110.8,109.6,110.0,110.4,96.9],'밴드대비','#2558A3');
@@ -426,10 +487,10 @@
   (()=>{const ch=new Chart(document.getElementById('c10'),{type:'scatter',data:{datasets:[
     {label:'유통비율vs종가',data:SD.filter(d=>d.float&&d.y_close!=null).map(d=>({x:d.float,y:d.y_close})),backgroundColor:C1+'50',borderColor:C1,borderWidth:.8,pointRadius:2.5},
     regLine(-1.319,101.0,0,100,C5)
-  ]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{title:{display:true,text:'유통비율(%)',font:{size:9}},min:0,max:100},y:{title:{display:true,text:'종가수익률(%)',font:{size:9}}}}}});ch.config._r2='0.046';ch.update()})();
+  ]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{title:{display:true,text:'유통비율(%)',font:{size:9}},min:0,max:100},y:{title:{display:true,text:'종가수익률(%)',font:{size:9}}}}}});ch.config._eq='y = -1.32x + 101.0';ch.update()})();
   (()=>{const ch=new Chart(document.getElementById('c11'),{type:'scatter',data:{datasets:[
     {label:'공모규모vs종가',data:SD.filter(d=>d.size&&d.y_close!=null).map(d=>({x:d.size,y:d.y_close})),backgroundColor:C2+'50',borderColor:C2,borderWidth:.8,pointRadius:2.5},
     regLine(-0.0001,56.3,10,130000,C5)
-  ]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{type:'logarithmic',title:{display:true,text:'공모규모(억원,log)',font:{size:9}}},y:{title:{display:true,text:'종가수익률(%)',font:{size:9}}}}}});ch.config._r2='0.000';ch.update()})();
+  ]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{type:'logarithmic',title:{display:true,text:'공모규모(억원,log)',font:{size:9}}},y:{title:{display:true,text:'종가수익률(%)',font:{size:9}}}}}});ch.config._eq='y = -0.0001x + 56.3';ch.update()})();
 </script>
 </body></html>
