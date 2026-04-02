@@ -200,7 +200,7 @@
   <div class="page-footer"><div class="page-footer__source">Source: 메리츠증권 IB, 금융투자협회. '21년 이후 유가증권시장 기준시총 1조원+ 대형 IPO 21건 대상.</div><div class="page-footer__page">8</div></div>
 </div><div class="page">
   <div class="page-header"><div class="page-header__logo"><div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div><span class="page-header__company">ROI Analysis</span></div><div class="page-header__meta"><div class="page-header__confidential">Confidential</div><div>2026.03 | IPO Market Review</div></div></div>
-  <div class="slide-title"><div class="slide-title__main">IPO 시장에 뚜렷한 계절성 존재 — 4~6월 비수기에 가격 측면에서 유리한 조건 형성</div><div class="slide-title__sub">2021-2025 월별 IPO 건수(막대), 밴드대비 확정공모가·수요예측 경쟁률 평균(꺾은선), 분기별 평균(점선)</div></div>
+  <div class="slide-title"><div class="slide-title__main">IPO 시장에 뚜렷한 계절성 존재; 4~6월 비수기에 가격 측면에서 유리한 조건 형성</div><div class="slide-title__sub">2021-2025 월별 IPO 건수(막대), 밴드대비 확정공모가·수요예측 경쟁률 평균(꺾은선), 분기별 평균(점선)</div></div>
   <div class="content-grid content-grid--2col">
     <div class="panel"><div class="panel__title">월별 IPO 건수 + 밴드대비 확정공모가<span class="panel__title-unit">건 / %</span></div><div class="panel__chart"><canvas id="c9a"></canvas></div></div>
     <div class="panel"><div class="panel__title">월별 IPO 건수 + 수요예측 경쟁률<span class="panel__title-unit">건 / :1</span></div><div class="panel__chart"><canvas id="c9b"></canvas></div></div>
@@ -209,7 +209,7 @@
   <div class="page-footer"><div class="page-footer__source">Source: KRX KIND, DART 투자설명서. SPAC/합병상장 제외(별도 명시 시 포함).</div><div class="page-footer__page">9</div></div>
 </div><div class="page">
   <div class="page-header"><div class="page-header__logo"><div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div><span class="page-header__company">ROI Analysis</span></div><div class="page-header__meta"><div class="page-header__confidential">Confidential</div><div>2026.03 | IPO Market Review</div></div></div>
-  <div class="slide-title"><div class="slide-title__main">유통비율 20-30%대가 최적 구간(평균 84%), 공모규모 소형주에서 수익률 최고</div><div class="slide-title__sub">유통주식 비율 및 공모규모 구간별 종가 수익률 분석 (2021-2025)</div></div>
+  <div class="slide-title"><div class="slide-title__main">유통비율과 공모규모가 낮을수록 상장직후 수급 및 주가에 유리</div><div class="slide-title__sub">유통주식 비율 및 공모규모 구간별 종가 수익률 분석 (2021-2025)</div></div>
   <div class="content-grid content-grid--2col">
     <div class="panel"><div class="panel__title">유통비율 vs 종가 수익률<span class="panel__title-unit">X:%, Y:%</span></div><div class="panel__chart"><canvas id="c10"></canvas></div></div>
     <div class="panel"><div class="panel__title">공모규모 vs 종가 수익률<span class="panel__title-unit">X:억원(log), Y:%</span></div><div class="panel__chart"><canvas id="c11"></canvas></div></div>
@@ -299,13 +299,14 @@
   const p4aRaw={PER:[76,67,74,68,60],EBITDA:[7,3,2,3,11],PBR:[2,0,4,3,2],PSR:[1,0,1,1,2],ETC:[0,0,1,4,1]};
   const p4aTotal=Y5.map((_,i)=>p4aRaw.PER[i]+p4aRaw.EBITDA[i]+p4aRaw.PBR[i]+p4aRaw.PSR[i]+p4aRaw.ETC[i]);
   const p4aPct=(arr)=>arr.map((v,i)=>Math.round(v/p4aTotal[i]*100));
-  const p4aDL=(raw,minPct,txtColor)=>({display:true,anchor:'center',align:'center',textAlign:'center',font:{size:11,weight:'700'},color:txtColor||'#fff',formatter:(v,ctx)=>{const r=raw[ctx.dataIndex];return v<minPct?'':r+'건\n('+v+'%)'}});
+  const p4aDL=(raw,txtColor)=>({display:true,anchor:'center',align:'center',textAlign:'center',font:{size:11,weight:'700'},color:txtColor||'#fff',formatter:(v,ctx)=>{const r=raw[ctx.dataIndex];return r+'건\n('+v+'%)'}});
+  const p4aHide={display:false};
   new Chart(document.getElementById('c4a'),{type:'bar',data:{labels:Y5,datasets:[
-    {label:'PER',data:p4aPct(p4aRaw.PER),backgroundColor:'#2558A3',datalabels:p4aDL(p4aRaw.PER,8)},
-    {label:'EV/EBITDA',data:p4aPct(p4aRaw.EBITDA),backgroundColor:'#6AAFE0',datalabels:p4aDL(p4aRaw.EBITDA,5)},
-    {label:'PBR',data:p4aPct(p4aRaw.PBR),backgroundColor:'#B8D9F0',datalabels:p4aDL(p4aRaw.PBR,5,'#58534D')},
-    {label:'PSR',data:p4aPct(p4aRaw.PSR),backgroundColor:'#58534D',datalabels:p4aDL(p4aRaw.PSR,5)},
-    {label:'기타',data:p4aPct(p4aRaw.ETC),backgroundColor:'#E8E4DE',datalabels:p4aDL(p4aRaw.ETC,5,'#78736C')}
+    {label:'PER',data:p4aPct(p4aRaw.PER),backgroundColor:'#2558A3',datalabels:p4aDL(p4aRaw.PER)},
+    {label:'EV/EBITDA',data:p4aPct(p4aRaw.EBITDA),backgroundColor:'#6AAFE0',datalabels:{display:true,anchor:'start',align:'center',textAlign:'center',font:{size:11,weight:'700'},color:'#fff',formatter:(v,ctx)=>{const r=p4aRaw.EBITDA[ctx.dataIndex];return r+'건\n('+v+'%)'}}},
+    {label:'PBR',data:p4aPct(p4aRaw.PBR),backgroundColor:'#B8D9F0',datalabels:p4aHide},
+    {label:'PSR',data:p4aPct(p4aRaw.PSR),backgroundColor:'#58534D',datalabels:p4aHide},
+    {label:'기타',data:p4aPct(p4aRaw.ETC),backgroundColor:'#E8E4DE',datalabels:p4aHide}
   ]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,max:100,display:false}}}});
   new Chart(document.getElementById('c4b'),{type:'bar',data:{labels:Y5,datasets:[
     {label:'P25-P75',data:[[21.0,30.6],[16.6,28.6],[18.3,26.8],[19.9,28.4],[21.4,29.0]],backgroundColor:'rgba(88,83,77,.25)',borderColor:C1,borderWidth:{top:1,right:1,bottom:1,left:1},borderSkipped:false,datalabels:{display:false}},
