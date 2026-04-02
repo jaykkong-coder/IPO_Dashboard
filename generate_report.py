@@ -92,22 +92,30 @@ def generate():
     cnt_kd = [sum(1 for d in by_year.get(y, []) if d.get("시장구분") == "코스닥") for y in Y10]
     cnt_kp = [sum(1 for d in by_year.get(y, []) if d.get("시장구분") == "유가증권") for y in Y10]
     cnt_t = [a + b for a, b in zip(cnt_kd, cnt_kp)]
-    amt_t = [round(sum(d["확정공모금액_억원"] for d in by_year.get(y, []) if d.get("확정공모금액_억원")) / 10000, 1) for y in Y10]
-    avg_a = [round(sum(d["확정공모금액_억원"] for d in by_year.get(y, []) if d.get("확정공모금액_억원")) / max(sum(1 for d in by_year.get(y, []) if d.get("확정공모금액_억원")), 1), 0) for y in Y10]
+    y_max_cnt = max(max(cnt_kd), max(cnt_kp), max(cnt_t)) + 5
 
-    page2("IPO 시장 현황 (2016~2025)",
+    # 코스피/코스닥 각각 평균공모금액 (억원)
+    avg_kp = [round(sum(d["확정공모금액_억원"] for d in by_year.get(y, []) if d.get("확정공모금액_억원") and d.get("시장구분") == "유가증권") / max(sum(1 for d in by_year.get(y, []) if d.get("확정공모금액_억원") and d.get("시장구분") == "유가증권"), 1), 0) for y in Y10]
+    avg_kd = [round(sum(d["확정공모금액_억원"] for d in by_year.get(y, []) if d.get("확정공모금액_억원") and d.get("시장구분") == "코스닥") / max(sum(1 for d in by_year.get(y, []) if d.get("확정공모금액_억원") and d.get("시장구분") == "코스닥"), 1), 0) for y in Y10]
+
+    page2("대형딜 중심의 코스피 시장과, 기술상장 기업 중심의 코스닥 시장",
           f"10년간 신규상장 {total}건, 연평균 {total//10}건 · '21년 대형 IPO 집중",
           {"id": "p1a", "traces": json.dumps([
-              {"x": Y10, "y": cnt_kd, "type": "bar", "name": "코스닥", "marker": {"color": C["bar2"]}},
-              {"x": Y10, "y": cnt_kp, "type": "bar", "name": "유가증권", "marker": {"color": C["bar1"]}},
-              {"x": Y10, "y": cnt_t, "type": "scatter", "mode": "text", "text": [str(v) for v in cnt_t],
-               "textposition": "top center", "textfont": {"size": 9, "color": "#334155"}, "showlegend": False},
-          ]), "layout": json.dumps(base_layout("IPO 건수 추이", barmode="stack"))},
-          {"id": "p1b", "traces": json.dumps([
-              {"x": Y10, "y": amt_t, "type": "bar", "name": "공모규모(조)", "marker": {"color": C["bar2"]}},
-              {"x": Y10, "y": avg_a, "type": "scatter", "mode": "lines+markers", "name": "평균(억)", "yaxis": "y2",
+              {"x": Y10, "y": cnt_kp, "type": "bar", "name": "코스피", "marker": {"color": C["bar1"]},
+               "text": [str(v) for v in cnt_kp], "textposition": "outside", "textfont": {"size": 9}},
+              {"x": Y10, "y": avg_kp, "type": "scatter", "mode": "lines+markers", "name": "평균공모(억)", "yaxis": "y2",
                "line": {"color": C["accent"], "width": 2.5}, "marker": {"size": 6}},
-          ]), "layout": json.dumps(base_layout("공모규모 · 평균공모규모", yaxis2={"title": "억원", "overlaying": "y", "side": "right", "gridcolor": "rgba(0,0,0,0)", "tickfont": {"size": 9}}))},
+          ]), "layout": json.dumps(base_layout("코스피 — 상장건수 · 평균공모규모",
+              yaxis={"range": [0, y_max_cnt], "gridcolor": "rgba(0,0,0,0.07)", "linecolor": "#e2e8f0", "tickfont": {"size": 10}, "zeroline": True, "zerolinecolor": "#cbd5e1"},
+              yaxis2={"title": "억원", "overlaying": "y", "side": "right", "gridcolor": "rgba(0,0,0,0)", "tickfont": {"size": 9}}))},
+          {"id": "p1b", "traces": json.dumps([
+              {"x": Y10, "y": cnt_kd, "type": "bar", "name": "코스닥", "marker": {"color": C["bar2"]},
+               "text": [str(v) for v in cnt_kd], "textposition": "outside", "textfont": {"size": 9}},
+              {"x": Y10, "y": avg_kd, "type": "scatter", "mode": "lines+markers", "name": "평균공모(억)", "yaxis": "y2",
+               "line": {"color": C["accent"], "width": 2.5}, "marker": {"size": 6}},
+          ]), "layout": json.dumps(base_layout("코스닥 — 상장건수 · 평균공모규모",
+              yaxis={"range": [0, y_max_cnt], "gridcolor": "rgba(0,0,0,0.07)", "linecolor": "#e2e8f0", "tickfont": {"size": 10}, "zeroline": True, "zerolinecolor": "#cbd5e1"},
+              yaxis2={"title": "억원", "overlaying": "y", "side": "right", "gridcolor": "rgba(0,0,0,0)", "tickfont": {"size": 9}}))},
           [f"'25년 76건, 전년 대비 소폭 감소 (YoY -5%)", f"'21년 공모규모 최대 — LG에너지솔루션(12.8조) 등 대형 IPO 집중", f"평균 공모규모는 연간 200~450억원 수준"])
 
     # ================================================================
