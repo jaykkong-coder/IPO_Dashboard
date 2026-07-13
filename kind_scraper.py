@@ -277,7 +277,7 @@ def update_db_with_price_data(db_path=None):
 
     update_sql = f"""
         UPDATE ipo_companies SET
-            {', '.join(f'{f} = ?' for f in price_fields)},
+            {', '.join(f'{f} = COALESCE(?, {f})' for f in price_fields)},
             updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
     """
