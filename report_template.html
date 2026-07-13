@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>{{보고서 제목}}</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+  :root {
+    --navy-900: #0B1D3A; --navy-800: #0F2847; --navy-700: #163560; --navy-600: #1B4178; --navy-500: #58534D;
+    --accent-blue: #4A8EC2; --accent-teal: #9E9A94; --accent-gold: #4A8EC2;
+    --meritz-orange: #EF3B24; --meritz-gray: #6D6E71;
+    --gray-900: #1A1A1A; --gray-700: #404040; --gray-600: #525252; --gray-500: #6B6B6B; --gray-400: #8E8E8E;
+    --gray-300: #B8B8B8; --gray-200: #D6D6D6; --gray-100: #ECECEC; --gray-50: #F7F7F7; --white: #FFFFFF;
+    --positive: #1A8754; --negative: #EF3B24; --warning: #D4A843; --info: #4A8EC2;
+    --chart-1: #58534D; --chart-2: #9E9A94; --chart-3: #4A8EC2; --chart-4: #CCC7BF; --chart-5: #9E8C63; --chart-6: #E8E4DE;
+    --font-body: 'Pretendard', -apple-system, 'Segoe UI', sans-serif;
+    --page-width: 297mm; --page-height: 210mm;
+    --page-margin-top: 14mm; --page-margin-bottom: 12mm; --page-margin-left: 16mm; --page-margin-right: 16mm;
+  }
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font-body);font-size:13pt;line-height:1.5;color:var(--gray-900);background:#C0C0C0;-webkit-font-smoothing:antialiased}
+  .page{width:var(--page-width);height:var(--page-height);margin:20px auto;padding:var(--page-margin-top) var(--page-margin-right) var(--page-margin-bottom) var(--page-margin-left);background:var(--white);box-shadow:0 2px 20px rgba(0,0,0,.15);position:relative;display:flex;flex-direction:column;overflow:hidden}
+  @media print{body{background:white}.page{margin:0;box-shadow:none;page-break-after:always;page-break-inside:avoid}@page{size:A4 landscape;margin:0}}
+  .page-header{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:8px;border-bottom:2.5px solid var(--navy-800);margin-bottom:10px;flex-shrink:0;position:relative}
+  .page-header::after{content:'';position:absolute;bottom:-2.5px;left:0;width:60px;height:2.5px;background:var(--meritz-orange)}
+  .page-header__logo{display:flex;align-items:center;gap:10px}
+  .page-header__logo-mark{display:flex;align-items:center}
+  .page-header__logo-mark svg{height:24px;width:auto}
+  .page-header__company{font-size:12pt;font-weight:600;color:var(--meritz-gray);padding-left:10px;border-left:1px solid var(--gray-200)}
+  .page-header__meta{text-align:right;font-size:11pt;color:var(--gray-500);line-height:1.4}
+  .page-header__confidential{font-size:11pt;font-weight:400;color:var(--negative);letter-spacing:0}
+  .slide-title{margin-bottom:8px;flex-shrink:0}
+  .slide-title__main{font-size:18pt;font-weight:800;color:var(--navy-900);line-height:1.3;letter-spacing:-.3px;margin-bottom:2px}
+  .slide-title__sub{font-size:12pt;color:var(--gray-500);font-weight:400}
+  .content-grid{display:grid;gap:10px;flex:1;min-height:0}
+  .content-grid--2col{grid-template-columns:1fr 1fr;grid-template-rows:1fr}
+  .content-grid--3col{grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr}
+  .content-grid--60-40{grid-template-columns:3fr 2fr;grid-template-rows:1fr}
+  .content-grid--1col{grid-template-columns:1fr;grid-template-rows:1fr}
+  .content-grid--2x2{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+  .panel{border:1px solid var(--gray-200);border-radius:4px;padding:10px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .panel--borderless{border:none;padding:0}
+  .panel__title{font-size:12pt;font-weight:700;color:var(--navy-800);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:baseline;flex-shrink:0}
+  .panel__title-unit{font-size:10pt;font-weight:400;color:var(--gray-400)}
+  .panel__chart{flex:1;position:relative;min-height:0}
+  .panel__bumper{font-size:10pt;color:var(--gray-500);margin-top:5px;padding-top:4px;border-top:1px solid var(--gray-100);line-height:1.4;font-style:italic;flex-shrink:0}
+  .data-table{width:100%;border-collapse:collapse;font-size:11pt;line-height:1.4}
+  .data-table thead th{background:var(--navy-800);color:var(--white);font-weight:600;padding:5px 6px;text-align:left;font-size:10pt;white-space:nowrap}
+  .data-table thead th:first-child{border-radius:3px 0 0 0}.data-table thead th:last-child{border-radius:0 3px 0 0}
+  .data-table tbody td{padding:4px 6px;border-bottom:1px solid var(--gray-100)}
+  .data-table tbody tr:nth-child(even){background:var(--gray-50)}
+  .data-table .num{text-align:right;font-variant-numeric:tabular-nums}
+  .data-table .bold{font-weight:700}.data-table .positive{color:var(--positive);font-weight:600}.data-table .negative{color:var(--negative);font-weight:600}
+  .callout{background:#F0F5FA;border-left:3px solid var(--navy-600);padding:12px 16px;border-radius:0 4px 4px 0;margin-top:6px;flex-shrink:0}
+  .callout__label{font-size:10pt;font-weight:700;color:var(--navy-600);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:5px}
+  .legend__item{display:flex;align-items:center;gap:4px;font-size:10pt;color:var(--gray-600)}
+  .legend__dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+  .page-footer{margin-top:auto;padding-top:6px;border-top:1px solid var(--gray-200);display:flex;justify-content:space-between;align-items:flex-end;flex-shrink:0}
+  .page-footer__source{font-size:10pt;color:var(--gray-400);line-height:1.4;max-width:70%}
+  .page-footer__page{font-size:10pt;font-weight:700;color:var(--gray-900)}
+  .commentary{list-style:none;padding:0}
+  .commentary li{font-size:11pt;line-height:1.5;padding:3px 0 3px 12px;position:relative;color:var(--gray-700);border-bottom:1px solid var(--gray-100)}
+  .commentary li:last-child{border-bottom:none}
+  .commentary li::before{content:'';position:absolute;left:0;top:11px;width:5px;height:5px;background:var(--navy-600);border-radius:50%}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ 표지 (SVG 리본 — 벡터라 자유 수정 가능) ═══════════ -->
+<div class="page" style="justify-content:center;align-items:center;position:relative;overflow:hidden;padding:0;">
+  <svg viewBox="0 0 2970 2100" preserveAspectRatio="xMidYMid slice" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+  <defs>
+    <linearGradient id="rgA" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#A81E0C"/><stop offset="0.5" stop-color="#D93A22"/>
+      <stop offset="0.85" stop-color="#E8563C"/><stop offset="1" stop-color="#C82C15"/>
+    </linearGradient>
+    <linearGradient id="rgB" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#C22C15"/><stop offset="0.35" stop-color="#DD4128"/>
+      <stop offset="0.7" stop-color="#EC6A4C"/><stop offset="1" stop-color="#DD3B22"/>
+    </linearGradient>
+    <filter id="csoft" x="-25%" y="-25%" width="150%" height="150%"><feGaussianBlur stdDeviation="42"/></filter>
+    <filter id="csoft2" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="24"/></filter>
+    <clipPath id="cclipB">
+      <path d="M 1000,1600 C 1700,1745 2140,690 3030,190 L 3030,520 C 2300,980 1900,1800 1120,1770 C 1050,1740 1010,1670 1000,1600 Z"/>
+    </clipPath>
+  </defs>
+  <rect width="2970" height="2100" fill="#ffffff"/>
+  <path d="M -60,1400 C 430,1050 840,1090 1195,1520 L 1165,1725 C 720,1490 390,1520 -60,1790 Z"
+        fill="#40403f" opacity="0.14" filter="url(#csoft)" transform="translate(30,85)"/>
+  <path d="M 1000,1600 C 1700,1745 2140,690 3030,190 L 3030,520 C 2300,980 1900,1800 1120,1770 Z"
+        fill="#40403f" opacity="0.13" filter="url(#csoft)" transform="translate(25,80)"/>
+  <path d="M 1000,1600 C 1700,1745 2140,690 3030,190 L 3030,520 C 2300,980 1900,1800 1120,1770 C 1050,1740 1010,1670 1000,1600 Z" fill="url(#rgB)"/>
+  <path d="M 1000,1600 C 1700,1745 2140,690 3030,190 L 3030,290 C 2220,760 1840,1700 1030,1650 Z" fill="#ffffff" opacity="0.15"/>
+  <g clip-path="url(#cclipB)"><ellipse cx="1180" cy="1620" rx="230" ry="170" fill="#5a0e02" opacity="0.30" filter="url(#csoft2)"/></g>
+  <path d="M -60,1400 C 430,1050 840,1090 1195,1520 C 1225,1565 1215,1660 1165,1725 C 720,1490 390,1520 -60,1790 Z" fill="url(#rgA)"/>
+  <path d="M -60,1400 C 430,1050 840,1090 1195,1520 L 1170,1575 C 830,1190 430,1150 -60,1480 Z" fill="#ffffff" opacity="0.13"/>
+  <path d="M 1195,1520 C 1225,1565 1215,1660 1165,1725 C 1150,1700 1148,1580 1195,1520 Z" fill="#8c1a08" opacity="0.55"/>
+  <rect y="1952" width="2970" height="148" fill="#A9AEB0"/>
+</svg>
+  <div style="position:absolute;top:12mm;left:25mm;z-index:1;font-size:11pt;color:#525252;letter-spacing:.2px;">Strictly Private &amp; Confidential</div>
+  <div style="position:absolute;bottom:16mm;right:25mm;z-index:1;font-size:25pt;font-weight:800;">
+    <span style="color:#EE3B24;letter-spacing:-1px;">meritz</span> <span style="color:#3A3A3A;font-weight:700;font-size:23pt;">메리츠증권</span>
+  </div>
+  <div style="text-align:left;width:100%;padding:0 25mm;position:absolute;top:24mm;left:0;z-index:1;">
+    <div style="width:60px;height:4px;background:var(--meritz-orange);margin-bottom:16px;"></div>
+    <div style="font-size:40pt;font-weight:800;color:var(--gray-900);line-height:1.15;letter-spacing:-1px;margin-bottom:10px;">{{보고서 제목}}</div>
+    <div style="font-size:18pt;font-weight:400;color:var(--gray-600);letter-spacing:-.5px;margin-bottom:22px;">{{부제 — 기간/범위 설명}}</div>
+    <div style="display:flex;gap:30px;">
+      <div style="border-left:3px solid var(--meritz-orange);padding-left:14px;">
+        <div style="font-size:10.5pt;color:var(--gray-500);font-weight:600;margin-bottom:2px;">{{지표1 라벨}}</div>
+        <div style="font-size:15pt;color:var(--gray-900);font-weight:700;">{{핵심수치1}}</div>
+        <div style="font-size:9.5pt;color:var(--gray-500);">{{수치1 설명}}</div>
+      </div>
+      <div style="border-left:3px solid var(--meritz-orange);padding-left:14px;">
+        <div style="font-size:10.5pt;color:var(--gray-500);font-weight:600;margin-bottom:2px;">{{지표2 라벨}}</div>
+        <div style="font-size:15pt;color:var(--gray-900);font-weight:700;">{{핵심수치2}}</div>
+        <div style="font-size:9.5pt;color:var(--gray-500);">{{수치2 설명}}</div>
+      </div>
+    </div>
+  </div>
+  <div style="position:absolute;bottom:4.5mm;left:25mm;z-index:1;">
+    <div style="font-size:11pt;color:rgba(255,255,255,.95);font-weight:700;display:inline;">{{YYYY. MM}}</div>
+    <div style="font-size:10pt;color:rgba(255,255,255,.8);display:inline;margin-left:10px;">{{작성 조직}}</div>
+  </div>
+</div>
+
+
+<!-- ═══════════ 콘텐츠 페이지 예시 (이 블록을 복제해 페이지 추가) ═══════════ -->
+<div class="page">
+  <div class="page-header"><div class="page-header__logo"><div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div><span class="page-header__company">{{섹션명 (예: Market Overview)}}</span></div><div class="page-header__meta"><div class="page-header__confidential">Confidential</div><div>{{YYYY.MM | 문서명}}</div></div></div>
+
+  <div class="slide-title">
+    <div class="slide-title__main">{{헤드메시지 — 이 페이지의 결론 한 문장}}</div>
+    <div class="slide-title__sub">{{데이터 범위/기준 설명}}</div>
+  </div>
+
+  <div class="content-grid content-grid--2col">
+    <div class="panel">
+      <div class="panel__title">{{차트 제목}}<span class="panel__title-unit">{{단위}}</span></div>
+      <div class="panel__chart"><canvas id="chart1"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="panel__title">{{차트 제목 2}}<span class="panel__title-unit">{{단위}}</span></div>
+      <div class="panel__chart"><canvas id="chart2"></canvas></div>
+    </div>
+  </div>
+
+  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px">
+    <li><strong>{{소제목}}:</strong> {{근거 수치를 포함한 발견}}</li>
+    <li><strong>{{소제목}}:</strong> {{두 번째 인사이트}}</li>
+  </ul></div>
+
+  <div class="page-footer"><div class="page-footer__source">Source: {{출처}}</div><div class="page-footer__page">1</div></div>
+</div>
+
+<script>
+  Chart.register(ChartDataLabels);
+  Chart.defaults.devicePixelRatio=3;
+  Chart.defaults.font.family="'Pretendard',-apple-system,'Segoe UI',sans-serif";
+  Chart.defaults.font.size=12; Chart.defaults.color='#6B6B6B';
+  Chart.defaults.plugins.legend.display=false;
+  Chart.defaults.plugins.datalabels={display:false};
+  Chart.defaults.scale.grid={color:'#ECECEC',lineWidth:.8};
+  Chart.defaults.scale.border={display:false};
+  Chart.defaults.elements.bar.borderRadius=2; Chart.defaults.elements.line.tension=.3;
+
+  // 차트 팔레트 (웜그레이 + 포인트 블루) — 순서대로 사용
+  const C1='#58534D',C2='#9E9A94',C3='#4A8EC2',C4='#CCC7BF',C5='#9E8C63',C6='#E8E4DE';
+  const HL='#2558A3'; // 강조 색 (핵심 시리즈 1개에만)
+  const DL_V={display:true,anchor:'end',align:'end',font:{size:12,weight:'700'},color:'#404040',formatter:v=>v===0?'':v};
+
+  // 예시 차트 — 실제 데이터로 교체
+  new Chart(document.getElementById('chart1'),{type:'bar',data:{labels:['A','B','C'],datasets:[
+    {label:'값',data:[10,20,30],backgroundColor:C6,datalabels:DL_V}]},
+    options:{responsive:true,maintainAspectRatio:false}});
+  new Chart(document.getElementById('chart2'),{type:'line',data:{labels:['A','B','C'],datasets:[
+    {label:'추이',data:[5,15,10],borderColor:HL,backgroundColor:HL,pointRadius:5,borderWidth:2.5,datalabels:DL_V}]},
+    options:{responsive:true,maintainAspectRatio:false}});
+</script>
+</body>
+</html>
