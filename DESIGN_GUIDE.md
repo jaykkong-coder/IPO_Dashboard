@@ -34,7 +34,7 @@
 2. `slide-title` — 헤드메시지 단독 (부제 없음)
 3. `content-grid` — 패널 배치: `--1col / --2col / --3col / --2x2 / --60-40` 변형
 4. `panel` — `panel__title`(+`panel__title-unit` 단위) + `panel__chart`(canvas)
-5. `callout` — **Key Insight 불릿 2~4개** (`<strong>소제목:</strong> 근거 수치 포함 서술`)
+5. `callout` — **Key Insight 불릿 2~4개** (`<strong>소제목:</strong> 근거 수치 포함 서술`). 헤드메시지와 동일 문체: 주장 1개 + 근거 수치, **대시(—) 연결 금지**(쉼표·마침표로 분리), 부연 수식어·차트 재서술 없이 1~2문장
 6. `page-footer` — Source 표기 + 페이지 번호
 
 ## 차트 규칙 (Chart.js 4.x + datalabels 플러그인)
