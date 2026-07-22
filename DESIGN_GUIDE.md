@@ -25,20 +25,21 @@
 
 ## 타이포그래피
 - 폰트: Pretendard (CDN), 본문 13pt
-- 페이지 헤드메시지(`slide-title__main`): **결론을 문장으로** ("~ 증가추세", "~ 수렴하는 경향") — 차트 나열식 제목 금지
-- 부제(`slide-title__sub`): 데이터 범위·기준 명시 (예: "2021-2026.1H 확정공모가 대비 …")
+- 페이지 헤드메시지(`slide-title__main`): **맥킨지 액션 타이틀** — 페이지 결론 주장 1개를 완결 문장으로. 주제 라벨("~현황", "~분석") 금지, **대시(—)로 메시지 2개 이어붙이기 금지**, 근거 수치 1개는 쉼표·괄호로 허용. 명사형 종결("~달성", "~전환"). 헤드메시지만 이어 읽어도 스토리가 완성돼야 함
+- **부제 금지**: 콘텐츠 페이지에 회색 부제(`slide-title__sub`)를 두지 않는다 (표지는 예외). 기간·기준 정보는 패널 제목 괄호나 Source로
 - 숫자 강조: `font-weight:700` + 데이터레이블 12pt
 
 ## 페이지 구조 (위→아래)
 1. `page-header` — meritz 로고(SVG 텍스트) + 섹션명 | Confidential + 문서명
-2. `slide-title` — 헤드메시지 + 부제
+2. `slide-title` — 헤드메시지 단독 (부제 없음)
 3. `content-grid` — 패널 배치: `--1col / --2col / --3col / --2x2 / --60-40` 변형
 4. `panel` — `panel__title`(+`panel__title-unit` 단위) + `panel__chart`(canvas)
 5. `callout` — **Key Insight 불릿 2~4개** (`<strong>소제목:</strong> 근거 수치 포함 서술`)
 6. `page-footer` — Source 표기 + 페이지 번호
 
 ## 차트 규칙 (Chart.js 4.x + datalabels 플러그인)
-- 전역: `devicePixelRatio:3`(인쇄 선명도), legend 기본 숨김, 그리드 `#ECECEC`
+- 전역: `devicePixelRatio:3`(인쇄 선명도), Chart.js 내장 legend 숨김, 그리드 `#ECECEC`
+- **범례 필수**: 모든 차트에 HTML `.legend` 블록으로 범례 표기 — 시리즈, 강조색 구간, 빗금(전망치), 음영 존까지 항목화. 좌우 이중축은 (좌)/(우) 표기. **패널 제목에 시리즈 설명 금지** ("매출(막대)×OPM(선)" ✗ → "펌텍코리아 재무실적 추이" ✓)
 - 막대 radius 2, 라인 tension .3, 포인트 5px
 - 데이터레이블: 위쪽 anchor/end, 12pt bold, `#404040` (강조 시리즈는 HL색)
 - 규제/이벤트 주석: afterDraw 플러그인으로 말풍선 (ipo_report.html의 `p4bBubble` 참고)
