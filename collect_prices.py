@@ -89,6 +89,9 @@ def main(limit=None):
     uni = pc.load_universe(con)[:limit]
     today = datetime.date.today().strftime("%Y%m%d")
     etf_cache: dict[str, object] = {}
+    # ETF 캐시 시작일: 전체 유니버스의 최소 상장일부터 시작하여
+    # 모든 종목에서 동일한 기준일부터 데이터를 보유하도록 보장
+    min_listing_date = min(u["listing_date"] for u in uni).replace("-", "")
     for i, u in enumerate(uni, 1):
         code = tickers.get(u["corp_code"])
         if not code:
@@ -98,7 +101,7 @@ def main(limit=None):
         px = stock.get_market_ohlcv(start, today, code)
         etf_code = INDEX_CODE.get(u["market"], "229200")
         if etf_code not in etf_cache:
-            etf_cache[etf_code] = stock.get_market_ohlcv(start, today, etf_code)
+            etf_cache[etf_code] = stock.get_market_ohlcv(min_listing_date, today, etf_code)
         idx = _slice_from(etf_cache[etf_code], start)
         time.sleep(0.3)
         horizons = horizon_dates(u["listing_date"])
