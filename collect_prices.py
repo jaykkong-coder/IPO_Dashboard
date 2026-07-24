@@ -1,4 +1,7 @@
-"""pykrx로 지평별 공모가·시초가 대비 시장조정 수익률 계산 → price_performance."""
+"""pykrx로 지평별 공모가·시초가 대비 시장조정 수익률 계산 → price_performance.
+
+시장조정 지수: pykrx 지수 API의 KRX 로그인 요구로 ETF 프록시 사용.
+"""
 import argparse
 import calendar
 import datetime
@@ -8,8 +11,10 @@ from pykrx import stock
 
 import perf_common as pc
 
-INDEX_CODE = {"유가증권": "1001", "코스피": "1001",
-              "코스닥": "2001", "코스닥글로벌": "2001"}
+# 지수 API(get_index_ohlcv)는 KRX 로그인 요구로 깨져 있어 ETF로 대체.
+# 069500=KODEX 200(코스피 프록시), 229200=KODEX 코스닥150(코스닥 프록시)
+INDEX_CODE = {"유가증권": "069500", "코스피": "069500",
+              "코스닥": "229200", "코스닥글로벌": "229200"}
 HORIZON_MONTHS = {"1M": 1, "3M": 3, "6M": 6, "12M": 12}
 
 
@@ -40,6 +45,13 @@ def _close_on_or_after(df, yyyymmdd: str):
         return None, None
     ts = sub.index[0]
     return ts.strftime("%Y-%m-%d"), float(sub.iloc[0]["종가"])
+
+
+def _slice_from(df, yyyymmdd: str):
+    """ETF 전체 시계열 캐시에서 상장일 이후 구간만 슬라이스."""
+    if df is None or df.empty:
+        return df
+    return df[df.index >= yyyymmdd]
 
 
 def _close_on_or_before(df, yyyymmdd: str):
@@ -76,6 +88,7 @@ def main(limit=None):
     tickers = pc.corp_to_stock_map()
     uni = pc.load_universe(con)[:limit]
     today = datetime.date.today().strftime("%Y%m%d")
+    etf_cache: dict[str, object] = {}
     for i, u in enumerate(uni, 1):
         code = tickers.get(u["corp_code"])
         if not code:
@@ -83,8 +96,10 @@ def main(limit=None):
             continue
         start = u["listing_date"].replace("-", "")
         px = stock.get_market_ohlcv(start, today, code)
-        idx_code = INDEX_CODE.get(u["market"], "2001")
-        idx = stock.get_index_ohlcv(start, today, idx_code)
+        etf_code = INDEX_CODE.get(u["market"], "229200")
+        if etf_code not in etf_cache:
+            etf_cache[etf_code] = stock.get_market_ohlcv(start, today, etf_code)
+        idx = _slice_from(etf_cache[etf_code], start)
         time.sleep(0.3)
         horizons = horizon_dates(u["listing_date"])
         for base_type, base in (("IPO", u["ipo_price"]), ("OPEN", u["open_price"])):
@@ -97,7 +112,7 @@ def main(limit=None):
                         excess_return, index_used, price_date)
                        VALUES (?,?,?,?,?,?,?)""",
                     (code, r["horizon"], base_type, r["abs_return"],
-                     r["excess_return"], idx_code, r["price_date"]))
+                     r["excess_return"], f"ETF:{etf_code}", r["price_date"]))
         con.commit()
         print(f"[{i}/{len(uni)}] {u['name']} ok")
 

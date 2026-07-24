@@ -33,3 +33,9 @@ def test_calc_returns_delisted_null():
     out = cp.calc_returns(px, idx, 10000, "2024-01-02",
                           {"6M": "20240702"})
     assert out[0]["abs_return"] is None
+
+def test_slice_from_returns_only_listing_date_onward():
+    full = _df(["2024-01-02", "2024-06-03", "2025-01-02"], [100, 110, 120])
+    sliced = cp._slice_from(full, "20240601")             # 상장일(=슬라이스 기준일) 이후만
+    assert list(sliced.index.strftime("%Y-%m-%d")) == ["2024-06-03", "2025-01-02"]
+    assert len(sliced) < len(full)                        # 캐시 전체가 아닌 부분집합
