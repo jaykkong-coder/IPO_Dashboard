@@ -47,6 +47,28 @@ def _match_field(account_nm):
     return None
 
 
+def _fetch_with_retry(url: str, params: dict, timeout: int = 30) -> requests.Response:
+    """재시도 로직을 포함한 requests.get wrapper.
+
+    ConnectionError/Timeout 발생 시:
+    - 1회차 실패: 5초 대기 후 재시도
+    - 2회차 실패: 30초 대기 후 재시도
+    - 3회차 실패: 120초 대기 후 재시도
+    - 모두 실패: 예외 그대로 전파
+    """
+    waits = [5, 30, 120]
+    for attempt in range(3):
+        try:
+            return requests.get(url, params=params, timeout=timeout)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+            if attempt == 2:  # 마지막 시도
+                raise
+            wait_secs = waits[attempt]
+            print(f"[RETRY] Attempt {attempt+1} failed ({type(e).__name__}). "
+                  f"Waiting {wait_secs}s before retry...", flush=True)
+            time.sleep(wait_secs)
+
+
 def fetch_reports(corp_code: str, year: int) -> dict:
     """연도별 4개 보고서(Q1/H1/Q3/FY)를 조회해 원본 값을 반환.
 
@@ -56,7 +78,7 @@ def fetch_reports(corp_code: str, year: int) -> dict:
     """
     out = {}
     for key, code in REPRT.items():
-        resp = requests.get(URL, params={
+        resp = _fetch_with_retry(URL, params={
             "crtfc_key": DART_API_KEY, "corp_code": corp_code,
             "bsns_year": str(year), "reprt_code": code}, timeout=30)
         time.sleep(0.15)
