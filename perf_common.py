@@ -18,6 +18,7 @@ SELECT dart_corp_code AS corp_code, "회사명" AS name, "상장일" AS listing_
 FROM ipo_companies
 WHERE "상장일" >= '2024-01-01'
   AND ("상장유형" IS NULL OR "상장유형" != 'SPAC')
+  AND "확정공모가" IS NOT NULL
 ORDER BY "상장일"
 """
 

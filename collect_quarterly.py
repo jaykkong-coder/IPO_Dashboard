@@ -1,4 +1,14 @@
-"""DART fnlttSinglAcnt로 유니버스 분기실적 수집 → quarterly_earnings."""
+"""DART fnlttSinglAcnt로 유니버스 분기실적 수집 → quarterly_earnings.
+
+분기 산출 공식 (task-2-review.md §3 실측 근거):
+    Q1 = Q1보고서(11013).thstrm_amount                         (그대로)
+    Q2 = H1보고서(11012).thstrm_amount                         (그대로, 차감 없음)
+    Q3 = Q3보고서(11014).thstrm_amount                         (그대로, 차감 없음)
+    Q4 = FY보고서(11011).thstrm_amount - Q3보고서.thstrm_add_amount
+
+DART 반기/3분기 보고서의 thstrm_amount는 "누적값"이 아니라 해당 3개월 단독값이다.
+진짜 누적값(YTD)은 thstrm_add_amount 필드에 별도로 들어있다 (1분기만 두 필드가 우연히 같음).
+"""
 import argparse
 import datetime
 import time
@@ -10,9 +20,12 @@ from pipeline import DART_API_KEY
 
 URL = "https://opendart.fss.or.kr/api/fnlttSinglAcnt.json"
 REPRT = {"Q1": "11013", "H1": "11012", "Q3": "11014", "FY": "11011"}
-ACCOUNTS = {"매출액": "revenue", "영업이익": "op_income", "당기순이익": "net_income"}
-SEQ = ["Q1", "H1", "Q3", "FY"]          # 누적 차감 순서
+ACCOUNTS = {"매출액": "revenue", "영업이익": "op_income"}
+FIELDS = ("revenue", "op_income", "net_income")
 QTR_NAME = {"Q1": "Q1", "H1": "Q2", "Q3": "Q3", "FY": "Q4"}
+
+# DART 한도 초과류 status: 조용히 넘어가면 안 되고 즉시 중단해야 함
+LIMIT_STATUSES = {"020", "800"}
 
 
 def _parse_amount(s):
@@ -25,7 +38,22 @@ def _parse_amount(s):
         return None
 
 
+def _match_field(account_nm):
+    name = (account_nm or "").strip()
+    if name in ACCOUNTS:
+        return ACCOUNTS[name]
+    if name.startswith("당기순이익"):        # 실제 API 필드명 "당기순이익(손실)" 등 커버
+        return "net_income"
+    return None
+
+
 def fetch_reports(corp_code: str, year: int) -> dict:
+    """연도별 4개 보고서(Q1/H1/Q3/FY)를 조회해 원본 값을 반환.
+
+    각 보고서(FY 제외)에 대해 `<field>`(thstrm_amount, 해당 기간 단독값)와
+    `<field>_add`(thstrm_add_amount, 연초 누적값)를 함께 저장한다.
+    Q4 계산 시 Q3 보고서의 `<field>_add`가 필요하다.
+    """
     out = {}
     for key, code in REPRT.items():
         resp = requests.get(URL, params={
@@ -33,19 +61,39 @@ def fetch_reports(corp_code: str, year: int) -> dict:
             "bsns_year": str(year), "reprt_code": code}, timeout=30)
         time.sleep(0.15)
         data = resp.json()
-        if data.get("status") != "000":
+        status = data.get("status")
+        if status == "013":                 # 정상: 해당 보고서 없음
             continue
+        if status in LIMIT_STATUSES:         # 한도 초과류: 조용히 넘길 수 없음
+            raise RuntimeError(
+                f"DART API 한도 초과 (status={status}, msg={data.get('message')}): "
+                f"corp_code={corp_code} year={year} reprt_code={code}")
+        if status != "000":
+            print(f"[WARN] DART status={status} msg={data.get('message')} "
+                  f"corp_code={corp_code} year={year} reprt_code={code} — skip")
+            continue
+
+        is_interim = key != "FY"
         acc = {}
         for fs in ("CFS", "OFS"):
-            rows = [r for r in data["list"] if r.get("fs_div") == fs]
+            rows = [r for r in data.get("list", []) if r.get("fs_div") == fs]
             for r in rows:
-                field = ACCOUNTS.get(r.get("account_nm", "").strip())
-                if field and field not in acc:
+                field = _match_field(r.get("account_nm"))
+                if not field:
+                    continue
+                if field not in acc:
                     v = _parse_amount(r.get("thstrm_amount"))
                     if v is not None:
                         acc[field] = v
                         acc.setdefault("fs_div", fs)
-            if len(acc) > 1:            # fs_div + 1개 이상 잡히면 확정
+                if is_interim:
+                    add_field = f"{field}_add"
+                    if add_field not in acc:
+                        av = _parse_amount(r.get("thstrm_add_amount"))
+                        if av is not None:
+                            acc[add_field] = av
+            matched = {f for f in FIELDS if f in acc}
+            if matched:                      # CFS에서 핵심 지표가 하나라도 잡히면 확정
                 break
         if acc:
             out[key] = acc
@@ -55,25 +103,38 @@ def fetch_reports(corp_code: str, year: int) -> dict:
 def to_quarters(reports_by_year: dict) -> list[dict]:
     rows = []
     for year, reports in sorted(reports_by_year.items()):
-        prev_cum = None                 # 직전 보고서 누적값
-        for key in SEQ:
-            cur = reports.get(key)
-            if cur is None:
-                prev_cum = None         # 연속성 끊김 → 이후 차감 불가
-                continue
-            row = {"quarter": f"{year}{QTR_NAME[key]}",
-                   "fs_div": cur.get("fs_div", "CFS"), "is_cumulative": 0}
-            for f in ("revenue", "op_income", "net_income"):
-                if key == "Q1":
-                    row[f] = cur.get(f)
-                elif prev_cum is not None and cur.get(f) is not None \
-                        and prev_cum.get(f) is not None:
-                    row[f] = cur[f] - prev_cum[f]
-                else:
-                    row[f] = cur.get(f)
-                    row["is_cumulative"] = 1
+        q1, h1, q3, fy = (reports.get(k) for k in ("Q1", "H1", "Q3", "FY"))
+
+        def _as_is_row(qname, src):
+            row = {"quarter": f"{year}{qname}",
+                   "fs_div": src.get("fs_div", "CFS"), "is_cumulative": 0}
+            for f in FIELDS:
+                row[f] = src.get(f)
+            return row
+
+        if q1:
+            rows.append(_as_is_row("Q1", q1))
+        if h1:
+            rows.append(_as_is_row("Q2", h1))
+        if q3:
+            rows.append(_as_is_row("Q3", q3))
+
+        if fy:
+            if q3 is not None:
+                # 정상 경로: FY 연간값 - Q3(9개월 누적, thstrm_add_amount)
+                vals = {}
+                for f in FIELDS:
+                    fy_v, add_v = fy.get(f), q3.get(f"{f}_add")
+                    vals[f] = (fy_v - add_v) if (fy_v is not None and add_v is not None) else None
+                is_cumulative = 0
+            else:
+                # Q3 보고서 자체가 없어 차감 불가 → FY 연간값을 그대로 저장
+                vals = {f: fy.get(f) for f in FIELDS}
+                is_cumulative = 1
+            row = {"quarter": f"{year}Q4", "fs_div": fy.get("fs_div", "CFS"),
+                   "is_cumulative": is_cumulative}
+            row.update(vals)
             rows.append(row)
-            prev_cum = cur
     return rows
 
 
