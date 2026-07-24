@@ -57,11 +57,11 @@ def _fetch_with_retry(url: str, params: dict, timeout: int = 30) -> requests.Res
     - 모두 실패: 예외 그대로 전파
     """
     waits = [5, 30, 120]
-    for attempt in range(3):
+    for attempt in range(4):
         try:
             return requests.get(url, params=params, timeout=timeout)
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
-            if attempt == 2:  # 마지막 시도
+            if attempt == 3:  # 마지막 시도
                 raise
             wait_secs = waits[attempt]
             print(f"[RETRY] Attempt {attempt+1} failed ({type(e).__name__}). "

@@ -14,7 +14,7 @@ def test_universe_size_and_fields():
 def test_corp_to_stock_map():
     m = pc.corp_to_stock_map()
     assert len(m) > 3000
-    assert all(len(v) == 6 and v.isdigit() for v in list(m.values())[:100])
+    assert all(len(v) == 6 and v.isalnum() for v in list(m.values())[:100])
 
 def test_ensure_tables():
     con = pc.get_db()

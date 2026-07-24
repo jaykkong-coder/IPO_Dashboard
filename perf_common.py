@@ -38,7 +38,7 @@ def corp_to_stock_map() -> dict[str, str]:
     out = {}
     for el in tree.getroot().iter("list"):
         stock = (el.findtext("stock_code") or "").strip()
-        if len(stock) == 6 and stock.isdigit():
+        if len(stock) == 6 and stock.isalnum():
             out[el.findtext("corp_code").strip()] = stock
     return out
 
