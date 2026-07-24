@@ -277,7 +277,7 @@ p3_headline = f"IPO 성과 스펙트럼은 최고 {sp(top5[0]['excess_6m'])}에�
 snapshot_rows = [
     ("의무보유확약비율", p(lock["W_median"]), p(lock["L_median"]), f"+{lock['W_median']-lock['L_median']:.1f}%p"),
     ("기관경쟁률", ratio(inst["W_median"]), ratio(inst["L_median"]), f"+{inst['W_median']-inst['L_median']:.0f}"),
-    ("유통가능주식수비율", p(flt["W_median"]), p(flt["L_median"]), f"{flt['W_median']-flt['L_median']:+.1f}%p (무차이)"),
+    ("유통가능주식수비율", p(flt["W_median"]), p(flt["L_median"]), f"{flt['W_median']-flt['L_median']:+.1f}%p (약한 역방향)"),
     ("공모규모(억원)", won(offer["W_median"]), won(offer["L_median"]), f"+{offer['W_median']-offer['L_median']:.1f}억"),
 ]
 snap_tr = "".join(
@@ -407,7 +407,7 @@ def ind_row(i):
 
 ind_rows_html = "".join(ind_row(i) for i in industries_sorted)
 
-p6_headline = f"유통가능주식수비율은 승자군 {p(flt['W_median'])}, 패자군 {p(flt['L_median'])}로 사실상 무차이"
+p6_headline = f"유통가능주식수비율은 원문 검증 후 승자군 {p(flt['W_median'])}, 패자군 {p(flt['L_median'])} — 통념 방향이나 격차는 작다"
 p6_body = f"""  <div class="content-grid content-grid--60-40">
     <div class="panel">
       <div class="panel__title">업종별 6M 초과수익률 순위<span class="panel__title-unit">중앙값, 내림차순</span></div>
@@ -500,7 +500,7 @@ p8_body = f"""  <div class="content-grid content-grid--3col">
     <div class="takeaway">
       <div class="takeaway__head">반전 발견 · 통념 재점검 필요</div>
       <ul class="commentary">
-        <li>유통가능주식수비율은 W {p(flt['W_median'])} vs L {p(flt['L_median'])}로 사실상 무차이다. "유통물량이 적으면 방어된다"는 통념은 이 표본에서 근거가 없다.</li>
+        <li>유통가능주식수비율은 W {p(flt['W_median'])} vs L {p(flt['L_median'])} — 투자설명서 원문 전수 검증(172사 중 49사 정정) 후 "유통물량이 적을수록 유리"라는 통념 방향이 4개 지평에서 일관되게 나타났다. 다만 격차가 확약비율 대비 크게 작아 독립 요인이라기보다 보조 신호로 보는 것이 타당하다.</li>
         <li>추정치 달성률은 W {sp(est['W_median'])} vs L {sp(est['L_median'])}로 반직관적이다. 기술특례 성장주가 W군에 몰려 "이익보다 스토리"가 주가를 이끈 결과로 해석되며, 달성해도 못 오르는 L군도 있어 달성률 자체는 매수 신호로 부적합하다.</li>
       </ul>
     </div>

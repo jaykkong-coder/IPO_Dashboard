@@ -43,13 +43,14 @@
  "factor_contrast": [
   {
    "factor": "float_ratio",
-   "W_median": 32.0,
-   "L_median": 32.2,
-   "W_n": 49,
+   "W_median": 30.5,
+   "L_median": 32.1,
+   "W_n": 48,
    "L_n": 51,
    "thin_sample": false,
    "consistent_horizons": [
     "1M",
+    "3M",
     "6M",
     "12M"
    ]
@@ -249,7 +250,7 @@
    "industry": "금융",
    "group_6m": "M",
    "excess_6m": -40.1,
-   "float_ratio": 40.0,
+   "float_ratio": 33.81,
    "estimate_achievement": 64.6,
    "earnings_shock": null
   },
@@ -269,7 +270,7 @@
    "industry": "기계/장비",
    "group_6m": "L",
    "excess_6m": -56.7,
-   "float_ratio": 3.08,
+   "float_ratio": 29.75,
    "estimate_achievement": 36.5,
    "earnings_shock": null
   },
@@ -299,7 +300,7 @@
    "industry": "기계/장비",
    "group_6m": "M",
    "excess_6m": -31.7,
-   "float_ratio": 10.0,
+   "float_ratio": 36.69,
    "estimate_achievement": -41.8,
    "earnings_shock": null
   },
@@ -309,7 +310,7 @@
    "industry": "기계/장비",
    "group_6m": "M",
    "excess_6m": -36.9,
-   "float_ratio": 35.89,
+   "float_ratio": 32.36,
    "estimate_achievement": -24.0,
    "earnings_shock": null
   },
@@ -349,7 +350,7 @@
    "industry": "바이오/헬스케어",
    "group_6m": "M",
    "excess_6m": -16.4,
-   "float_ratio": 350.45,
+   "float_ratio": 37.45,
    "estimate_achievement": null,
    "earnings_shock": 1
   },
@@ -379,7 +380,7 @@
    "industry": "바이오/헬스케어",
    "group_6m": "W",
    "excess_6m": 43.7,
-   "float_ratio": 16.42,
+   "float_ratio": 21.45,
    "estimate_achievement": -127.6,
    "earnings_shock": null
   },
@@ -389,7 +390,7 @@
    "industry": "기계/장비",
    "group_6m": "L",
    "excess_6m": -41.3,
-   "float_ratio": 82.63,
+   "float_ratio": 17.37,
    "estimate_achievement": -79.4,
    "earnings_shock": null
   },
@@ -399,7 +400,7 @@
    "industry": "바이오/헬스케어",
    "group_6m": "L",
    "excess_6m": -58.3,
-   "float_ratio": 21.2,
+   "float_ratio": 27.0,
    "estimate_achievement": -140.7,
    "earnings_shock": null
   },
@@ -409,7 +410,7 @@
    "industry": "2차전지/에너지",
    "group_6m": "M",
    "excess_6m": -32.7,
-   "float_ratio": 203.0,
+   "float_ratio": 28.62,
    "estimate_achievement": -14.8,
    "earnings_shock": null
   },
@@ -449,7 +450,7 @@
    "industry": "소비재/유통",
    "group_6m": "M",
    "excess_6m": -26.6,
-   "float_ratio": 5.0,
+   "float_ratio": 22.74,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -469,7 +470,7 @@
    "industry": "바이오/헬스케어",
    "group_6m": "M",
    "excess_6m": -26.5,
-   "float_ratio": 34.36,
+   "float_ratio": 33.12,
    "estimate_achievement": -224.1,
    "earnings_shock": null
   },
@@ -489,7 +490,7 @@
    "industry": "2차전지/에너지",
    "group_6m": "M",
    "excess_6m": -3.3,
-   "float_ratio": 28.21,
+   "float_ratio": 29.22,
    "estimate_achievement": 34.4,
    "earnings_shock": null
   },
@@ -529,7 +530,7 @@
    "industry": "방산/우주항공",
    "group_6m": "L",
    "excess_6m": -64.0,
-   "float_ratio": 21.0,
+   "float_ratio": 29.67,
    "estimate_achievement": -577.7,
    "earnings_shock": null
   },
@@ -539,7 +540,7 @@
    "industry": "바이오/헬스케어",
    "group_6m": "L",
    "excess_6m": -42.1,
-   "float_ratio": 100.0,
+   "float_ratio": 32.96,
    "estimate_achievement": 24.5,
    "earnings_shock": null
   },
@@ -549,7 +550,7 @@
    "industry": "엔터/미디어/게임",
    "group_6m": "W",
    "excess_6m": 20.7,
-   "float_ratio": 85.0,
+   "float_ratio": 18.02,
    "estimate_achievement": 94575.6,
    "earnings_shock": null
   },
@@ -559,7 +560,7 @@
    "industry": "바이오/헬스케어",
    "group_6m": "L",
    "excess_6m": -44.3,
-   "float_ratio": 80.76,
+   "float_ratio": 47.31,
    "estimate_achievement": -235.9,
    "earnings_shock": null
   },
@@ -569,7 +570,7 @@
    "industry": "기타",
    "group_6m": "W",
    "excess_6m": 117.5,
-   "float_ratio": 76.0,
+   "float_ratio": 20.45,
    "estimate_achievement": 7357.4,
    "earnings_shock": null
   },
@@ -579,7 +580,7 @@
    "industry": "바이오/헬스케어",
    "group_6m": "L",
    "excess_6m": -61.9,
-   "float_ratio": 66.0,
+   "float_ratio": 39.2,
    "estimate_achievement": 31.2,
    "earnings_shock": null
   },
@@ -589,7 +590,7 @@
    "industry": "기계/장비",
    "group_6m": "L",
    "excess_6m": -51.9,
-   "float_ratio": 13.3,
+   "float_ratio": 20.3,
    "estimate_achievement": -64.2,
    "earnings_shock": null
   },
@@ -599,7 +600,7 @@
    "industry": "IT/소프트웨어",
    "group_6m": "L",
    "excess_6m": -65.3,
-   "float_ratio": 50.0,
+   "float_ratio": 36.13,
    "estimate_achievement": -29.8,
    "earnings_shock": null
   },
@@ -609,7 +610,7 @@
    "industry": "IT/소프트웨어",
    "group_6m": "L",
    "excess_6m": -42.0,
-   "float_ratio": 178.5,
+   "float_ratio": 56.77,
    "estimate_achievement": -337.6,
    "earnings_shock": null
   },
@@ -639,7 +640,7 @@
    "industry": "IT/소프트웨어",
    "group_6m": "L",
    "excess_6m": -65.4,
-   "float_ratio": 10.0,
+   "float_ratio": 37.05,
    "estimate_achievement": -64.2,
    "earnings_shock": null
   },
@@ -669,7 +670,7 @@
    "industry": "바이오/헬스케어",
    "group_6m": "W",
    "excess_6m": 28.6,
-   "float_ratio": 45.7,
+   "float_ratio": 33.28,
    "estimate_achievement": -219.6,
    "earnings_shock": null
   },
@@ -689,7 +690,7 @@
    "industry": "반도체/디스플레이",
    "group_6m": "M",
    "excess_6m": -39.2,
-   "float_ratio": 28.4,
+   "float_ratio": 30.14,
    "estimate_achievement": -69.3,
    "earnings_shock": null
   },
@@ -709,7 +710,7 @@
    "industry": "바이오/헬스케어",
    "group_6m": "W",
    "excess_6m": 33.3,
-   "float_ratio": 10.0,
+   "float_ratio": 33.99,
    "estimate_achievement": -70.7,
    "earnings_shock": null
   },
@@ -719,7 +720,7 @@
    "industry": "기계/장비",
    "group_6m": "L",
    "excess_6m": -60.7,
-   "float_ratio": 75.01,
+   "float_ratio": 25.03,
    "estimate_achievement": -15.3,
    "earnings_shock": null
   },
@@ -739,7 +740,7 @@
    "industry": "방산/우주항공",
    "group_6m": "M",
    "excess_6m": -15.9,
-   "float_ratio": 30.99,
+   "float_ratio": 28.55,
    "estimate_achievement": 0.3,
    "earnings_shock": null
   },
@@ -759,7 +760,7 @@
    "industry": "기계/장비",
    "group_6m": "M",
    "excess_6m": -6.5,
-   "float_ratio": 83.2,
+   "float_ratio": 34.12,
    "estimate_achievement": -222.0,
    "earnings_shock": null
   },
@@ -799,7 +800,7 @@
    "industry": "2차전지/에너지",
    "group_6m": "L",
    "excess_6m": -45.9,
-   "float_ratio": 19.72,
+   "float_ratio": 23.09,
    "estimate_achievement": 2423.7,
    "earnings_shock": null
   },
@@ -829,7 +830,7 @@
    "industry": "바이오/헬스케어",
    "group_6m": "M",
    "excess_6m": 1.1,
-   "float_ratio": 10.0,
+   "float_ratio": 29.8,
    "estimate_achievement": -219.2,
    "earnings_shock": null
   },
@@ -849,7 +850,7 @@
    "industry": "기계/장비",
    "group_6m": "W",
    "excess_6m": 27.5,
-   "float_ratio": 100.3,
+   "float_ratio": 32.17,
    "estimate_achievement": -62.6,
    "earnings_shock": null
   },
@@ -879,7 +880,7 @@
    "industry": "엔터/미디어/게임",
    "group_6m": "L",
    "excess_6m": -73.5,
-   "float_ratio": 84.0,
+   "float_ratio": 34.52,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -939,7 +940,7 @@
    "industry": "IT/소프트웨어",
    "group_6m": "M",
    "excess_6m": -20.5,
-   "float_ratio": 42.1,
+   "float_ratio": 34.7,
    "estimate_achievement": -164.4,
    "earnings_shock": null
   },
@@ -949,7 +950,7 @@
    "industry": "방산/우주항공",
    "group_6m": "L",
    "excess_6m": -50.4,
-   "float_ratio": 25.39,
+   "float_ratio": 20.97,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -959,7 +960,7 @@
    "industry": "바이오/헬스케어",
    "group_6m": "W",
    "excess_6m": 70.1,
-   "float_ratio": 100.0,
+   "float_ratio": 29.58,
    "estimate_achievement": -90.2,
    "earnings_shock": null
   },
@@ -1559,7 +1560,7 @@
    "industry": "IT/소프트웨어",
    "group_6m": "W",
    "excess_6m": 253.0,
-   "float_ratio": 20.0,
+   "float_ratio": 29.12,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -1659,7 +1660,7 @@
    "industry": "기계/장비",
    "group_6m": "L",
    "excess_6m": -66.2,
-   "float_ratio": 65.9,
+   "float_ratio": 34.1,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -1709,7 +1710,7 @@
    "industry": "IT/소프트웨어",
    "group_6m": "M",
    "excess_6m": -0.6,
-   "float_ratio": 33.2,
+   "float_ratio": 36.3,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -1729,7 +1730,7 @@
    "industry": "바이오/헬스케어",
    "group_6m": "W",
    "excess_6m": 83.4,
-   "float_ratio": 71.3,
+   "float_ratio": null,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -1819,7 +1820,7 @@
    "industry": "바이오/헬스케어",
    "group_6m": null,
    "excess_6m": null,
-   "float_ratio": 18.55,
+   "float_ratio": 23.82,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -1829,7 +1830,7 @@
    "industry": "금융",
    "group_6m": null,
    "excess_6m": null,
-   "float_ratio": 23.42,
+   "float_ratio": 31.63,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -1839,7 +1840,7 @@
    "industry": "바이오/헬스케어",
    "group_6m": null,
    "excess_6m": null,
-   "float_ratio": 89.5,
+   "float_ratio": 33.0,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -1849,7 +1850,7 @@
    "industry": "바이오/헬스케어",
    "group_6m": null,
    "excess_6m": null,
-   "float_ratio": 10.0,
+   "float_ratio": 31.69,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -1859,7 +1860,7 @@
    "industry": "바이오/헬스케어",
    "group_6m": null,
    "excess_6m": null,
-   "float_ratio": 10.0,
+   "float_ratio": 29.87,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -1869,7 +1870,7 @@
    "industry": "2차전지/에너지",
    "group_6m": null,
    "excess_6m": null,
-   "float_ratio": 75.16,
+   "float_ratio": 23.18,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -1899,7 +1900,7 @@
    "industry": "IT/소프트웨어",
    "group_6m": null,
    "excess_6m": null,
-   "float_ratio": 31.2,
+   "float_ratio": 38.48,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -1919,7 +1920,7 @@
    "industry": "2차전지/에너지",
    "group_6m": null,
    "excess_6m": null,
-   "float_ratio": 10.0,
+   "float_ratio": 29.4,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -1929,7 +1930,7 @@
    "industry": "IT/소프트웨어",
    "group_6m": null,
    "excess_6m": null,
-   "float_ratio": 51.03,
+   "float_ratio": 49.51,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -1939,7 +1940,7 @@
    "industry": "기타",
    "group_6m": null,
    "excess_6m": null,
-   "float_ratio": 0.1,
+   "float_ratio": 30.87,
    "estimate_achievement": null,
    "earnings_shock": null
   },
@@ -1949,7 +1950,7 @@
    "industry": "IT/소프트웨어",
    "group_6m": null,
    "excess_6m": null,
-   "float_ratio": 84.04,
+   "float_ratio": 33.19,
    "estimate_achievement": null,
    "earnings_shock": null
   }
