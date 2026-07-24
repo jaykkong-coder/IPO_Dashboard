@@ -7,3 +7,9 @@ poc_docs/
 poc_result.json
 debug_nulls.py
 ipo_data_backup_*.db
+
+# perf-analysis scratch
+.superpowers/
+*.log
+CORPCODE.xml.bak*
+compare_report/*.pdf
