@@ -1,0 +1,1957 @@
+{
+ "meta": {
+  "asof": "2026-07-24",
+  "universe_n": 172,
+  "grouped_n": 153
+ },
+ "horizon_summary": {
+  "1M": {
+   "n": 168,
+   "median_abs": -1.8,
+   "median_excess": -1.1
+  },
+  "3M": {
+   "n": 163,
+   "median_abs": -5.4,
+   "median_excess": -10.8
+  },
+  "6M": {
+   "n": 153,
+   "median_abs": -12.5,
+   "median_excess": -22.4
+  },
+  "12M": {
+   "n": 119,
+   "median_abs": -29.5,
+   "median_excess": -46.2
+  }
+ },
+ "groups_6m": {
+  "W": {
+   "n": 51,
+   "median_excess": 58.5
+  },
+  "M": {
+   "n": 51,
+   "median_excess": -22.4
+  },
+  "L": {
+   "n": 51,
+   "median_excess": -59.6
+  }
+ },
+ "factor_contrast": [
+  {
+   "factor": "float_ratio",
+   "W_median": 32.0,
+   "L_median": 32.2,
+   "W_n": 49,
+   "L_n": 51,
+   "thin_sample": false,
+   "consistent_horizons": [
+    "1M",
+    "6M",
+    "12M"
+   ]
+  },
+  {
+   "factor": "inst_ratio",
+   "W_median": 965.0,
+   "L_median": 841.1,
+   "W_n": 50,
+   "L_n": 49,
+   "thin_sample": false,
+   "consistent_horizons": [
+    "1M",
+    "3M",
+    "6M"
+   ]
+  },
+  {
+   "factor": "lockup_ratio",
+   "W_median": 8.6,
+   "L_median": 3.2,
+   "W_n": 51,
+   "L_n": 49,
+   "thin_sample": false,
+   "consistent_horizons": [
+    "1M",
+    "3M",
+    "6M",
+    "12M"
+   ]
+  },
+  {
+   "factor": "offer_size",
+   "W_median": 288.3,
+   "L_median": 264.0,
+   "W_n": 50,
+   "L_n": 51,
+   "thin_sample": false,
+   "consistent_horizons": [
+    "1M",
+    "3M",
+    "6M"
+   ]
+  },
+  {
+   "factor": "price_vs_band_top",
+   "W_median": 100.0,
+   "L_median": 100.0,
+   "W_n": 47,
+   "L_n": 50,
+   "thin_sample": false,
+   "consistent_horizons": []
+  },
+  {
+   "factor": "old_share_ratio",
+   "W_median": 0.0,
+   "L_median": 0.0,
+   "W_n": 48,
+   "L_n": 51,
+   "thin_sample": false,
+   "consistent_horizons": []
+  },
+  {
+   "factor": "estimate_achievement",
+   "W_median": -62.1,
+   "L_median": 24.5,
+   "W_n": 15,
+   "L_n": 27,
+   "thin_sample": false,
+   "consistent_horizons": [
+    "3M",
+    "6M",
+    "12M"
+   ]
+  },
+  {
+   "factor": "earnings_shock",
+   "W_median": 0.0,
+   "L_median": 50.0,
+   "W_n": 1,
+   "L_n": 2,
+   "thin_sample": true,
+   "consistent_horizons": [
+    "1M",
+    "3M",
+    "6M"
+   ]
+  },
+  {
+   "factor": "revenue_yoy_2q",
+   "W_median": 120.1,
+   "L_median": 21.8,
+   "W_n": 5,
+   "L_n": 3,
+   "thin_sample": true,
+   "consistent_horizons": [
+    "3M",
+    "6M",
+    "12M"
+   ]
+  }
+ ],
+ "industry_table": [
+  {
+   "industry": "바이오/헬스케어",
+   "n": 36,
+   "median_excess_6m": 7.1,
+   "median_industry_relative": 29.5
+  },
+  {
+   "industry": "기계/장비",
+   "n": 26,
+   "median_excess_6m": -7.8,
+   "median_industry_relative": 14.5
+  },
+  {
+   "industry": "IT/소프트웨어",
+   "n": 24,
+   "median_excess_6m": -37.2,
+   "median_industry_relative": -14.8
+  },
+  {
+   "industry": "화학/소재",
+   "n": 15,
+   "median_excess_6m": -32.5,
+   "median_industry_relative": -10.1
+  },
+  {
+   "industry": "반도체/디스플레이",
+   "n": 11,
+   "median_excess_6m": -38.2,
+   "median_industry_relative": -15.8
+  },
+  {
+   "industry": "2차전지/에너지",
+   "n": 8,
+   "median_excess_6m": -13.6,
+   "median_industry_relative": 8.8
+  },
+  {
+   "industry": "소비재/유통",
+   "n": 7,
+   "median_excess_6m": -26.6,
+   "median_industry_relative": -4.2
+  },
+  {
+   "industry": "방산/우주항공",
+   "n": 6,
+   "median_excess_6m": -6.7,
+   "median_industry_relative": 15.7
+  },
+  {
+   "industry": "기타",
+   "n": 5,
+   "median_excess_6m": -35.3,
+   "median_industry_relative": -12.9
+  },
+  {
+   "industry": "자동차/모빌리티",
+   "n": 5,
+   "median_excess_6m": 23.0,
+   "median_industry_relative": 45.4
+  },
+  {
+   "industry": "엔터/미디어/게임",
+   "n": 5,
+   "median_excess_6m": -2.1,
+   "median_industry_relative": 20.3
+  },
+  {
+   "industry": "건설/인프라",
+   "n": 3,
+   "median_excess_6m": -17.3,
+   "median_industry_relative": 5.1
+  },
+  {
+   "industry": "금융",
+   "n": 2,
+   "median_excess_6m": 14.2,
+   "median_industry_relative": 36.6
+  }
+ ],
+ "companies": [
+  {
+   "name": "우진엔텍",
+   "stock_code": "457550",
+   "industry": "2차전지/에너지",
+   "group_6m": "W",
+   "excess_6m": 334.3,
+   "float_ratio": 17.78,
+   "estimate_achievement": 101.1,
+   "earnings_shock": null
+  },
+  {
+   "name": "HB인베스트먼트",
+   "stock_code": "440290",
+   "industry": "금융",
+   "group_6m": "M",
+   "excess_6m": -40.1,
+   "float_ratio": 40.0,
+   "estimate_achievement": 64.6,
+   "earnings_shock": null
+  },
+  {
+   "name": "현대힘스",
+   "stock_code": "460930",
+   "industry": "기타",
+   "group_6m": "W",
+   "excess_6m": 112.7,
+   "float_ratio": 22.0,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "포스뱅크",
+   "stock_code": "105760",
+   "industry": "기계/장비",
+   "group_6m": "L",
+   "excess_6m": -56.7,
+   "float_ratio": 3.08,
+   "estimate_achievement": 36.5,
+   "earnings_shock": null
+  },
+  {
+   "name": "이닉스",
+   "stock_code": "452400",
+   "industry": "자동차/모빌리티",
+   "group_6m": "M",
+   "excess_6m": -29.6,
+   "float_ratio": 31.35,
+   "estimate_achievement": 2.2,
+   "earnings_shock": null
+  },
+  {
+   "name": "스튜디오삼익",
+   "stock_code": "415380",
+   "industry": "소비재/유통",
+   "group_6m": "L",
+   "excess_6m": -81.1,
+   "float_ratio": 25.52,
+   "estimate_achievement": 89.3,
+   "earnings_shock": null
+  },
+  {
+   "name": "케이웨더",
+   "stock_code": "068100",
+   "industry": "기계/장비",
+   "group_6m": "M",
+   "excess_6m": -31.7,
+   "float_ratio": 10.0,
+   "estimate_achievement": -41.8,
+   "earnings_shock": null
+  },
+  {
+   "name": "코셈",
+   "stock_code": "360350",
+   "industry": "기계/장비",
+   "group_6m": "M",
+   "excess_6m": -36.9,
+   "float_ratio": 35.89,
+   "estimate_achievement": -24.0,
+   "earnings_shock": null
+  },
+  {
+   "name": "이에이트",
+   "stock_code": "418620",
+   "industry": "IT/소프트웨어",
+   "group_6m": "M",
+   "excess_6m": -36.2,
+   "float_ratio": 43.91,
+   "estimate_achievement": -125.1,
+   "earnings_shock": null
+  },
+  {
+   "name": "에이피알",
+   "stock_code": "278470",
+   "industry": "화학/소재",
+   "group_6m": "L",
+   "excess_6m": -84.4,
+   "float_ratio": 36.85,
+   "estimate_achievement": 378.2,
+   "earnings_shock": 0
+  },
+  {
+   "name": "케이엔알시스템",
+   "stock_code": "199430",
+   "industry": "기계/장비",
+   "group_6m": "M",
+   "excess_6m": -24.7,
+   "float_ratio": 33.43,
+   "estimate_achievement": -172.5,
+   "earnings_shock": null
+  },
+  {
+   "name": "오상헬스케어",
+   "stock_code": "036220",
+   "industry": "바이오/헬스케어",
+   "group_6m": "M",
+   "excess_6m": -16.4,
+   "float_ratio": 350.45,
+   "estimate_achievement": null,
+   "earnings_shock": 1
+  },
+  {
+   "name": "삼현",
+   "stock_code": "437730",
+   "industry": "자동차/모빌리티",
+   "group_6m": "L",
+   "excess_6m": -59.3,
+   "float_ratio": 18.38,
+   "estimate_achievement": 64.9,
+   "earnings_shock": null
+  },
+  {
+   "name": "엔젤로보틱스",
+   "stock_code": "455900",
+   "industry": "기계/장비",
+   "group_6m": "W",
+   "excess_6m": 58.5,
+   "float_ratio": 30.1,
+   "estimate_achievement": -129.0,
+   "earnings_shock": null
+  },
+  {
+   "name": "아이엠비디엑스",
+   "stock_code": "461030",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 43.7,
+   "float_ratio": 16.42,
+   "estimate_achievement": -127.6,
+   "earnings_shock": null
+  },
+  {
+   "name": "제일엠앤에스",
+   "stock_code": "412540",
+   "industry": "기계/장비",
+   "group_6m": "L",
+   "excess_6m": -41.3,
+   "float_ratio": 82.63,
+   "estimate_achievement": -79.4,
+   "earnings_shock": null
+  },
+  {
+   "name": "디앤디파마텍",
+   "stock_code": "347850",
+   "industry": "바이오/헬스케어",
+   "group_6m": "L",
+   "excess_6m": -58.3,
+   "float_ratio": 21.2,
+   "estimate_achievement": -140.7,
+   "earnings_shock": null
+  },
+  {
+   "name": "민테크",
+   "stock_code": "452200",
+   "industry": "2차전지/에너지",
+   "group_6m": "M",
+   "excess_6m": -32.7,
+   "float_ratio": 203.0,
+   "estimate_achievement": -14.8,
+   "earnings_shock": null
+  },
+  {
+   "name": "코칩",
+   "stock_code": "126730",
+   "industry": "2차전지/에너지",
+   "group_6m": "M",
+   "excess_6m": -23.9,
+   "float_ratio": 25.63,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "HD현대마린솔루션",
+   "stock_code": "443060",
+   "industry": "건설/인프라",
+   "group_6m": "W",
+   "excess_6m": 88.8,
+   "float_ratio": 16.0,
+   "estimate_achievement": 13325.3,
+   "earnings_shock": null
+  },
+  {
+   "name": "아이씨티케이",
+   "stock_code": "456010",
+   "industry": "반도체/디스플레이",
+   "group_6m": "L",
+   "excess_6m": -59.6,
+   "float_ratio": 32.11,
+   "estimate_achievement": -62.6,
+   "earnings_shock": null
+  },
+  {
+   "name": "노브랜드",
+   "stock_code": "145170",
+   "industry": "소비재/유통",
+   "group_6m": "M",
+   "excess_6m": -26.6,
+   "float_ratio": 5.0,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "그리드위즈",
+   "stock_code": "453450",
+   "industry": "2차전지/에너지",
+   "group_6m": "L",
+   "excess_6m": -42.1,
+   "float_ratio": 30.66,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "라메디텍",
+   "stock_code": "462510",
+   "industry": "바이오/헬스케어",
+   "group_6m": "M",
+   "excess_6m": -26.5,
+   "float_ratio": 34.36,
+   "estimate_achievement": -224.1,
+   "earnings_shock": null
+  },
+  {
+   "name": "씨어스테크놀로지",
+   "stock_code": "458870",
+   "industry": "바이오/헬스케어",
+   "group_6m": "L",
+   "excess_6m": -59.9,
+   "float_ratio": 29.22,
+   "estimate_achievement": 206.0,
+   "earnings_shock": null
+  },
+  {
+   "name": "한중엔시에스",
+   "stock_code": "107640",
+   "industry": "2차전지/에너지",
+   "group_6m": "M",
+   "excess_6m": -3.3,
+   "float_ratio": 28.21,
+   "estimate_achievement": 34.4,
+   "earnings_shock": null
+  },
+  {
+   "name": "에스오에스랩",
+   "stock_code": "464080",
+   "industry": "자동차/모빌리티",
+   "group_6m": "W",
+   "excess_6m": 23.0,
+   "float_ratio": 29.73,
+   "estimate_achievement": -168.1,
+   "earnings_shock": null
+  },
+  {
+   "name": "하이젠알앤엠",
+   "stock_code": "160190",
+   "industry": "기계/장비",
+   "group_6m": "W",
+   "excess_6m": 103.8,
+   "float_ratio": 14.3,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "에이치브이엠",
+   "stock_code": "295310",
+   "industry": "화학/소재",
+   "group_6m": "W",
+   "excess_6m": 53.1,
+   "float_ratio": 32.04,
+   "estimate_achievement": 123.2,
+   "earnings_shock": null
+  },
+  {
+   "name": "이노스페이스",
+   "stock_code": "462350",
+   "industry": "방산/우주항공",
+   "group_6m": "L",
+   "excess_6m": -64.0,
+   "float_ratio": 21.0,
+   "estimate_achievement": -577.7,
+   "earnings_shock": null
+  },
+  {
+   "name": "하스",
+   "stock_code": "450330",
+   "industry": "바이오/헬스케어",
+   "group_6m": "L",
+   "excess_6m": -42.1,
+   "float_ratio": 100.0,
+   "estimate_achievement": 24.5,
+   "earnings_shock": null
+  },
+  {
+   "name": "시프트업",
+   "stock_code": "462870",
+   "industry": "엔터/미디어/게임",
+   "group_6m": "W",
+   "excess_6m": 20.7,
+   "float_ratio": 85.0,
+   "estimate_achievement": 94575.6,
+   "earnings_shock": null
+  },
+  {
+   "name": "엑셀세라퓨틱스",
+   "stock_code": "373110",
+   "industry": "바이오/헬스케어",
+   "group_6m": "L",
+   "excess_6m": -44.3,
+   "float_ratio": 80.76,
+   "estimate_achievement": -235.9,
+   "earnings_shock": null
+  },
+  {
+   "name": "산일전기",
+   "stock_code": "062040",
+   "industry": "기타",
+   "group_6m": "W",
+   "excess_6m": 117.5,
+   "float_ratio": 76.0,
+   "estimate_achievement": 7357.4,
+   "earnings_shock": null
+  },
+  {
+   "name": "피앤에스미캐닉스",
+   "stock_code": "460940",
+   "industry": "바이오/헬스케어",
+   "group_6m": "L",
+   "excess_6m": -61.9,
+   "float_ratio": 66.0,
+   "estimate_achievement": 31.2,
+   "earnings_shock": null
+  },
+  {
+   "name": "아이빔테크놀로지",
+   "stock_code": "460470",
+   "industry": "기계/장비",
+   "group_6m": "L",
+   "excess_6m": -51.9,
+   "float_ratio": 13.3,
+   "estimate_achievement": -64.2,
+   "earnings_shock": null
+  },
+  {
+   "name": "뱅크웨어글로벌",
+   "stock_code": "199480",
+   "industry": "IT/소프트웨어",
+   "group_6m": "L",
+   "excess_6m": -65.3,
+   "float_ratio": 50.0,
+   "estimate_achievement": -29.8,
+   "earnings_shock": null
+  },
+  {
+   "name": "유라클",
+   "stock_code": "088340",
+   "industry": "IT/소프트웨어",
+   "group_6m": "L",
+   "excess_6m": -42.0,
+   "float_ratio": 178.5,
+   "estimate_achievement": -337.6,
+   "earnings_shock": null
+  },
+  {
+   "name": "전진건설로봇",
+   "stock_code": "079900",
+   "industry": "기계/장비",
+   "group_6m": "W",
+   "excess_6m": 260.8,
+   "float_ratio": 16.0,
+   "estimate_achievement": 1444.9,
+   "earnings_shock": null
+  },
+  {
+   "name": "넥스트바이오메디컬",
+   "stock_code": "389650",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 83.8,
+   "float_ratio": 44.49,
+   "estimate_achievement": -1.7,
+   "earnings_shock": null
+  },
+  {
+   "name": "케이쓰리아이",
+   "stock_code": "431190",
+   "industry": "IT/소프트웨어",
+   "group_6m": "L",
+   "excess_6m": -65.4,
+   "float_ratio": 10.0,
+   "estimate_achievement": -64.2,
+   "earnings_shock": null
+  },
+  {
+   "name": "티디에스팜",
+   "stock_code": "464280",
+   "industry": "바이오/헬스케어",
+   "group_6m": "M",
+   "excess_6m": 8.8,
+   "float_ratio": 23.1,
+   "estimate_achievement": 97.3,
+   "earnings_shock": null
+  },
+  {
+   "name": "M83",
+   "stock_code": "476080",
+   "industry": "엔터/미디어/게임",
+   "group_6m": "M",
+   "excess_6m": -1.3,
+   "float_ratio": 34.9,
+   "estimate_achievement": -138.2,
+   "earnings_shock": null
+  },
+  {
+   "name": "이엔셀",
+   "stock_code": "456070",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 28.6,
+   "float_ratio": 45.7,
+   "estimate_achievement": -219.6,
+   "earnings_shock": null
+  },
+  {
+   "name": "아이스크림미디어",
+   "stock_code": "461300",
+   "industry": "IT/소프트웨어",
+   "group_6m": "L",
+   "excess_6m": -57.6,
+   "float_ratio": 37.48,
+   "estimate_achievement": 173.9,
+   "earnings_shock": null
+  },
+  {
+   "name": "아이언디바이스",
+   "stock_code": "464500",
+   "industry": "반도체/디스플레이",
+   "group_6m": "M",
+   "excess_6m": -39.2,
+   "float_ratio": 28.4,
+   "estimate_achievement": -69.3,
+   "earnings_shock": null
+  },
+  {
+   "name": "제닉스",
+   "stock_code": "381620",
+   "industry": "기계/장비",
+   "group_6m": "L",
+   "excess_6m": -64.2,
+   "float_ratio": 29.51,
+   "estimate_achievement": -106.3,
+   "earnings_shock": null
+  },
+  {
+   "name": "셀비온",
+   "stock_code": "308430",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 33.3,
+   "float_ratio": 10.0,
+   "estimate_achievement": -70.7,
+   "earnings_shock": null
+  },
+  {
+   "name": "와이제이링크",
+   "stock_code": "209640",
+   "industry": "기계/장비",
+   "group_6m": "L",
+   "excess_6m": -60.7,
+   "float_ratio": 75.01,
+   "estimate_achievement": -15.3,
+   "earnings_shock": null
+  },
+  {
+   "name": "인스피언",
+   "stock_code": "465480",
+   "industry": "IT/소프트웨어",
+   "group_6m": "M",
+   "excess_6m": -22.4,
+   "float_ratio": 23.21,
+   "estimate_achievement": 67.8,
+   "earnings_shock": null
+  },
+  {
+   "name": "루미르",
+   "stock_code": "474170",
+   "industry": "방산/우주항공",
+   "group_6m": "M",
+   "excess_6m": -15.9,
+   "float_ratio": 30.99,
+   "estimate_achievement": 0.3,
+   "earnings_shock": null
+  },
+  {
+   "name": "한켐",
+   "stock_code": "457370",
+   "industry": "화학/소재",
+   "group_6m": "L",
+   "excess_6m": -42.8,
+   "float_ratio": 35.8,
+   "estimate_achievement": 107.6,
+   "earnings_shock": null
+  },
+  {
+   "name": "씨메스",
+   "stock_code": "475400",
+   "industry": "기계/장비",
+   "group_6m": "M",
+   "excess_6m": -6.5,
+   "float_ratio": 83.2,
+   "estimate_achievement": -222.0,
+   "earnings_shock": null
+  },
+  {
+   "name": "웨이비스",
+   "stock_code": "289930",
+   "industry": "반도체/디스플레이",
+   "group_6m": "M",
+   "excess_6m": -38.2,
+   "float_ratio": 34.37,
+   "estimate_achievement": 26.8,
+   "earnings_shock": null
+  },
+  {
+   "name": "에이치엔에스하이텍",
+   "stock_code": "044990",
+   "industry": "반도체/디스플레이",
+   "group_6m": "M",
+   "excess_6m": -16.9,
+   "float_ratio": 68.37,
+   "estimate_achievement": 68.0,
+   "earnings_shock": 0
+  },
+  {
+   "name": "클로봇",
+   "stock_code": "466100",
+   "industry": "IT/소프트웨어",
+   "group_6m": "W",
+   "excess_6m": 40.2,
+   "float_ratio": 28.0,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "성우",
+   "stock_code": "458650",
+   "industry": "2차전지/에너지",
+   "group_6m": "L",
+   "excess_6m": -45.9,
+   "float_ratio": 19.72,
+   "estimate_achievement": 2423.7,
+   "earnings_shock": null
+  },
+  {
+   "name": "탑런토탈솔루션",
+   "stock_code": "336680",
+   "industry": "반도체/디스플레이",
+   "group_6m": "L",
+   "excess_6m": -72.2,
+   "float_ratio": 12.77,
+   "estimate_achievement": 299.9,
+   "earnings_shock": null
+  },
+  {
+   "name": "에이럭스",
+   "stock_code": "475580",
+   "industry": "소비재/유통",
+   "group_6m": "M",
+   "excess_6m": -25.7,
+   "float_ratio": 34.97,
+   "estimate_achievement": -226.0,
+   "earnings_shock": null
+  },
+  {
+   "name": "에이치이엠파마",
+   "stock_code": "376270",
+   "industry": "바이오/헬스케어",
+   "group_6m": "M",
+   "excess_6m": 1.1,
+   "float_ratio": 10.0,
+   "estimate_achievement": -219.2,
+   "earnings_shock": null
+  },
+  {
+   "name": "더본코리아",
+   "stock_code": "475560",
+   "industry": "소비재/유통",
+   "group_6m": "M",
+   "excess_6m": -24.4,
+   "float_ratio": 19.67,
+   "estimate_achievement": -85.9,
+   "earnings_shock": null
+  },
+  {
+   "name": "토모큐브",
+   "stock_code": "475960",
+   "industry": "기계/장비",
+   "group_6m": "W",
+   "excess_6m": 27.5,
+   "float_ratio": 100.3,
+   "estimate_achievement": -62.6,
+   "earnings_shock": null
+  },
+  {
+   "name": "에어레인",
+   "stock_code": "163280",
+   "industry": "기계/장비",
+   "group_6m": "L",
+   "excess_6m": -50.2,
+   "float_ratio": 35.13,
+   "estimate_achievement": 138.1,
+   "earnings_shock": null
+  },
+  {
+   "name": "노머스",
+   "stock_code": "473980",
+   "industry": "엔터/미디어/게임",
+   "group_6m": "M",
+   "excess_6m": -2.1,
+   "float_ratio": 25.59,
+   "estimate_achievement": 78.1,
+   "earnings_shock": null
+  },
+  {
+   "name": "닷밀",
+   "stock_code": "464580",
+   "industry": "엔터/미디어/게임",
+   "group_6m": "L",
+   "excess_6m": -73.5,
+   "float_ratio": 84.0,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "쓰리빌리언",
+   "stock_code": "394800",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 55.8,
+   "float_ratio": 32.9,
+   "estimate_achievement": -62.1,
+   "earnings_shock": null
+  },
+  {
+   "name": "엠오티",
+   "stock_code": "413390",
+   "industry": "기계/장비",
+   "group_6m": "M",
+   "excess_6m": -16.5,
+   "float_ratio": 35.87,
+   "estimate_achievement": 1715.7,
+   "earnings_shock": null
+  },
+  {
+   "name": "에스켐",
+   "stock_code": "475660",
+   "industry": "화학/소재",
+   "group_6m": "L",
+   "excess_6m": -46.7,
+   "float_ratio": 36.1,
+   "estimate_achievement": -38.4,
+   "earnings_shock": null
+  },
+  {
+   "name": "사이냅소프트",
+   "stock_code": "466410",
+   "industry": "IT/소프트웨어",
+   "group_6m": "L",
+   "excess_6m": -44.0,
+   "float_ratio": 29.85,
+   "estimate_achievement": 83.8,
+   "earnings_shock": null
+  },
+  {
+   "name": "위츠",
+   "stock_code": "459100",
+   "industry": "IT/소프트웨어",
+   "group_6m": "M",
+   "excess_6m": 1.7,
+   "float_ratio": 30.3,
+   "estimate_achievement": 55.8,
+   "earnings_shock": null
+  },
+  {
+   "name": "벡트",
+   "stock_code": "457600",
+   "industry": "IT/소프트웨어",
+   "group_6m": "M",
+   "excess_6m": -20.5,
+   "float_ratio": 42.1,
+   "estimate_achievement": -164.4,
+   "earnings_shock": null
+  },
+  {
+   "name": "엠앤씨솔루션",
+   "stock_code": "484870",
+   "industry": "방산/우주항공",
+   "group_6m": "L",
+   "excess_6m": -50.4,
+   "float_ratio": 25.39,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "온코크로스",
+   "stock_code": "382150",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 70.1,
+   "float_ratio": 100.0,
+   "estimate_achievement": -90.2,
+   "earnings_shock": null
+  },
+  {
+   "name": "온코닉테라퓨틱스",
+   "stock_code": "476060",
+   "industry": "바이오/헬스케어",
+   "group_6m": "L",
+   "excess_6m": -67.0,
+   "float_ratio": 25.12,
+   "estimate_achievement": 142.1,
+   "earnings_shock": null
+  },
+  {
+   "name": "듀켐바이오",
+   "stock_code": "176750",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 17.2,
+   "float_ratio": null,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "쓰리에이로직스",
+   "stock_code": "177900",
+   "industry": "반도체/디스플레이",
+   "group_6m": "L",
+   "excess_6m": -49.9,
+   "float_ratio": 32.22,
+   "estimate_achievement": -43.4,
+   "earnings_shock": null
+  },
+  {
+   "name": "파인메딕스",
+   "stock_code": "387570",
+   "industry": "바이오/헬스케어",
+   "group_6m": "M",
+   "excess_6m": -39.2,
+   "float_ratio": 28.58,
+   "estimate_achievement": -39.5,
+   "earnings_shock": null
+  },
+  {
+   "name": "미트박스",
+   "stock_code": "475460",
+   "industry": "소비재/유통",
+   "group_6m": "M",
+   "excess_6m": -33.7,
+   "float_ratio": 38.97,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "와이즈넛",
+   "stock_code": "096250",
+   "industry": "IT/소프트웨어",
+   "group_6m": "M",
+   "excess_6m": -27.2,
+   "float_ratio": 66.97,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "데이원컴퍼니",
+   "stock_code": "373160",
+   "industry": "기타",
+   "group_6m": "L",
+   "excess_6m": -62.8,
+   "float_ratio": 32.38,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "아스테라시스",
+   "stock_code": "450950",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 123.2,
+   "float_ratio": 36.61,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "삼양엔씨켐",
+   "stock_code": "482630",
+   "industry": "화학/소재",
+   "group_6m": "L",
+   "excess_6m": -61.6,
+   "float_ratio": 19.6,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "피아이이",
+   "stock_code": "452450",
+   "industry": "기계/장비",
+   "group_6m": "W",
+   "excess_6m": 58.2,
+   "float_ratio": null,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "아이지넷",
+   "stock_code": "462980",
+   "industry": "IT/소프트웨어",
+   "group_6m": "L",
+   "excess_6m": -71.8,
+   "float_ratio": 29.99,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "LG씨엔에스",
+   "stock_code": "064400",
+   "industry": "IT/소프트웨어",
+   "group_6m": "M",
+   "excess_6m": -18.2,
+   "float_ratio": null,
+   "estimate_achievement": null,
+   "earnings_shock": 0
+  },
+  {
+   "name": "아이에스티이",
+   "stock_code": "212710",
+   "industry": "반도체/디스플레이",
+   "group_6m": "M",
+   "excess_6m": -18.4,
+   "float_ratio": 39.74,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "동방메디컬",
+   "stock_code": "240550",
+   "industry": "바이오/헬스케어",
+   "group_6m": "M",
+   "excess_6m": -0.3,
+   "float_ratio": 32.15,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "오름테라퓨틱",
+   "stock_code": "475830",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 19.3,
+   "float_ratio": 38.87,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "동국생명과학",
+   "stock_code": "303810",
+   "industry": "바이오/헬스케어",
+   "group_6m": "L",
+   "excess_6m": -53.9,
+   "float_ratio": 32.64,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "모티브링크",
+   "stock_code": "463480",
+   "industry": "2차전지/에너지",
+   "group_6m": "W",
+   "excess_6m": 38.5,
+   "float_ratio": 28.92,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "위너스",
+   "stock_code": "479960",
+   "industry": "2차전지/에너지",
+   "group_6m": "W",
+   "excess_6m": 46.8,
+   "float_ratio": 24.81,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "엘케이켐",
+   "stock_code": "489500",
+   "industry": "화학/소재",
+   "group_6m": "M",
+   "excess_6m": -22.8,
+   "float_ratio": 22.06,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "대진첨단소재",
+   "stock_code": "393970",
+   "industry": "화학/소재",
+   "group_6m": "M",
+   "excess_6m": -38.9,
+   "float_ratio": 31.64,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "엠디바이스",
+   "stock_code": "226590",
+   "industry": "반도체/디스플레이",
+   "group_6m": "W",
+   "excess_6m": 17.9,
+   "float_ratio": 53.06,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "서울보증보험",
+   "stock_code": "031210",
+   "industry": "금융",
+   "group_6m": "W",
+   "excess_6m": 68.5,
+   "float_ratio": 14.07,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "씨케이솔루션",
+   "stock_code": "480370",
+   "industry": "건설/인프라",
+   "group_6m": "L",
+   "excess_6m": -113.2,
+   "float_ratio": 35.68,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "한텍",
+   "stock_code": "098070",
+   "industry": "기계/장비",
+   "group_6m": "W",
+   "excess_6m": 293.7,
+   "float_ratio": 29.74,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "티엑스알로보틱스",
+   "stock_code": "484810",
+   "industry": "기계/장비",
+   "group_6m": "W",
+   "excess_6m": 11.8,
+   "float_ratio": 19.9,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "심플랫폼",
+   "stock_code": "444530",
+   "industry": "IT/소프트웨어",
+   "group_6m": "L",
+   "excess_6m": -51.0,
+   "float_ratio": 37.11,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "더즌",
+   "stock_code": "462860",
+   "industry": "IT/소프트웨어",
+   "group_6m": "L",
+   "excess_6m": -65.9,
+   "float_ratio": 18.7,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "에이유브랜즈",
+   "stock_code": "481070",
+   "industry": "소비재/유통",
+   "group_6m": "M",
+   "excess_6m": 5.3,
+   "float_ratio": 14.12,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "한국피아이엠",
+   "stock_code": "448900",
+   "industry": "자동차/모빌리티",
+   "group_6m": "W",
+   "excess_6m": 122.2,
+   "float_ratio": 44.57,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "쎄크",
+   "stock_code": "081180",
+   "industry": "기계/장비",
+   "group_6m": "L",
+   "excess_6m": -70.3,
+   "float_ratio": 36.78,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "나우로보틱스",
+   "stock_code": "459510",
+   "industry": "기계/장비",
+   "group_6m": "W",
+   "excess_6m": 171.8,
+   "float_ratio": 27.35,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "원일티엔아이",
+   "stock_code": "136150",
+   "industry": "기계/장비",
+   "group_6m": "W",
+   "excess_6m": 26.7,
+   "float_ratio": 30.94,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "오가노이드사이언스",
+   "stock_code": "476040",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 22.2,
+   "float_ratio": 27.59,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "로킷헬스케어",
+   "stock_code": "376900",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 188.0,
+   "float_ratio": 36.31,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "이뮨온시아",
+   "stock_code": "424870",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 52.4,
+   "float_ratio": 29.4,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "바이오비쥬",
+   "stock_code": "489460",
+   "industry": "화학/소재",
+   "group_6m": "M",
+   "excess_6m": -1.6,
+   "float_ratio": 28.16,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "달바글로벌",
+   "stock_code": "483650",
+   "industry": "화학/소재",
+   "group_6m": "W",
+   "excess_6m": 38.5,
+   "float_ratio": 32.73,
+   "estimate_achievement": null,
+   "earnings_shock": 0
+  },
+  {
+   "name": "인투셀",
+   "stock_code": "287840",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 188.4,
+   "float_ratio": 36.34,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "키스트론",
+   "stock_code": "475430",
+   "industry": "화학/소재",
+   "group_6m": "M",
+   "excess_6m": -12.7,
+   "float_ratio": 35.3,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "링크솔루션",
+   "stock_code": "474650",
+   "industry": "기계/장비",
+   "group_6m": "W",
+   "excess_6m": 89.2,
+   "float_ratio": 36.34,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "지씨지놈",
+   "stock_code": "340450",
+   "industry": "바이오/헬스케어",
+   "group_6m": "L",
+   "excess_6m": -48.9,
+   "float_ratio": 42.47,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "지에프씨생명과학",
+   "stock_code": "388610",
+   "industry": "화학/소재",
+   "group_6m": "M",
+   "excess_6m": -29.2,
+   "float_ratio": 41.34,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "뉴엔AI",
+   "stock_code": "463020",
+   "industry": "IT/소프트웨어",
+   "group_6m": "M",
+   "excess_6m": -11.7,
+   "float_ratio": 27.99,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "싸이닉솔루션",
+   "stock_code": "234030",
+   "industry": "반도체/디스플레이",
+   "group_6m": "W",
+   "excess_6m": 79.3,
+   "float_ratio": 32.3,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "아우토크립트",
+   "stock_code": "331740",
+   "industry": "IT/소프트웨어",
+   "group_6m": "M",
+   "excess_6m": -38.2,
+   "float_ratio": 35.9,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "도우인시스",
+   "stock_code": "484120",
+   "industry": "반도체/디스플레이",
+   "group_6m": "L",
+   "excess_6m": -47.2,
+   "float_ratio": 26.57,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "뉴로핏",
+   "stock_code": "380550",
+   "industry": "IT/소프트웨어",
+   "group_6m": "W",
+   "excess_6m": 27.1,
+   "float_ratio": 35.91,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "엔알비",
+   "stock_code": "475230",
+   "industry": "화학/소재",
+   "group_6m": "L",
+   "excess_6m": -63.4,
+   "float_ratio": 31.24,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "프로티나",
+   "stock_code": "468530",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 429.7,
+   "float_ratio": 31.49,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "대한조선",
+   "stock_code": "439260",
+   "industry": "기타",
+   "group_6m": "M",
+   "excess_6m": -35.3,
+   "float_ratio": 22.02,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "아이티켐",
+   "stock_code": "309710",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 54.2,
+   "float_ratio": 14.84,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "지투지바이오",
+   "stock_code": "456160",
+   "industry": "바이오/헬스케어",
+   "group_6m": "M",
+   "excess_6m": 5.4,
+   "float_ratio": 35.39,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "삼양컴텍",
+   "stock_code": "484590",
+   "industry": "방산/우주항공",
+   "group_6m": "M",
+   "excess_6m": 2.6,
+   "float_ratio": 37.14,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "에스엔시스",
+   "stock_code": "0008Z0",
+   "industry": "기타",
+   "group_6m": "L",
+   "excess_6m": -45.8,
+   "float_ratio": 37.88,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "한라캐스트",
+   "stock_code": "125490",
+   "industry": "자동차/모빌리티",
+   "group_6m": "W",
+   "excess_6m": 161.0,
+   "float_ratio": 37.76,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "제이피아이헬스케어",
+   "stock_code": "0010V0",
+   "industry": "바이오/헬스케어",
+   "group_6m": "L",
+   "excess_6m": -80.0,
+   "float_ratio": 30.95,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "그래피",
+   "stock_code": "318060",
+   "industry": "화학/소재",
+   "group_6m": "W",
+   "excess_6m": 191.3,
+   "float_ratio": 37.74,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "에스투더블유",
+   "stock_code": "488280",
+   "industry": "IT/소프트웨어",
+   "group_6m": "M",
+   "excess_6m": -19.5,
+   "float_ratio": 31.07,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "명인제약",
+   "stock_code": "317450",
+   "industry": "바이오/헬스케어",
+   "group_6m": "L",
+   "excess_6m": -77.5,
+   "float_ratio": 21.53,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "노타",
+   "stock_code": "486990",
+   "industry": "IT/소프트웨어",
+   "group_6m": "W",
+   "excess_6m": 253.0,
+   "float_ratio": 20.0,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "이노테크",
+   "stock_code": "469610",
+   "industry": "기계/장비",
+   "group_6m": "W",
+   "excess_6m": 24.8,
+   "float_ratio": 32.48,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "큐리오시스",
+   "stock_code": "494120",
+   "industry": "기계/장비",
+   "group_6m": "M",
+   "excess_6m": -9.2,
+   "float_ratio": 32.96,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "세나테크놀로지",
+   "stock_code": "061090",
+   "industry": "IT/소프트웨어",
+   "group_6m": "M",
+   "excess_6m": -39.5,
+   "float_ratio": 36.22,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "그린광학",
+   "stock_code": "0015G0",
+   "industry": "기계/장비",
+   "group_6m": "W",
+   "excess_6m": 53.9,
+   "float_ratio": 36.46,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "더핑크퐁컴퍼니",
+   "stock_code": "403850",
+   "industry": "엔터/미디어/게임",
+   "group_6m": "L",
+   "excess_6m": -84.2,
+   "float_ratio": 33.84,
+   "estimate_achievement": null,
+   "earnings_shock": 1
+  },
+  {
+   "name": "씨엠티엑스",
+   "stock_code": "388210",
+   "industry": "반도체/디스플레이",
+   "group_6m": "W",
+   "excess_6m": 70.3,
+   "float_ratio": 31.97,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "비츠로넥스텍",
+   "stock_code": "488900",
+   "industry": "방산/우주항공",
+   "group_6m": "W",
+   "excess_6m": 99.5,
+   "float_ratio": 24.12,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "아로마티카",
+   "stock_code": "0015N0",
+   "industry": "화학/소재",
+   "group_6m": "L",
+   "excess_6m": -44.9,
+   "float_ratio": 31.37,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "에임드바이오",
+   "stock_code": "0009K0",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 135.7,
+   "float_ratio": 24.14,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "테라뷰",
+   "stock_code": "950250",
+   "industry": "기계/장비",
+   "group_6m": "L",
+   "excess_6m": -66.2,
+   "float_ratio": 65.9,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "페스카로",
+   "stock_code": "0015S0",
+   "industry": "IT/소프트웨어",
+   "group_6m": "L",
+   "excess_6m": -43.8,
+   "float_ratio": 32.18,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "이지스",
+   "stock_code": "261520",
+   "industry": "IT/소프트웨어",
+   "group_6m": "L",
+   "excess_6m": -80.5,
+   "float_ratio": 27.13,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "쿼드메디슨",
+   "stock_code": "464490",
+   "industry": "바이오/헬스케어",
+   "group_6m": "L",
+   "excess_6m": -61.8,
+   "float_ratio": 39.9,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "티엠씨",
+   "stock_code": "217590",
+   "industry": "화학/소재",
+   "group_6m": "M",
+   "excess_6m": -32.5,
+   "float_ratio": 21.55,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "아크릴",
+   "stock_code": "0007C0",
+   "industry": "IT/소프트웨어",
+   "group_6m": "M",
+   "excess_6m": -0.6,
+   "float_ratio": 33.2,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "나라스페이스테크놀로지",
+   "stock_code": "478340",
+   "industry": "방산/우주항공",
+   "group_6m": "W",
+   "excess_6m": 9.6,
+   "float_ratio": 32.41,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "알지노믹스",
+   "stock_code": "476830",
+   "industry": "바이오/헬스케어",
+   "group_6m": "W",
+   "excess_6m": 83.4,
+   "float_ratio": 71.3,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "삼진식품",
+   "stock_code": "0013V0",
+   "industry": "소비재/유통",
+   "group_6m": "L",
+   "excess_6m": -42.6,
+   "float_ratio": 37.57,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "리브스메드",
+   "stock_code": "491000",
+   "industry": "바이오/헬스케어",
+   "group_6m": "M",
+   "excess_6m": -40.1,
+   "float_ratio": 32.03,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "세미파이브",
+   "stock_code": "490470",
+   "industry": "건설/인프라",
+   "group_6m": "M",
+   "excess_6m": -17.3,
+   "float_ratio": 36.95,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "덕양에너젠",
+   "stock_code": "0001A0",
+   "industry": "2차전지/에너지",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 32.33,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "케이뱅크",
+   "stock_code": "279570",
+   "industry": "금융",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 37.32,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "에스팀",
+   "stock_code": "458350",
+   "industry": "기타",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 34.69,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "액스비스",
+   "stock_code": "0011A0",
+   "industry": "기계/장비",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 33.05,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "카나프테라퓨틱스",
+   "stock_code": "0082N0",
+   "industry": "바이오/헬스케어",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 40.69,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "아이엠바이오로직스",
+   "stock_code": "493280",
+   "industry": "바이오/헬스케어",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 18.55,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "한패스",
+   "stock_code": "408470",
+   "industry": "금융",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 23.42,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "메쥬",
+   "stock_code": "0088M0",
+   "industry": "바이오/헬스케어",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 89.5,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "리센스메디컬",
+   "stock_code": "394420",
+   "industry": "바이오/헬스케어",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 10.0,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "인벤테라",
+   "stock_code": "0007J0",
+   "industry": "바이오/헬스케어",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 10.0,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "채비",
+   "stock_code": "0011T0",
+   "industry": "2차전지/에너지",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 75.16,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "코스모로보틱스",
+   "stock_code": "439960",
+   "industry": "바이오/헬스케어",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 32.43,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "폴레드",
+   "stock_code": "487580",
+   "industry": "소비재/유통",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 27.94,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "마키나락스",
+   "stock_code": "477850",
+   "industry": "IT/소프트웨어",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 31.2,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "피스피스스튜디오",
+   "stock_code": "0117P0",
+   "industry": "소비재/유통",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 40.61,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "져스텍",
+   "stock_code": "153890",
+   "industry": "2차전지/에너지",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 10.0,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "스트라드비젼",
+   "stock_code": "475040",
+   "industry": "IT/소프트웨어",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 51.03,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "매드업",
+   "stock_code": "0039P0",
+   "industry": "기타",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 0.1,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  },
+  {
+   "name": "레몬헬스케어",
+   "stock_code": "365660",
+   "industry": "IT/소프트웨어",
+   "group_6m": null,
+   "excess_6m": null,
+   "float_ratio": 84.04,
+   "estimate_achievement": null,
+   "earnings_shock": null
+  }
+ ]
+}

@@ -201,16 +201,21 @@ def main():
         l = stat([r[f] for r in six if r["groups"]["6M"] == "L"])
         if w is None or l is None:
             continue
+        # Fix 1: W_n/L_n을 factor별 non-null 카운트로 교체
+        w_n = sum(1 for r in six if r["groups"]["6M"] == "W" and r[f] is not None)
+        l_n = sum(1 for r in six if r["groups"]["6M"] == "L" and r[f] is not None)
         direction = w > l
         consistent = []
         for h, sub in groups_by_h.items():
             wh = stat([r[f] for r in sub if r["groups"][h] == "W"])
             lh = stat([r[f] for r in sub if r["groups"][h] == "L"])
-            if wh is not None and lh is not None and (wh > lh) == direction:
+            # Fix 2: 동점(wh == lh) 처리 - 동점 지평은 consistent에 포함하지 않음
+            if wh is not None and lh is not None and wh != lh and (wh > lh) == direction:
                 consistent.append(h)
+        # Fix 3: thin_sample 필드 추가 (W_n<10 or L_n<10이면 true)
         contrast.append({"factor": f, "W_median": w, "L_median": l,
-                         "W_n": sum(1 for r in six if r["groups"]["6M"] == "W"),
-                         "L_n": sum(1 for r in six if r["groups"]["6M"] == "L"),
+                         "W_n": w_n, "L_n": l_n,
+                         "thin_sample": w_n < 10 or l_n < 10,
                          "consistent_horizons": consistent})
     # --- 산출
     out = {
