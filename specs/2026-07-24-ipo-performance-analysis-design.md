@@ -133,3 +133,16 @@ analysis_flags(
 - Streamlit 대시보드 통합 (기존 dashboard.py 수정 없음 — 추후 별도 프로젝트)
 - 일별 주가 원시 시계열 DB 저장
 - 상장 전 재무 이력 수집 (투자설명서 적용이익만 사용)
+
+---
+
+## 9. 구현 노트 — 실측에 따른 스펙 수정 사항 (2026-07-24 실행 후 기록)
+
+1. **시장조정**: pykrx 지수 API가 KRX 로그인 요구로 불능 → ETF 프록시(KODEX200 069500 / KODEX코스닥150 229200) 대비 초과수익률로 대체
+2. **유니버스 186 → 172**: "이전상장 기제외" 전제가 사실과 달라(KIND이 이전상장도 '신규상장' 태깅) `확정공모가 IS NOT NULL` 필터 추가로 14건 제외. 지평별 실측 표본: 1M 168 / 3M 163 / 6M 153 / 12M 119
+3. **분기 산출 공식 (§4.2 정정)**: fnlttSinglAcnt의 thstrm_amount는 반기·3분기 보고서에서 "3개월 단독값"(누적은 thstrm_add_amount). Q1~Q3=thstrm 그대로, Q4=FY−Q3.thstrm_add. 계정명은 "당기순이익(손실)" startswith 매칭
+4. **티커 매핑**: CORPCODE stock_code에 영숫자 임시코드(0008Z0 류 54건) 존재 → isalnum 허용 + pykrx 이름 폴백(2차 안전망)
+5. **추정치 달성률**: §4.3의 "샘플 20건 수동 검증" 대신 valuation_method PER 미포함 시 None 처리(25사)로 대체. factor 표본 W15/L27
+6. **earnings_shock**: 상장 전 분기보고서 부재로 YoY 쌍이 구조적 희소(실표본 3건) — 결론 유보로 처리
+7. **산출 확장**: factor_contrast에 W_n/L_n(non-null 실표본)·thin_sample(n<10) 필드, 동점 지평은 일관성 제외. 스크립트 4개(build_performance_report.py 추가)
+8. NOW 지평은 수집만 하고 v1 보고서에선 미사용
