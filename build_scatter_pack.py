@@ -39,6 +39,111 @@ VARIABLES = [
     ("estimate_achievement", "추정치 달성률", "%", False),
 ]
 
+FIN_VARIABLES = [
+    ("rev_growth", "매출성장률 (상장후 4분기 vs 직전연도)", "%", False),
+    ("op_growth", "영업이익 성장률 (직전연도 흑자社만)", "%", False),
+    ("op_margin", "영업이익률 (상장후)", "%", False),
+]
+
+# 손익 전환 상태 (별도 스트립 차트 페이지)
+TRANSITION_ORDER = ["흑자유지", "흑자전환", "적자전환", "적자지속"]
+
+
+def _listing_quarter(listing_date: str) -> str:
+    return f"{listing_date[:4]}Q{(int(listing_date[5:7]) - 1) // 3 + 1}"
+
+
+def _year_total(qs, year, field):
+    """해당 연도 연간값: 4분기 완비 합 또는 Q4 연간폴백(is_cumulative=1)."""
+    rows = [q for q in qs if q["quarter"].startswith(str(year))]
+    vals = [q[field] for q in rows if q[field] is not None]
+    q4 = next((q for q in rows if q["quarter"].endswith("Q4")), None)
+    if q4 and q4["is_cumulative"] and q4[field] is not None:
+        return q4[field]
+    if len(vals) == 4:
+        return sum(vals)
+    return None
+
+
+def compute_financials(df: pd.DataFrame, con) -> pd.DataFrame:
+    qe = pd.read_sql(
+        "SELECT corp_code, quarter, revenue, op_income, is_cumulative "
+        "FROM quarterly_earnings", con)
+    by_corp = {k: g.sort_values("quarter").to_dict("records")
+               for k, g in qe.groupby("corp_code")}
+    out = {"rev_growth": [], "op_growth": [], "op_margin": [], "transition": []}
+    for _, r in df.iterrows():
+        qs = by_corp.get(r["corp_code"], [])
+        lq = _listing_quarter(r["listing_date"])
+        prev_year = int(r["listing_date"][:4]) - 1
+        # 상장 후 분기 (상장 분기 다음부터, 연간폴백 행 제외) 최대 4개
+        post = [q for q in qs if q["quarter"] > lq and not q["is_cumulative"]][:4]
+        n = len(post)
+        rev_post = [q["revenue"] for q in post if q["revenue"] is not None]
+        op_post = [q["op_income"] for q in post if q["op_income"] is not None]
+        rev_prev = _year_total(qs, prev_year, "revenue")
+        op_prev = _year_total(qs, prev_year, "op_income")
+        # 연환산 (가용 분기 2개 이상일 때만)
+        rev_ann = sum(rev_post) * 4 / len(rev_post) if len(rev_post) >= 2 else None
+        op_ann = sum(op_post) * 4 / len(op_post) if len(op_post) >= 2 else None
+        out["rev_growth"].append(
+            round((rev_ann / rev_prev - 1) * 100, 1)
+            if rev_ann is not None and rev_prev and rev_prev > 0 else None)
+        out["op_growth"].append(
+            round((op_ann / op_prev - 1) * 100, 1)
+            if op_ann is not None and op_prev and op_prev > 0 else None)
+        out["op_margin"].append(
+            round(sum(op_post) / sum(rev_post) * 100, 1)
+            if len(rev_post) >= 2 and sum(rev_post) > 0 and len(op_post) >= 2 else None)
+        if op_prev is not None and op_ann is not None:
+            out["transition"].append(
+                "흑자유지" if op_prev > 0 and op_ann > 0 else
+                "적자전환" if op_prev > 0 else
+                "흑자전환" if op_ann > 0 else "적자지속")
+        else:
+            out["transition"].append(None)
+    for k, v in out.items():
+        df[k] = v
+    return df
+
+
+def draw_transition_page(pdf, df):
+    """손익 전환 상태 스트립 차트: x=수익률, y=상태(지터)."""
+    rng = np.random.default_rng(42)
+    fig, axes = plt.subplots(2, 2, figsize=(11.7, 8.3))
+    fig.suptitle("영업손익 전환 상태 (직전연도 → 상장후 연환산)  vs  초과수익률",
+                 fontsize=14, fontproperties=FONT, fontweight="bold", y=0.98)
+    for ax, h in zip(axes.flat, HORIZONS):
+        sub = df[[h, "transition", "group_6m"]].dropna(subset=[h, "transition"])
+        for yi, cat in enumerate(TRANSITION_ORDER):
+            cc = sub[sub["transition"] == cat]
+            jitter = rng.uniform(-0.18, 0.18, len(cc))
+            colors = cc["group_6m"].map({"W": C_W, "L": C_L}).fillna(C_M)
+            ax.scatter(cc[h], yi + jitter, s=16, c=colors, alpha=0.7,
+                       edgecolors="white", linewidths=0.3)
+            med = cc[h].median()
+            if len(cc) >= 3:
+                ax.plot([med, med], [yi - 0.28, yi + 0.28], color="#333333",
+                        lw=1.6, zorder=3)
+            ax.text(ax.get_xlim()[1], yi, f" n={len(cc)}", fontsize=7,
+                    va="center", fontproperties=FONT, color="#666666")
+        ax.set_yticks(range(len(TRANSITION_ORDER)))
+        ax.set_yticklabels(TRANSITION_ORDER, fontsize=9, fontproperties=FONT)
+        ax.invert_yaxis()
+        ax.axvline(0, color="#c9c9c9", lw=0.8, zorder=0)
+        ax.grid(True, axis="x", color="#ececec", lw=0.5, zorder=0)
+        ax.set_axisbelow(True)
+        for sp in ("top", "right"):
+            ax.spines[sp].set_visible(False)
+        ax.tick_params(labelsize=8)
+        ax.set_title(f"{h}   n={len(sub)}   (세로선=그룹 중앙값)", fontsize=10,
+                     fontproperties=FONT, loc="left")
+        ax.set_xlabel(f"{h} 초과수익률 (%)", fontsize=9, fontproperties=FONT)
+    fig.tight_layout(rect=(0, 0.04, 1, 0.95))
+    pdf.savefig(fig)
+    plt.close(fig)
+
+
 EXTRA_SQL = """
 SELECT dart_corp_code AS corp_code,
        "청약경쟁률_비례" AS subs_ratio, "수요예측_참여기관수" AS inst_count,
@@ -132,7 +237,22 @@ def draw_page(pdf, df, key, label, unit, logy):
 
 
 def main():
+    con = pc.get_db()
     df = load_frame()
+    df = compute_financials(df, con)
+    # 검증 정정값 반영 (data_corrections 존재 시): corrected→원문값, unresolved→NULL
+    try:
+        corr = pd.read_sql(
+            "SELECT corp_code, verified_value, verdict FROM data_corrections "
+            "WHERE field='유통가능주식수비율'", con)
+        fix = corr[corr["verdict"] == "corrected"].set_index("corp_code")["verified_value"]
+        drop = set(corr[corr["verdict"] == "unresolved"]["corp_code"])
+        df["float_ratio"] = np.where(
+            df["corp_code"].isin(fix.index), df["corp_code"].map(fix),
+            np.where(df["corp_code"].isin(drop), np.nan, df["float_ratio"]))
+        print(f"유통비율 정정 반영: corrected {len(fix)}건, 제외 {len(drop)}건")
+    except Exception:
+        print("(data_corrections 없음 — 유통비율 원본 사용)")
     out = pc.ROOT / "compare_report" / "ipo_scatter_pack.pdf"
     with PdfPages(out) as pdf:
         # 안내 페이지
@@ -154,7 +274,11 @@ def main():
         plt.close(fig)
         for key, label, unit, logy in VARIABLES:
             draw_page(pdf, df, key, label, unit, logy)
-    print(f"saved {out} ({1 + len(VARIABLES)} pages)")
+        for key, label, unit, logy in FIN_VARIABLES:
+            draw_page(pdf, df, key, label, unit, logy)
+        draw_transition_page(pdf, df)
+    n_pages = 1 + len(VARIABLES) + len(FIN_VARIABLES) + 1
+    print(f"saved {out} ({n_pages} pages)")
 
 
 if __name__ == "__main__":
