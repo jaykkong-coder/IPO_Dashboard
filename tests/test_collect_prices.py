@@ -39,3 +39,9 @@ def test_slice_from_returns_only_listing_date_onward():
     sliced = cp._slice_from(full, "20240601")             # 상장일(=슬라이스 기준일) 이후만
     assert list(sliced.index.strftime("%Y-%m-%d")) == ["2024-06-03", "2025-01-02"]
     assert len(sliced) < len(full)                        # 캐시 전체가 아닌 부분집합
+
+def test_resolve_ticker_by_name_exact_then_stripped_then_none():
+    name_map = {"피스피스스튜디오": "0117P0", "그린 광학": "0015G0"}
+    assert cp.resolve_ticker_by_name("피스피스스튜디오", name_map) == "0117P0"  # 정확일치
+    assert cp.resolve_ticker_by_name("그린광학", name_map) == "0015G0"          # 공백 제거 일치
+    assert cp.resolve_ticker_by_name("존재안함", name_map) is None              # 스킵
