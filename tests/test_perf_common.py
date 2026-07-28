@@ -22,3 +22,21 @@ def test_ensure_tables():
     names = {r[0] for r in con.execute(
         "SELECT name FROM sqlite_master WHERE type='table'")}
     assert {"quarterly_earnings", "price_performance", "analysis_flags"} <= names
+
+def test_ensure_tables_creates_share_structure():
+    """share_structure / impl_reports 테이블이 ensure_tables로 생성된다."""
+    import sqlite3
+    import perf_common as pc
+
+    con = sqlite3.connect(":memory:")
+    pc.ensure_tables(con)
+    names = {r[0] for r in con.execute(
+        "SELECT name FROM sqlite_master WHERE type='table'")}
+    assert "share_structure" in names
+    assert "impl_reports" in names
+
+    cols = {r[1] for r in con.execute("PRAGMA table_info(share_structure)")}
+    for c in ("corp_code", "total_shares", "lockup_existing", "lockup_inst",
+              "esop", "free_float", "free_float_pct", "inst_alloc",
+              "lockup_inst_pct", "identity_gap", "verdict"):
+        assert c in cols, f"missing column {c}"
