@@ -358,16 +358,16 @@ LOCKUP_LABELS = {
 
 
 def _row_total_qty(cells: list[str]) -> int:
-    """행의 마지막 수량 셀(=합계 열)을 반환. 전부 '-'면 0.
+    """행에서 가장 큰 수량형 셀(=합계 열)을 반환. 전부 '-'면 0.
 
-    합계 열은 항상 맨 오른쪽이지만 그 뒤에 비중 셀이 따라붙는다.
-    뒤에서부터 훑어 처음 만나는 수량형 셀을 채택한다.
+    위치가 아니라 크기로 고르는 이유: 합계 열 뒤에 비중 셀이 따라붙는데,
+    비중이 "100" 처럼 소수점 없는 정수로 찍히면 parse_qty가 수량과 구분하지
+    못한다(TOMO 실측 계 행: ['계','249,016','100','1,500,000','100']).
+    뒤에서부터 첫 수량형 셀을 잡으면 그 "100"을 합계로 오채택한다.
+    합계는 구성요소의 합이므로 행 내 어떤 수량보다 크거나 같다.
     """
-    for c in reversed(cells[1:]):
-        q = parse_qty(c)
-        if q is not None:
-            return q
-    return 0
+    quantities = [q for q in (parse_qty(c) for c in cells[1:]) if q is not None]
+    return max(quantities) if quantities else 0
 
 
 def parse_lockup_table(text: str) -> dict | None:
@@ -504,14 +504,21 @@ ALLOC_LABELS = {"우리사주조합": "esop", "기관투자자": "inst", "일반
 
 
 def _final_alloc_qty(cells: list[str]) -> int:
-    """최종 배정수량 = 뒤에서 세 번째 수량 셀.
+    """최종 배정수량 = 뒤에서 두 번째 수량 셀.
 
-    행 끝이 (수량, 금액, 비율) 순서이므로 수량형 셀을 뒤에서 훑어
-    3번째로 만나는 것이 최종 배정수량이다. 전부 '-'인 행은 0.
+    「최종 배정 현황」 구획은 (건수, 수량, 금액, 비율) 순서로 끝난다.
+    비율은 소수점이 있어 parse_qty가 걸러내므로, 뒤에서부터 수량형 셀을
+    모으면 [금액, 수량, 건수, ...] 순서가 되고 인덱스 1이 배정수량이다.
+    전부 '-'인 행(우리사주 미배정 등)은 0.
+
+    마키나락스 일반투자자 행으로 검증:
+      [... '545,850', '658,750', '9,881,250,000', '25.0']
+      → qtys = [9881250000, 658750, 545850, ...] → qtys[1] = 658,750 ✓
+      (qtys[2]는 청약건수 545,850을 집는다 — 인덱스를 옮기지 말 것)
     """
     qtys = [q for q in (parse_qty(c) for c in reversed(cells[1:])) if q is not None]
-    if len(qtys) >= 3:
-        return qtys[2]
+    if len(qtys) >= 2:
+        return qtys[1]
     return qtys[-1] if qtys else 0
 
 
