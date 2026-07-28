@@ -27,6 +27,19 @@ TOMO_TABLE = """
 </TABLE>
 """
 
+# 2주일 확약 매핑 검증용 fixture — '2주일 확약' 행에 nonzero 수량 포함
+TWO_WEEKS_TABLE = """
+<TABLE>
+<TR><TD>확약기간</TD><TD>운용사(집합)</TD><TD>비중</TD><TD>합계</TD><TD>비중</TD></TR>
+<TR><TD>6개월 확약</TD><TD>50,000</TD><TD>10.0</TD><TD>100,000</TD><TD>20.0</TD></TR>
+<TR><TD>3개월 확약</TD><TD>40,000</TD><TD>8.0</TD><TD>80,000</TD><TD>16.0</TD></TR>
+<TR><TD>1개월 확약</TD><TD>30,000</TD><TD>6.0</TD><TD>60,000</TD><TD>12.0</TD></TR>
+<TR><TD>2주일 확약</TD><TD>60,000</TD><TD>12.0</TD><TD>120,000</TD><TD>24.0</TD></TR>
+<TR><TD>미확약</TD><TD>50,000</TD><TD>10.0</TD><TD>140,000</TD><TD>28.0</TD></TR>
+<TR><TD>계</TD><TD>230,000</TD><TD>46.0</TD><TD>500,000</TD><TD>100.0</TD></TR>
+</TABLE>
+"""
+
 
 def test_parse_lockup_table_makinarocks():
     """확약 우선배정 시행 후 사례: 미확약 1.8% → 확약 98.2%."""
@@ -62,6 +75,23 @@ def test_lockup_components_sum_to_total():
         r = irp.parse_lockup_table(table)
         parts = r["15d"] + r["1m"] + r["3m"] + r["6m"] + r["none"]
         assert parts == r["total"], f"{parts} != {r['total']}"
+
+
+def test_parse_lockup_table_2weeks_alias_maps_to_15d():
+    """'2주일 확약' 라벨이 '15일 확약'과 같은 범주로 '15d' 키로 매핑됨을 검증.
+
+    이 테스트는 nonzero '2주일 확약' 수량을 포함해야 매핑 유무를 구분할 수 있다.
+    """
+    r = irp.parse_lockup_table(TWO_WEEKS_TABLE)
+    assert r["15d"] == 120_000, "2주일 확약 수량이 15d 키로 매핑되어야 함"
+    assert r["6m"] == 100_000
+    assert r["3m"] == 80_000
+    assert r["1m"] == 60_000
+    assert r["none"] == 140_000
+    assert r["total"] == 500_000
+    # 내부 정합성: 모든 확약기간의 합 = total
+    parts = r["15d"] + r["1m"] + r["3m"] + r["6m"] + r["none"]
+    assert parts == r["total"]
 
 
 def test_decode_document_prefers_utf8():
