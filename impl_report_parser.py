@@ -99,3 +99,43 @@ def parse_lockup_table(text: str) -> dict | None:
         out.setdefault(k, 0)
     out["locked"] = out["total"] - out["none"]
     return out
+
+
+# 청약·배정현황 표 행 라벨 → 표준 키
+ALLOC_LABELS = {"우리사주조합": "esop", "기관투자자": "inst", "일반투자자": "retail"}
+
+
+def _final_alloc_qty(cells: list[str]) -> int:
+    """최종 배정수량 = 뒤에서 두 번째 수량 셀.
+
+    「최종 배정 현황」 구획은 (건수, 수량, 금액, 비율) 순서로 끝난다.
+    비율은 소수점이 있어 parse_qty가 걸러내므로, 뒤에서부터 수량형 셀을
+    모으면 [금액, 수량, 건수, ...] 순서가 되고 인덱스 1이 배정수량이다.
+    전부 '-'인 행(우리사주 미배정 등)은 0.
+
+    마키나락스 일반투자자 행으로 검증:
+      [... '545,850', '658,750', '9,881,250,000', '25.0']
+      → qtys = [9881250000, 658750, 545850, ...] → qtys[1] = 658,750 ✓
+      (qtys[2]는 청약건수 545,850을 집는다 — 인덱스를 옮기지 말 것)
+    """
+    qtys = [q for q in (parse_qty(c) for c in reversed(cells[1:])) if q is not None]
+    if len(qtys) >= 2:
+        return qtys[1]
+    return qtys[-1] if qtys else 0
+
+
+def parse_allocation_table(text: str) -> dict | None:
+    """「청약 및 배정현황」 표에서 그룹별 최종 배정수량을 파싱."""
+    out = {}
+    for cells in extract_rows(text):
+        if len(cells) < 2:
+            continue
+        key = ALLOC_LABELS.get(WS_RE.sub("", cells[0]))
+        if key is None:
+            continue
+        out[key] = _final_alloc_qty(cells)
+    if "inst" not in out:
+        return None
+    out.setdefault("esop", 0)
+    out.setdefault("retail", 0)
+    return out
