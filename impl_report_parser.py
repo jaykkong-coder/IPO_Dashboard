@@ -52,3 +52,49 @@ def parse_qty(cell: str) -> int | None:
         return int(s.replace(",", ""))
     except ValueError:
         return None
+
+
+# 확약기간 행 라벨 → 표준 키. '2주일'과 '15일'은 같은 범주다.
+LOCKUP_LABELS = {
+    "15일확약": "15d", "2주일확약": "15d", "2주확약": "15d",
+    "1개월확약": "1m", "3개월확약": "3m", "6개월확약": "6m",
+    "미확약": "none", "계": "total", "합계": "total",
+}
+
+
+def _row_total_qty(cells: list[str]) -> int:
+    """행의 마지막 수량 셀(=합계 열)을 반환. 전부 '-'면 0.
+
+    합계 열은 항상 맨 오른쪽이지만 그 뒤에 비중 셀이 따라붙는다.
+    비중(0-100%)과 수량을 구분하기 위해, 모든 수량 셀 중 가장 큰 값을 합계로 본다.
+    (합계는 컴포넌트 수량들의 합이므로 가장 크다)
+    """
+    quantities = []
+    for c in cells[1:]:
+        q = parse_qty(c)
+        if q is not None:
+            quantities.append(q)
+    return max(quantities) if quantities else 0
+
+
+def parse_lockup_table(text: str) -> dict | None:
+    """「기관투자자 의무보유확약기간별 배정현황」 표를 파싱.
+
+    반환: {"total","none","15d","1m","3m","6m","locked"} / 표 없으면 None
+    """
+    out = {}
+    for cells in extract_rows(text):
+        if len(cells) < 2:
+            continue
+        label = WS_RE.sub("", cells[0])
+        key = LOCKUP_LABELS.get(label)
+        if key is None:
+            continue
+        out[key] = _row_total_qty(cells)
+
+    if "total" not in out or "none" not in out:
+        return None
+    for k in ("15d", "1m", "3m", "6m"):
+        out.setdefault(k, 0)
+    out["locked"] = out["total"] - out["none"]
+    return out
