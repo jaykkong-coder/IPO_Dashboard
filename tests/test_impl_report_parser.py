@@ -137,6 +137,52 @@ MAKINA_ALLOC = """
 <TR><TD>일반투자자</TD><TD>658,750</TD><TD>25.0</TD><TD>546,153</TD><TD>1,849,631,580</TD>
     <TD>27,744,473,700,000</TD><TD>99.9</TD><TD>545,850</TD><TD>658,750</TD>
     <TD>9,881,250,000</TD><TD>25.0</TD></TR>
+<TR><TD>계</TD><TD>2,635,000</TD><TD>100.0</TD><TD>548,581</TD><TD>3,825,881,580</TD>
+    <TD>27,773,727,700,000</TD><TD>100.0</TD><TD>548,578</TD><TD>2,635,000</TD>
+    <TD>39,524,750,000</TD><TD>100.0</TD></TR>
+</TABLE>
+"""
+
+# ESOP 우선배정 도입 후 사례: 최초배정 350k → 최종배정 200k로 감소 (150k 재배정)
+# 이 케이스는 최初배定과 最終配定이 다를 때 올바른 인덱스를 선택하는지 검증
+ESOP_CLAWBACK_ALLOC = """
+<TABLE>
+<TR><TD>구분</TD><TD>수량</TD><TD>비율</TD><TD>건수</TD><TD>수량</TD><TD>금액</TD><TD>비율</TD>
+    <TD>건수</TD><TD>수량</TD><TD>금액</TD><TD>비율</TD></TR>
+<TR><TD>우리사주조합</TD><TD>350,000</TD><TD>14.0</TD><TD>1</TD><TD>350,000</TD>
+    <TD>5,250,000,000</TD><TD>0.1</TD><TD>1</TD><TD>200,000</TD>
+    <TD>3,000,000,000</TD><TD>8.0</TD></TR>
+<TR><TD>기관투자자</TD><TD>1,500,000</TD><TD>60.0</TD><TD>2,000</TD><TD>1,500,000</TD>
+    <TD>22,500,000,000</TD><TD>50.0</TD><TD>2,300</TD><TD>1,800,000</TD>
+    <TD>27,000,000,000</TD><TD>72.0</TD></TR>
+<TR><TD>일반투자자</TD><TD>650,000</TD><TD>26.0</TD><TD>400,000</TD><TD>1,650,000</TD>
+    <TD>24,750,000,000</TD><TD>49.9</TD><TD>388,000</TD><TD>700,000</TD>
+    <TD>10,500,000,000</TD><TD>20.0</TD></TR>
+<TR><TD>계</TD><TD>2,500,000</TD><TD>100.0</TD><TD>402,001</TD><TD>3,500,000</TD>
+    <TD>52,500,000,000</TD><TD>100.0</TD><TD>390,301</TD><TD>2,700,000</TD>
+    <TD>40,500,000,000</TD><TD>100.0</TD></TR>
+</TABLE>
+"""
+
+# 정수형 비율을 포함한 fixture: 100% = "100" (소수점 없음)
+# parse_qty("100") = 100이므로 위치 기반 추출이 실패하는 사례
+# INST 행에만 "100"이 있으면, INST와 계는 둘 다 shift되지만
+# RETAIL은 shift 안 되므로 합계가 맞지 않음 → None 반환하여 버그 감지
+BARE_INTEGER_RATIO_ALLOC = """
+<TABLE>
+<TR><TD>구분</TD><TD>수량</TD><TD>비율</TD><TD>건수</TD><TD>수량</TD><TD>금액</TD><TD>비율</TD>
+    <TD>건수</TD><TD>수량</TD><TD>금액</TD><TD>비율</TD></TR>
+<TR><TD>우리사주조합</TD><TD>-</TD><TD>-</TD><TD>-</TD><TD>-</TD><TD>-</TD>
+    <TD>-</TD><TD>-</TD><TD>-</TD><TD>-</TD><TD>-</TD></TR>
+<TR><TD>기관투자자</TD><TD>1,500,000</TD><TD>100</TD><TD>2,000</TD><TD>1,500,000</TD>
+    <TD>22,500,000,000</TD><TD>100</TD><TD>2,000</TD><TD>1,500,000</TD>
+    <TD>22,500,000,000</TD><TD>100</TD></TR>
+<TR><TD>일반투자자</TD><TD>500,000</TD><TD>33.3</TD><TD>100,000</TD><TD>500,000</TD>
+    <TD>7,500,000,000</TD><TD>25.0</TD><TD>100,000</TD><TD>500,000</TD>
+    <TD>7,500,000,000</TD><TD>33.3</TD></TR>
+<TR><TD>계</TD><TD>2,000,000</TD><TD>100.0</TD><TD>102,000</TD><TD>2,000,000</TD>
+    <TD>30,000,000,000</TD><TD>100.0</TD><TD>102,000</TD><TD>2,000,000</TD>
+    <TD>30,000,000,000</TD><TD>100.0</TD></TR>
 </TABLE>
 """
 
@@ -169,3 +215,64 @@ def test_parse_allocation_no_esop():
     r = irp.parse_allocation_table(text)
     assert r["esop"] == 0
     assert r["inst"] == 1_500_000
+
+
+def test_parse_allocation_missing_inst_returns_none():
+    """기관투자자 행이 없으면 불완전한 배정현황 → None 반환."""
+    text = """
+    <TABLE>
+    <TR><TD>우리사주조합</TD><TD>349,300</TD><TD>13.3</TD><TD>1</TD><TD>349,300</TD>
+        <TD>5,239,500,000</TD><TD>0.0</TD><TD>1</TD><TD>349,300</TD>
+        <TD>5,239,500,000</TD><TD>13.3</TD></TR>
+    <TR><TD>일반투자자</TD><TD>658,750</TD><TD>25.0</TD><TD>546,153</TD><TD>1,849,631,580</TD>
+        <TD>27,744,473,700,000</TD><TD>99.9</TD><TD>545,850</TD><TD>658,750</TD>
+        <TD>9,881,250,000</TD><TD>25.0</TD></TR>
+    </TABLE>
+    """
+    r = irp.parse_allocation_table(text)
+    assert r is None
+
+
+def test_parse_allocation_esop_clawback_picks_final_not_initial():
+    """최初배定과 最終配定이 다를 때 최종 값을 선택하는지 검증.
+
+    이 테스트는 qtys[1]이 정확한지 실증적으로 검증한다.
+    만약 qtys[-1] (최초배정)을 선택하면 ESOP이 350,000으로 틀린다.
+    """
+    r = irp.parse_allocation_table(ESOP_CLAWBACK_ALLOC)
+    assert r["esop"] == 200_000, "최終배定 선택"
+    assert r["inst"] == 1_800_000, "최終배定 선택"
+    assert r["retail"] == 700_000, "최終배定 선택"
+    # 검증: esop + inst + retail == 계
+    assert r["esop"] + r["inst"] + r["retail"] == 2_700_000
+
+
+def test_parse_allocation_sum_matches_total_row():
+    """배정현황 3그룹의 합이 계 행과 일치하는지 검증.
+
+    마키나락스: 349,300 + 1,626,950 + 658,750 = 2,635,000 (계)
+    ESOP 우선배정 케이스: 200,000 + 1,800,000 + 700,000 = 2,700,000 (계)
+    """
+    r1 = irp.parse_allocation_table(MAKINA_ALLOC)
+    assert r1["esop"] + r1["inst"] + r1["retail"] == 2_635_000
+
+    r2 = irp.parse_allocation_table(ESOP_CLAWBACK_ALLOC)
+    assert r2["esop"] + r2["inst"] + r2["retail"] == 2_700_000
+
+
+def test_parse_allocation_bare_integer_ratio_fails_gracefully():
+    """정수형 비율 ('100')을 포함한 행에서 위치 기반 추출이 실패하면 None 반환.
+
+    This tests Issue #3: 위치 기반 추출의 취약점.
+    "100" (bare integer)가 비율 위치에 있으면 parse_qty()가 100을 수량으로 인식,
+    일부 행의 인덱스가 shift되어 잘못된 배정수량을 반환할 수 있다.
+
+    이 테스트는 합계 검증으로 mismatch를 감지하고 None 반환하는지 확인한다.
+    INST 행에만 "100"이 있으므로 INST는 shift되지만 RETAIL은 정상.
+    따라서 esop(0) + inst(shifted) + retail(500k) ≠ 계(2M)가 되어
+    mismatch 검출 → None 반환.
+    """
+    r = irp.parse_allocation_table(BARE_INTEGER_RATIO_ALLOC)
+    # 합계 검증이 실패하면 None을 반환해야 함 (부분 채워진 dict 금지)
+    # 이는 위치 기반 추출 오류를 감지하기 위한 safety valve 역할
+    assert r is None, "bare-integer ratio shift로 인한 mismatch를 감지하고 None 반환해야 함"

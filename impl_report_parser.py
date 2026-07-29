@@ -125,17 +125,39 @@ def _final_alloc_qty(cells: list[str]) -> int:
 
 
 def parse_allocation_table(text: str) -> dict | None:
-    """「청약 및 배정현황」 표에서 그룹별 최종 배정수량을 파싱."""
+    """「청약 및 배정현황」 표에서 그룹별 최종 배정수량을 파싱.
+
+    반환: {"esop": int, "inst": int, "retail": int} 또는 None
+    - inst 없으면 None (필수 키)
+    - esop/retail 없으면 0 (선택 키)
+    - 내부 검증: esop + inst + retail == 계 행의 배정수량. 불일치 시 None 반환.
+      이는 위치 기반 추출의 index shift 버그를 감지하기 위함.
+    """
     out = {}
+    total_from_계 = None
+
     for cells in extract_rows(text):
         if len(cells) < 2:
             continue
-        key = ALLOC_LABELS.get(WS_RE.sub("", cells[0]))
+        label = WS_RE.sub("", cells[0])
+        key = ALLOC_LABELS.get(label)
         if key is None:
+            # 계 행에서 최종 배정 수량을 저장
+            if label == "계":
+                total_from_계 = _final_alloc_qty(cells)
             continue
         out[key] = _final_alloc_qty(cells)
+
     if "inst" not in out:
         return None
     out.setdefault("esop", 0)
     out.setdefault("retail", 0)
+
+    # 내부 검증: 세 그룹의 합이 계 행과 일치하는지 확인
+    if total_from_계 is not None:
+        computed_total = out["esop"] + out["inst"] + out["retail"]
+        if computed_total != total_from_계:
+            # 합계 불일치 = 위치 기반 추출 오류 가능성 높음 → None 반환
+            return None
+
     return out
