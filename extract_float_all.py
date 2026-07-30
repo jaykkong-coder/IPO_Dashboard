@@ -15,10 +15,18 @@ import verify_float_extractor as vf
 DDL = """CREATE TABLE IF NOT EXISTS float_extractions(
     corp_code TEXT PRIMARY KEY, float_pct REAL, verdict TEXT, detail TEXT)"""
 
-# Step 7 골든셋 검증 결과 wrong-confident가 나온 상장연도. 해당 연도는
-# extract_for_company가 confident를 반환해도 ambiguous로 강등한다.
-# (verify_float_extractor.py 자체는 수정하지 않는다 -- 가드는 여기서만.)
-LEGACY_AMBIGUOUS_GUARD_YEARS: set[str] = set()
+# Step 7 골든셋(2016~2021, 20건, confident 우선순위 float_pct>=60%)을 원문
+# 대조로 수기 검증한 결과 2/20이 wrong-confident였다 (대원 81.45%->실제
+# 16.29%: 표 제목행 【상장 이후 예상 유통가능물량】을 그룹라벨로 오인해
+# 매도금지 소계를 유통가능으로 오채택 / 에코프로비엠 83.3%->실제 40.07%:
+# 공모주식수 대비 부분비율 문구를 majority 다수결로 전체비율로 오채택).
+# data_corrections.field='유통가능주식수비율_구간검증'에 20건 전체 근거 기록.
+# 0건이어야 confident를 안전하게 채택할 수 있는데 2건이 나왔으므로,
+# 2016~2021 전체를 ambiguous로 강등한다 (verify_float_extractor.py 자체는
+# 수정하지 않는다 -- 가드는 여기서만). 2020~2021은 Step 9에서 캐시의
+# CP949 인코딩 오류를 정정해 confident 수가 급증했지만(fix_cache_encoding.py),
+# 그 신규 결과들은 골든셋으로 검증된 적이 없으므로 마찬가지로 강등 대상이다.
+LEGACY_AMBIGUOUS_GUARD_YEARS: set[str] = {"2016", "2017", "2018", "2019", "2020", "2021"}
 
 
 def summarize(rows) -> dict:
