@@ -325,13 +325,22 @@ def test_parse_allocation_table_makinarocks_real_document():
     assert r == {"esop": 349_300, "inst": 1_626_950, "retail": 658_750}
 
 
-def test_parse_lockup_table_makinarocks_real_document():
-    """실문서(마키나락스 20260514001096) 확약표 조각.
+def test_parse_lockup_table_acode_makinarocks_real_document():
+    """실문서(마키나락스 20260514001096) 확약표 조각 — ACODE 경로 자체를 검증.
+
+    코드리뷰 지적사항: 공개 함수 parse_lockup_table()로 검증하면 이 fixture는
+    "합계가 각 행의 최댓값"이라는 우연 때문에 positional fallback(_row_total_qty의
+    max() 휴리스틱)도 똑같은 정답을 낸다. 그래서 LOCKUP_TOTAL_ACODES를 통째로
+    비워 ACODE 경로를 완전히 죽여도 공개 함수 테스트는 폴백을 타고 바이트 단위로
+    동일하게 통과해버려 회귀를 잡지 못했다(리뷰어가 실측 확인, task-4b-report.md
+    "Step 6 코드리뷰 대응" 참고). _parse_lockup_table_acode()를 직접 호출해
+    ACODE 경로만 떼어내 검증한다.
 
     합계 열 ACODE는 행마다 다르다 (기간행=TOT_CNT, 미확약=NTOT_CNT, 계=TTOT_CNT).
     """
     text = _load_fixture("impl_report_20260514001096_lockup.xml")
-    r = irp.parse_lockup_table(text)
+    r = irp._parse_lockup_table_acode(text)
+    assert r is not None, "ACODE 경로가 값을 만들어내지 못했다"
     assert r["total"] == 1_626_950
     assert r["none"] == 29_439
     assert r["locked"] == 1_597_511
@@ -339,10 +348,14 @@ def test_parse_lockup_table_makinarocks_real_document():
     assert r["3m"] == 520_076
     assert r["1m"] == 151_465
     assert r["15d"] == 83_150
+    # 공개 API도 ACODE 경로 결과를 그대로 반환해야 한다 (폴백으로 새지 않는지 확인)
+    assert irp.parse_lockup_table(text) == r
 
 
-def test_parse_lockup_table_legacy_2017_2021_scheme():
-    """실문서(대원 20171128000032, 2017년) 확약표 조각 — 구형 ACODE 체계.
+def test_parse_lockup_table_acode_legacy_2017_2021_scheme():
+    """실문서(대원 20171128000032, 2017년) 확약표 조각 — 구형 ACODE 체계, ACODE 경로 자체를 검증.
+
+    위 마키나락스 테스트와 같은 이유로 _parse_lockup_table_acode()를 직접 호출한다.
 
     Step 1 조사 결과: 2017~2021 문서는 기관투자자 카테고리 세분화가 없어
     확약 우선배정 이전의 단순 구조다. 라벨 ACODE는 확약기간 행에만
@@ -352,7 +365,8 @@ def test_parse_lockup_table_legacy_2017_2021_scheme():
       15일 10,000 / 1개월 - / 3개월 - / 미확약 1,390,000 / 합계 1,400,000
     """
     text = _load_fixture("impl_report_20171128000032_lockup.xml")
-    r = irp.parse_lockup_table(text)
+    r = irp._parse_lockup_table_acode(text)
+    assert r is not None, "ACODE 경로가 값을 만들어내지 못했다"
     assert r["total"] == 1_400_000
     assert r["none"] == 1_390_000
     assert r["15d"] == 10_000
@@ -360,6 +374,8 @@ def test_parse_lockup_table_legacy_2017_2021_scheme():
     assert r["3m"] == 0
     assert r["6m"] == 0
     assert r["locked"] == 10_000
+    # 공개 API도 ACODE 경로 결과를 그대로 반환해야 한다 (폴백으로 새지 않는지 확인)
+    assert irp.parse_lockup_table(text) == r
 
 
 def test_parse_allocation_dv_st_cnt_differs_from_both_initial_and_subscription():
