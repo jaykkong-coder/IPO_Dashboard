@@ -1,4 +1,12 @@
+from pathlib import Path
+
 import impl_report_parser as irp
+
+FIXTURES = Path(__file__).parent / "fixtures"
+
+
+def _load_fixture(name: str) -> str:
+    return (FIXTURES / name).read_text(encoding="utf-8")
 
 
 # 마키나락스 증권발행실적보고서(20260514001096) 실측 — 확약 우선배정 제도 시행 후
@@ -276,3 +284,107 @@ def test_parse_allocation_bare_integer_ratio_fails_gracefully():
     # 합계 검증이 실패하면 None을 반환해야 함 (부분 채워진 dict 금지)
     # 이는 위치 기반 추출 오류를 감지하기 위한 safety valve 역할
     assert r is None, "bare-integer ratio shift로 인한 mismatch를 감지하고 None 반환해야 함"
+
+
+# ============================================================================
+# Task 4b — ACODE 기반 파서. 실문서에서 뜬 fixture로만 검증한다 (합성 <TD> 금지).
+#
+# Task 2~4의 fixture는 전부 손으로 쓴 <TD> 마크업이었고, 실문서는 <TE>+ACODE를
+# 쓴다는 사실을 41개 테스트 전부가 놓쳤다 — 그 결과 955사 재수집에서 ok=0이 나왔다.
+# 이 섹션의 테스트는 tools/dump_fixture.py로 실문서에서 잘라낸 표 조각만 사용한다.
+# ============================================================================
+
+
+def test_extract_rows_with_acode_reads_te_cells_and_acode():
+    """<TE ACODE=...> 셀을 (ACODE, 값) 쌍으로 돌려준다. ACODE 없으면 None."""
+    text = """
+    <TABLE><TR>
+    <TE ACODE="DST_CD">우리사주조합</TE>
+    <TE ACODE="DV_ST_CNT">349,300</TE>
+    <TD>비고없음</TD>
+    </TR></TABLE>
+    """
+    rows = irp.extract_rows_with_acode(text)
+    assert rows == [[("DST_CD", "우리사주조합"), ("DV_ST_CNT", "349,300"), (None, "비고없음")]]
+
+
+def test_extract_rows_still_returns_plain_cell_values():
+    """기존 extract_rows() 시그니처는 유지 — <TE>도 포함해서 값만 반환."""
+    text = '<TABLE><TR><TE ACODE="DST_CD">기관투자자</TE><TE ACODE="DV_ST_CNT">1,626,950</TE></TR></TABLE>'
+    rows = irp.extract_rows(text)
+    assert rows == [["기관투자자", "1,626,950"]]
+
+
+def test_parse_allocation_table_makinarocks_real_document():
+    """실문서(마키나락스 20260514001096) 배정현황 표 조각.
+
+    DST_CD로 라벨을, DV_ST_CNT로 최종배정수량을 읽는다 — 위치 추측이 아니다.
+    """
+    text = _load_fixture("impl_report_20260514001096_alloc.xml")
+    r = irp.parse_allocation_table(text)
+    assert r == {"esop": 349_300, "inst": 1_626_950, "retail": 658_750}
+
+
+def test_parse_lockup_table_makinarocks_real_document():
+    """실문서(마키나락스 20260514001096) 확약표 조각.
+
+    합계 열 ACODE는 행마다 다르다 (기간행=TOT_CNT, 미확약=NTOT_CNT, 계=TTOT_CNT).
+    """
+    text = _load_fixture("impl_report_20260514001096_lockup.xml")
+    r = irp.parse_lockup_table(text)
+    assert r["total"] == 1_626_950
+    assert r["none"] == 29_439
+    assert r["locked"] == 1_597_511
+    assert r["6m"] == 842_820
+    assert r["3m"] == 520_076
+    assert r["1m"] == 151_465
+    assert r["15d"] == 83_150
+
+
+def test_parse_lockup_table_legacy_2017_2021_scheme():
+    """실문서(대원 20171128000032, 2017년) 확약표 조각 — 구형 ACODE 체계.
+
+    Step 1 조사 결과: 2017~2021 문서는 기관투자자 카테고리 세분화가 없어
+    확약 우선배정 이전의 단순 구조다. 라벨 ACODE는 확약기간 행에만
+    (ASS_PRD) 있고, 미확약/합계 행은 라벨에 ACODE가 아예 없다(<TD>).
+    합계 열 ACODE도 행마다 다르다: 확약기간행=ASS_CNT, 미확약=NASS_CNT,
+    합계=SUM_NASS_CNT. 원문을 눈으로 읽은 값:
+      15일 10,000 / 1개월 - / 3개월 - / 미확약 1,390,000 / 합계 1,400,000
+    """
+    text = _load_fixture("impl_report_20171128000032_lockup.xml")
+    r = irp.parse_lockup_table(text)
+    assert r["total"] == 1_400_000
+    assert r["none"] == 1_390_000
+    assert r["15d"] == 10_000
+    assert r["1m"] == 0
+    assert r["3m"] == 0
+    assert r["6m"] == 0
+    assert r["locked"] == 10_000
+
+
+def test_parse_allocation_dv_st_cnt_differs_from_both_initial_and_subscription():
+    """DV_ST_CNT(최종배정)가 FST_DV_CNT(최초배정)·SB_ST_CNT(청약)와 모두 다른 실문서 pin.
+
+    브리프가 제시한 마키나락스 예시는 사실 FST_DV_CNT == DV_ST_CNT라 최초/최종배정
+    구분을 pin하지 못한다(청약과의 구분만 됨). 실문서에서 세 값이 전부 다른 행을
+    찾아 대체했다: LG에너지솔루션(20220121000496) 일반투자자 행 —
+      FST_DV_CNT 10,625,000 / SB_ST_CNT 760,710,960 / DV_ST_CNT 10,970,482
+    (청약 대비 배정 축소 + 최초배정 대비 최종배정 증가가 동시에 일어난 사례)
+    """
+    text = _load_fixture("impl_report_20220121000496_alloc.xml")
+    r = irp.parse_allocation_table(text)
+    assert r == {"esop": 8_154_518, "inst": 23_375_000, "retail": 10_970_482}
+    assert r["esop"] + r["inst"] + r["retail"] == 42_500_000  # 계 행 DV_ST_CNT_TOT
+
+
+def test_parse_allocation_table_falls_back_to_positional_when_no_acode():
+    """ACODE가 전혀 없는 문서(합성 <TD> fixture)는 기존 위치 기반 경로로 폴백한다."""
+    r = irp.parse_allocation_table(MAKINA_ALLOC)
+    assert r == {"esop": 349_300, "inst": 1_626_950, "retail": 658_750}
+
+
+def test_parse_lockup_table_falls_back_to_positional_when_no_acode():
+    """ACODE가 전혀 없는 문서(합성 <TD> fixture)는 기존 max() 경로로 폴백한다."""
+    r = irp.parse_lockup_table(MAKINA_TABLE)
+    assert r["total"] == 1_626_950
+    assert r["none"] == 29_439
