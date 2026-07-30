@@ -1,10 +1,17 @@
-"""verify_float_extractor를 전기간(955사)에 적용해 float_extractions에 적재.
+"""verify_float_extractor를 전기간(dart_corp_code당 1건, corp_code 중복 dedupe 후
+919사)에 적용해 float_extractions에 적재.
+
+float_extractions의 행 수(및 confident/ambiguous 카운트)는 이 919사 기준으로
+재현 가능하다. run()이 SELECT하는 ipo_companies 원본 행은 946개지만 26개
+corp_code가 두 행에 걸쳐 중복되므로(dedupe_by_corp), 946은 float_extractions와
+1:1 대응하지 않는 숫자다 -- 최종 카운트를 인용할 때는 항상 919를 분모로 쓴다.
 
 verify_float_extractor는 confident일 때만 값을 내고 애매하면 ambiguous로 빠진다
 (2026-07-28 캘리브레이션: 160/172, wrong-confident 0건). 따라서 confident 판정은
 추가 검증 없이 채택해도 안전하다 -- 단, 그 캘리브레이션은 2024+ 문서 172건으로만
-이뤄졌다. 2016~2021 구간은 별도 골든셋(Step 7, .superpowers/sdd/...)으로 검증했고,
-그 결과에 따라 LEGACY_AMBIGUOUS_GUARD 연도가 정해진다 (없으면 빈 set).
+이뤄졌다. 2016~2022 구간은 별도 골든셋(Step 7 + 2022 추가검증, .superpowers/sdd/
+2026-07-28-share-structure-redefinition/task-6-report.md)으로 검증했고, 그
+결과에 따라 LEGACY_AMBIGUOUS_GUARD_YEARS 연도가 정해진다 (없으면 빈 set).
 """
 import argparse
 import collections
@@ -20,13 +27,25 @@ DDL = """CREATE TABLE IF NOT EXISTS float_extractions(
 # 16.29%: 표 제목행 【상장 이후 예상 유통가능물량】을 그룹라벨로 오인해
 # 매도금지 소계를 유통가능으로 오채택 / 에코프로비엠 83.3%->실제 40.07%:
 # 공모주식수 대비 부분비율 문구를 majority 다수결로 전체비율로 오채택).
-# data_corrections.field='유통가능주식수비율_구간검증'에 20건 전체 근거 기록.
 # 0건이어야 confident를 안전하게 채택할 수 있는데 2건이 나왔으므로,
 # 2016~2021 전체를 ambiguous로 강등한다 (verify_float_extractor.py 자체는
 # 수정하지 않는다 -- 가드는 여기서만). 2020~2021은 Step 9에서 캐시의
 # CP949 인코딩 오류를 정정해 confident 수가 급증했지만(fix_cache_encoding.py),
 # 그 신규 결과들은 골든셋으로 검증된 적이 없으므로 마찬가지로 강등 대상이다.
-LEGACY_AMBIGUOUS_GUARD_YEARS: set[str] = {"2016", "2017", "2018", "2019", "2020", "2021"}
+#
+# 2022 골든셋(20건, encoding fix로 새로 confident가 된 건 우선 + float_pct>=60%)도
+# 별도로 검증했다. 1/20이 wrong-confident였다 (브이씨 5.4%->실제 44.2%:
+# "한국투자증권(주)은 375,000주(공모 후 5.4%)를... 유통가능물량의 대거 출회를
+# 방지할 목적으로... 의무보유합니다"라는, 특정 투자자 1인의 자발적 의무보유를
+# 설명하는 문구가 "유통가능"이라는 단어 근처에서 4회 반복되어 majority
+# 다수결로 전체비율로 오채택됨 -- 진짜 전체 유통가능비율은 표에서 44.2%로
+# 확인). 2016~2021과 같은 기준(1건 이상 wrong-confident)이므로 2022도
+# 강등 대상에 포함한다.
+#
+# data_corrections.field='유통가능주식수비율_구간검증'에 두 골든셋(2016~2021
+# 20건 + 2022 20건 = 40건) 전체 근거를 기록했다.
+LEGACY_AMBIGUOUS_GUARD_YEARS: set[str] = {
+    "2016", "2017", "2018", "2019", "2020", "2021", "2022"}
 
 
 def summarize(rows) -> dict:
