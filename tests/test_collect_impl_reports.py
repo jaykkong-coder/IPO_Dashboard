@@ -48,3 +48,17 @@ def test_search_window_spans_listing_date():
     bgn, end = cir.search_window("2024-02-10")
     assert bgn == "20231010"
     assert end == "20240310"
+
+
+def test_search_window_clamps_invalid_day_for_short_months():
+    """상장일이 29~31일이면 4개월 전/1개월 후가 그 일자가 없는 달일 수 있다
+    (예: 5/31 -4개월 = 1/31은 유효하지만 +1개월 = 6/31은 존재하지 않음).
+    DART API는 이런 날짜를 status=100(잘못된 날짜형식)으로 거부하므로,
+    실제 있는 마지막 날로 클램프해야 한다. 실측: KC산업(2016-05-31)."""
+    bgn, end = cir.search_window("2016-05-31")
+    assert bgn == "20160131"      # 1월은 31일까지 있어 그대로
+    assert end == "20160630"      # 6월은 30일까지 → 31이 아니라 30으로 클램프
+
+    # 로스웰(2016-06-30): 4개월 전 = 2월, 2016년은 윤년이라 29일까지
+    bgn2, _ = cir.search_window("2016-06-30")
+    assert bgn2 == "20160229"

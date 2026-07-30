@@ -8,6 +8,7 @@
 개념상 해당 없음이므로 parse_status='na' 로 구분해 기록한다.
 """
 import argparse
+import calendar
 import datetime
 import io
 import time
@@ -39,13 +40,25 @@ def _fetch_with_retry(url, params, timeout=30):
             time.sleep(waits[attempt])
 
 
+def _shift_months(y: int, m: int, d: int, delta: int) -> tuple[int, int, int]:
+    """(y,m,d)에서 delta개월 이동. 대상 달에 그 날짜가 없으면 말일로 클램프.
+
+    예: 5/31 + 1개월 → 6월은 30일까지밖에 없으므로 6/30.
+    DART API는 20160631처럼 실존하지 않는 날짜를 status=100으로 거부하므로
+    클램프 없이는 상장일이 29~31일인 회사의 검색 자체가 조용히 실패한다.
+    """
+    idx = y * 12 + (m - 1) + delta
+    ny, nm = idx // 12, idx % 12 + 1
+    nd = min(d, calendar.monthrange(ny, nm)[1])
+    return ny, nm, nd
+
+
 def search_window(listing_date: str) -> tuple[str, str]:
     """상장일 기준 4개월 전 ~ 1개월 후 (YYYYMMDD)."""
     y, m, d = (int(x) for x in listing_date.split("-"))
-    base = y * 12 + (m - 1)
-    b, e = base - 4, base + 1
-    return (f"{b // 12:04d}{b % 12 + 1:02d}{d:02d}",
-            f"{e // 12:04d}{e % 12 + 1:02d}{d:02d}")
+    by, bm, bd = _shift_months(y, m, d, -4)
+    ey, em, ed = _shift_months(y, m, d, 1)
+    return f"{by:04d}{bm:02d}{bd:02d}", f"{ey:04d}{em:02d}{ed:02d}"
 
 
 def find_impl_report(corp_code: str, listing_date: str) -> dict | None:
