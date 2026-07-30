@@ -11,7 +11,9 @@ TAG_RE = re.compile(r"<[^>]+>")
 WS_RE = re.compile(r"\s+")
 DIGIT_GAP_RE = re.compile(r"(?<=\d)\s+(?=\d)")   # DART가 숫자 중간에 개행을 넣는 경우
 TR_RE = re.compile(r"<TR\b[^>]*>(.*?)</TR>", re.S | re.I)
-CELL_RE = re.compile(r"<T[DH]\b[^>]*>(.*?)</T[DH]>", re.S | re.I)
+# DART 데이터 셀은 <TE>다 (<TD>는 헤더/장식용). 셋 다 읽는다.
+CELL_RE = re.compile(r"<T[DHE]\b([^>]*)>(.*?)</T[DHE]>", re.S | re.I)
+ACODE_RE = re.compile(r'ACODE\s*=\s*"([^"]+)"', re.I)
 QTY_RE = re.compile(r"^-?[\d,]+$")
 
 
@@ -32,10 +34,22 @@ def normalize_cell(raw: str) -> str:
 
 
 def extract_rows(text: str) -> list[list[str]]:
-    """<TR>/<TD> 표를 셀 리스트의 리스트로."""
+    """<TR> 안의 <TD>/<TH>/<TE> 셀 값을 행 단위로. (기존 시그니처 유지 — fallback 경로가 의존)"""
+    return [[v for _, v in row] for row in extract_rows_with_acode(text)]
+
+
+def extract_rows_with_acode(text: str) -> list[list[tuple[str | None, str]]]:
+    """<TR> 안의 셀을 (ACODE, 값) 쌍으로. ACODE 없으면 None.
+
+    DART 문서는 데이터 셀에 <TE>를 쓰고 각 셀에 ACODE로 열의 의미를 박아둔다.
+    위치로 열을 추측하지 않고 이 값을 직접 쓰는 것이 훨씬 견고하다.
+    """
     rows = []
     for tr in TR_RE.findall(text):
-        cells = [normalize_cell(c) for c in CELL_RE.findall(tr)]
+        cells = []
+        for attrs, raw in CELL_RE.findall(tr):
+            m = ACODE_RE.search(attrs)
+            cells.append((m.group(1) if m else None, normalize_cell(raw)))
         if cells:
             rows.append(cells)
     return rows
@@ -55,11 +69,36 @@ def parse_qty(cell: str) -> int | None:
 
 
 # 확약기간 행 라벨 → 표준 키. '2주일'과 '15일'은 같은 범주다.
+# ACODE 경로에서는 "확약"이 붙지 않은 맨 라벨("15일", "1개월"...)도 실문서에서 쓰인다
+# (2017~2021년 문서, 예: 대원 20171128000032). 둘 다 등록해 둔다.
 LOCKUP_LABELS = {
     "15일확약": "15d", "2주일확약": "15d", "2주확약": "15d",
+    "15일": "15d", "2주일": "15d", "2주": "15d",
     "1개월확약": "1m", "3개월확약": "3m", "6개월확약": "6m",
+    "1개월": "1m", "3개월": "3m", "6개월": "6m",
     "미확약": "none", "계": "total", "합계": "total",
 }
+
+# 확약표 "합계 열" ACODE — Step 1 실측 조사 결과 (rcept 다수 실문서 대조).
+#
+# 기대와 달리 ACODE는 시기가 아니라 "행의 역할"에 따라 갈린다. 문서 하나 안에서도
+# 확약기간 행 / 미확약 행 / 계 행이 서로 다른 ACODE를 쓴다:
+#
+#   행 역할        기관 카테고리 세분화 있음(2016,2022~2026)   세분화 없음(2017~2021)
+#   확약기간 행     TOT_CNT                                   ASS_CNT
+#   미확약 행       NTOT_CNT                                  NASS_CNT
+#   계(합계) 행     TTOT_CNT                                  SUM_NASS_CNT
+#
+# 브리프가 제시한 "TOT_CNT가 전 연도 합계 열"이라는 가정은 틀렸다 — 브리프의 예시인
+# 마키나락스(2026, 20260514001096) 원문에서도 미확약 행은 NTOT_CNT, 계 행은
+# TTOT_CNT를 쓴다(TOT_CNT가 아니다). 실측: 미확약 NTOT_CNT=29,439, 계 TTOT_CNT=1,626,950
+# — 브리프 본문의 "실측 검증" 수치와 일치.
+#
+# 한 행에는 이 중 정확히 하나만 나타나므로, 행마다 이 집합에서 매칭되는 것을 찾으면 된다.
+LOCKUP_TOTAL_ACODES = ("TOT_CNT", "NTOT_CNT", "TTOT_CNT", "ASS_CNT", "NASS_CNT", "SUM_NASS_CNT")
+
+# 라벨 ACODE. 확약기간 행에만 있다 — 미확약/계 행은 라벨 셀에 ACODE가 없다(<TD>).
+_LOCKUP_LABEL_ACODE = "ASS_PRD"
 
 
 def _row_total_qty(cells: list[str]) -> int:
@@ -78,11 +117,41 @@ def _row_total_qty(cells: list[str]) -> int:
     return max(quantities) if quantities else 0
 
 
-def parse_lockup_table(text: str) -> dict | None:
-    """「기관투자자 의무보유확약기간별 배정현황」 표를 파싱.
+def _parse_lockup_table_acode(text: str) -> dict | None:
+    """ACODE 기반 확약표 파싱. ACODE 체계가 아예 없는 문서면 None (폴백 신호)."""
+    out = {}
+    saw_acode = False
+    for cells in extract_rows_with_acode(text):
+        if len(cells) < 2:
+            continue
+        acodes_here = {a for a, _ in cells if a}
+        if not (acodes_here & ({_LOCKUP_LABEL_ACODE} | set(LOCKUP_TOTAL_ACODES))):
+            continue
+        saw_acode = True
+        # 라벨 = 첫 셀 값 (ASS_PRD 있으면 그 값, 없어도 <TD> 첫 셀이 라벨이다)
+        label = WS_RE.sub("", cells[0][1])
+        key = LOCKUP_LABELS.get(label)
+        if key is None:
+            continue
+        qty = None
+        for a, v in cells:
+            if a in LOCKUP_TOTAL_ACODES:
+                qty = parse_qty(v)
+                break
+        out[key] = qty if qty is not None else 0
 
-    반환: {"total","none","15d","1m","3m","6m","locked"} / 표 없으면 None
-    """
+    if not saw_acode:
+        return None
+    if "total" not in out or "none" not in out:
+        return None
+    for k in ("15d", "1m", "3m", "6m"):
+        out.setdefault(k, 0)
+    out["locked"] = out["total"] - out["none"]
+    return out
+
+
+def _parse_lockup_table_positional(text: str) -> dict | None:
+    """위치(max()) 기반 확약표 파싱 — ACODE가 없는 문서용 fallback."""
     out = {}
     for cells in extract_rows(text):
         if len(cells) < 2:
@@ -101,8 +170,26 @@ def parse_lockup_table(text: str) -> dict | None:
     return out
 
 
+def parse_lockup_table(text: str) -> dict | None:
+    """「기관투자자 의무보유확약기간별 배정현황」 표를 파싱.
+
+    ACODE(열 식별자)가 있으면 그 값을 직접 읽는다. 없으면(합성 <TD> fixture 등)
+    기존 위치 기반(max()) 경로로 폴백한다.
+
+    반환: {"total","none","15d","1m","3m","6m","locked"} / 표 없으면 None
+    """
+    out = _parse_lockup_table_acode(text)
+    if out is not None:
+        return out
+    return _parse_lockup_table_positional(text)
+
+
 # 청약·배정현황 표 행 라벨 → 표준 키
 ALLOC_LABELS = {"우리사주조합": "esop", "기관투자자": "inst", "일반투자자": "retail"}
+
+# 배정현황 표 ACODE (전 연도 2016~2026 동일 — 실측: 마키나락스 2026, 대원 2017 등).
+_ALLOC_LABEL_ACODE = "DST_CD"
+_ALLOC_QTY_ACODE = "DV_ST_CNT"   # 최종 배정 수량. FST_DV_CNT(최초배정)·SB_ST_CNT(청약)와 혼동 금지.
 
 
 def _final_alloc_qty(cells: list[str]) -> int:
@@ -124,14 +211,48 @@ def _final_alloc_qty(cells: list[str]) -> int:
     return qtys[-1] if qtys else 0
 
 
-def parse_allocation_table(text: str) -> dict | None:
-    """「청약 및 배정현황」 표에서 그룹별 최종 배정수량을 파싱.
+def _parse_allocation_table_acode(text: str) -> dict | None:
+    """ACODE 기반 배정현황 파싱. ACODE 체계가 아예 없는 문서면 None (폴백 신호).
+
+    DST_CD로 행을 식별하고 DV_ST_CNT를 직접 읽으므로 위치를 추측하지 않는다.
+    계 행 체크섬은 여기서 불필요하다 — 열을 정확히 지목하기 때문에 자기검증할
+    이유가 없고, 실문서의 계 행 비율이 정수 "100"이라 오히려 오탐을 냈다
+    (positional 경로에서만 그 체크섬이 남아 있다).
+    """
+    out = {}
+    saw_acode = False
+    for cells in extract_rows_with_acode(text):
+        if len(cells) < 2:
+            continue
+        acode_map = {a: v for a, v in cells if a}
+        if _ALLOC_LABEL_ACODE not in acode_map:
+            continue
+        saw_acode = True
+        label = WS_RE.sub("", acode_map[_ALLOC_LABEL_ACODE])
+        key = ALLOC_LABELS.get(label)
+        if key is None:
+            continue
+        qty = parse_qty(acode_map.get(_ALLOC_QTY_ACODE, ""))
+        out[key] = qty if qty is not None else 0
+
+    if not saw_acode:
+        return None
+    if "inst" not in out:
+        return None
+    out.setdefault("esop", 0)
+    out.setdefault("retail", 0)
+    return out
+
+
+def _parse_allocation_table_positional(text: str) -> dict | None:
+    """위치 기반 배정현황 파싱 — ACODE가 없는 문서용 fallback.
 
     반환: {"esop": int, "inst": int, "retail": int} 또는 None
     - inst 없으면 None (필수 키)
     - esop/retail 없으면 0 (선택 키)
     - 내부 검증: esop + inst + retail == 계 행의 배정수량. 불일치 시 None 반환.
-      이는 위치 기반 추출의 index shift 버그를 감지하기 위함.
+      이는 위치 기반 추출의 index shift 버그를 감지하기 위함. ACODE 경로는
+      열을 정확히 지목하므로 이 체크섬이 없다 — positional 경로에만 남긴다.
     """
     out = {}
     total_from_계 = None
@@ -161,3 +282,17 @@ def parse_allocation_table(text: str) -> dict | None:
             return None
 
     return out
+
+
+def parse_allocation_table(text: str) -> dict | None:
+    """「청약 및 배정현황」 표에서 그룹별 최종 배정수량을 파싱.
+
+    ACODE(DST_CD/DV_ST_CNT)가 있으면 그 값을 직접 읽는다. 없으면(합성 <TD>
+    fixture 등) 기존 위치 기반 경로(+계 행 체크섬)로 폴백한다.
+
+    반환: {"esop": int, "inst": int, "retail": int} 또는 None
+    """
+    out = _parse_allocation_table_acode(text)
+    if out is not None:
+        return out
+    return _parse_allocation_table_positional(text)
