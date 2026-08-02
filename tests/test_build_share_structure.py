@@ -56,3 +56,23 @@ def test_na_when_no_public_offering():
     """공모 없는 상장은 na — 결측(failed)과 구분한다."""
     na = dict(MAKINA, inst_alloc=None, lockup_none=None, esop=None)
     assert bss.compute_structure(na)["verdict"] == "na"
+
+
+def test_failed_not_na_when_partial_parse_leaves_both_fields_null():
+    """parse_status='partial'인데 inst_alloc/lockup_none이 우연히 둘 다 null인 경우.
+
+    impl_reports 실측에서 61건이 이 패턴이다(공모가 없어서가 아니라 파서가
+    이 두 필드를 못 채운 것). row.get('inst_alloc')/('lockup_none') 둘 다 None
+    이라는 이유만으로 na 처리하면 수집 실패를 '공모 없음'으로 오분류한다.
+    parse_status가 명시적으로 'na'가 아닌 한 failed여야 한다.
+    """
+    bad = dict(MAKINA, inst_alloc=None, lockup_none=None, esop=None,
+               parse_status="partial")
+    assert bss.compute_structure(bad)["verdict"] == "failed"
+
+
+def test_na_when_parse_status_explicitly_na():
+    """impl_reports.parse_status == 'na'면 명시적으로 na."""
+    na = dict(MAKINA, inst_alloc=None, lockup_none=None, esop=None,
+              parse_status="na")
+    assert bss.compute_structure(na)["verdict"] == "na"

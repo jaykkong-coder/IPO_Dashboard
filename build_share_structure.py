@@ -29,8 +29,16 @@ def compute_structure(row: dict) -> dict:
 
     inst, none_q, esop = (row.get("inst_alloc"), row.get("lockup_none"),
                           row.get("esop"))
-    # 공모 자체가 없는 상장(이전상장 등) — 결측이 아니라 개념상 해당 없음
-    if inst is None and none_q is None:
+    parse_status = row.get("parse_status")
+    # 공모 자체가 없는 상장(이전상장 등) — 결측이 아니라 개념상 해당 없음.
+    # impl_reports.parse_status가 'na'로 명시된 경우를 우선 신뢰한다.
+    # parse_status가 없는 호출부(단위테스트 등)에서만 필드 결측으로 추정한다 —
+    # parse_status='partial'인데 이 두 필드만 우연히 둘 다 null인 61건이 있어,
+    # 그 경우까지 na로 묶으면 수집 실패(failed)를 공모 없음(na)으로 오분류한다.
+    if parse_status == "na":
+        out["verdict"] = "na"
+        return out
+    if inst is None and none_q is None and parse_status is None:
         out["verdict"] = "na"
         return out
 
@@ -82,7 +90,7 @@ SELECT c.dart_corp_code AS corp_code, c.상장일 AS listing_date,
        c.상장후주식수 AS total_shares,
        c.의무보유확약비율 AS lockup_38,
        f.float_pct, f.verdict AS float_verdict, f.detail AS float_detail,
-       i.inst_alloc, i.esop, i.lockup_none,
+       i.inst_alloc, i.esop, i.lockup_none, i.parse_status,
        i.lockup_15d, i.lockup_1m, i.lockup_3m, i.lockup_6m, i.rcept_no
 FROM ipo_companies c
 LEFT JOIN float_extractions f ON f.corp_code = c.dart_corp_code
@@ -96,10 +104,10 @@ def main():
     con = pc.get_db()
     pc.ensure_tables(con)
     now = datetime.datetime.now().isoformat(timespec="seconds")
-    counts = {}
+    src_rows = 0
     for r in con.execute(SRC_SQL):
+        src_rows += 1
         res = compute_structure(dict(r))
-        counts[res["verdict"]] = counts.get(res["verdict"], 0) + 1
         con.execute(
             """INSERT OR REPLACE INTO share_structure
                (corp_code, listing_date, total_shares, lockup_existing,
@@ -115,7 +123,17 @@ def main():
              res["lockup_3m"], res["lockup_6m"], res["identity_gap"],
              res["verdict"], r["rcept_no"], None, res["evidence"], now))
     con.commit()
+    # 카운트는 루프 중 누적하지 않고 커밋 후 테이블에서 다시 집계한다.
+    # ipo_companies에 dart_corp_code가 중복된 행이 26건(중복분 27행) 있어
+    # SRC_SQL 원행 수(src_rows)는 실제 회사 수보다 많다. share_structure는
+    # corp_code가 PK라 INSERT OR REPLACE로 자동 dedupe되므로, 최종 집계는
+    # 테이블 상태를 그대로 읽는 쪽이 정확하다.
+    counts = dict(con.execute(
+        "SELECT verdict, COUNT(*) FROM share_structure GROUP BY verdict"))
     total = sum(counts.values())
+    if src_rows != total:
+        print(f"[참고] 원본 SQL {src_rows}행 -> 회사 {total}사로 dedupe "
+              f"(ipo_companies dart_corp_code 중복 {src_rows - total}행)")
     print(f"총 {total}사: " + ", ".join(
         f"{k}={v}({v/total*100:.1f}%)" for k, v in sorted(counts.items())))
 
