@@ -14,8 +14,10 @@ SELECT dart_corp_code AS corp_code, "회사명" AS name, "상장일" AS listing_
        "기관경쟁률" AS inst_ratio, "의무보유확약비율" AS lockup_ratio,
        "적용이익_백만원" AS applied_profit_mm, "평가방법" AS valuation_method,
        "상단대비확정가비율" AS price_vs_band_top, "상장트랙" AS listing_track,
-       "확정공모금액_억원" AS offer_size, "신주" AS new_shares, "구주" AS old_shares
+       "확정공모금액_억원" AS offer_size, "신주" AS new_shares, "구주" AS old_shares,
+       s.free_float_pct, s.lockup_inst_pct, s.verdict AS structure_verdict
 FROM ipo_companies
+LEFT JOIN share_structure s ON s.corp_code = ipo_companies.dart_corp_code
 WHERE "상장일" >= '2024-01-01'
   AND ("상장유형" IS NULL OR "상장유형" != 'SPAC')
   AND "확정공모가" IS NOT NULL

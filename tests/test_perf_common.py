@@ -40,3 +40,12 @@ def test_ensure_tables_creates_share_structure():
               "esop", "free_float", "free_float_pct", "inst_alloc",
               "lockup_inst_pct", "identity_gap", "verdict"):
         assert c in cols, f"missing column {c}"
+
+def test_universe_sql_exposes_new_metrics():
+    """유니버스에 실유통비율·배정기준확약률이 포함된다."""
+    import perf_common as pc
+    con = pc.get_db()
+    rows = pc.load_universe(con)
+    assert rows, "유니버스가 비어 있음"
+    for key in ("free_float_pct", "lockup_inst_pct"):
+        assert key in rows[0], f"missing {key}"

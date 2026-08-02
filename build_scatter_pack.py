@@ -23,8 +23,10 @@ HORIZONS = ["1M", "3M", "6M", "12M"]
 
 # (컬럼키, 표시명, 단위, y로그스케일)
 VARIABLES = [
-    ("float_ratio", "유통가능주식수비율", "%", False),
-    ("lockup_ratio", "의무보유확약비율", "%", False),
+    ("free_float_pct", "상장일 실유통비율", "%", False),
+    ("lockup_inst_pct", "의무보유확약비율(배정기준)", "%", False),
+    ("float_ratio", "유통가능주식수비율(투설 원본)", "%", False),
+    ("lockup_ratio", "의무보유확약비율(38·신청기준)", "%", False),
     ("inst_ratio", "기관경쟁률", ":1", True),
     ("subs_ratio", "청약경쟁률(비례)", ":1", True),
     ("inst_count", "수요예측 참여기관수", "곳", False),
@@ -240,19 +242,12 @@ def main():
     con = pc.get_db()
     df = load_frame()
     df = compute_financials(df, con)
-    # 검증 정정값 반영 (data_corrections 존재 시): corrected→원문값, unresolved→NULL
-    try:
-        corr = pd.read_sql(
-            "SELECT corp_code, verified_value, verdict FROM data_corrections "
-            "WHERE field='유통가능주식수비율'", con)
-        fix = corr[corr["verdict"] == "corrected"].set_index("corp_code")["verified_value"]
-        drop = set(corr[corr["verdict"] == "unresolved"]["corp_code"])
-        df["float_ratio"] = np.where(
-            df["corp_code"].isin(fix.index), df["corp_code"].map(fix),
-            np.where(df["corp_code"].isin(drop), np.nan, df["float_ratio"]))
-        print(f"유통비율 정정 반영: corrected {len(fix)}건, 제외 {len(drop)}건")
-    except Exception:
-        print("(data_corrections 없음 — 유통비율 원본 사용)")
+    # 검증 통과분만 사용 (failed/na는 분석에서 제외)
+    before = len(df)
+    df.loc[df["structure_verdict"] != "auto_ok",
+           ["free_float_pct", "lockup_inst_pct"]] = np.nan
+    n_ok = (df["structure_verdict"] == "auto_ok").sum()
+    print(f"물량구조 검증통과 {n_ok}/{before}사 — 미통과분은 해당 변수만 NaN 처리")
     out = pc.ROOT / "compare_report" / "ipo_scatter_pack.pdf"
     with PdfPages(out) as pdf:
         # 안내 페이지
