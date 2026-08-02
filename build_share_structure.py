@@ -7,12 +7,21 @@
 과대 폭이 확약률에 비례한다. D는 여기서 B를 차감해 산출한다.
 """
 import argparse
+import collections
 import datetime
 
 import perf_common as pc
 
 FLOAT_MIN, FLOAT_MAX = 3.0, 85.0
+GATE3_TOL = 1               # 주 — 확약표 계와 배정표 기관배정의 허용오차
 GATE4_TOL = 1.0             # %p — 38 신청기준이 배정기준을 초과할 수 있는 허용오차
+GATE5_MAX_OFFER_RATIO = 0.5  # 공모물량 / 상장예정주식수 상한
+
+
+def _reject(out: dict, gate: str) -> dict:
+    """failed로 확정하고 어느 게이트가 잡았는지 기록. verdict는 이미 failed다."""
+    out["gate"] = gate
+    return out
 
 
 def compute_structure(row: dict) -> dict:
@@ -24,11 +33,12 @@ def compute_structure(row: dict) -> dict:
            "inst_alloc": row.get("inst_alloc"), "lockup_inst_pct": None,
            "lockup_15d": row.get("lockup_15d"), "lockup_1m": row.get("lockup_1m"),
            "lockup_3m": row.get("lockup_3m"), "lockup_6m": row.get("lockup_6m"),
-           "identity_gap": None, "verdict": "failed",
+           "identity_gap": None, "verdict": "failed", "gate": None,
            "evidence": row.get("float_detail")}
 
     inst, none_q, esop = (row.get("inst_alloc"), row.get("lockup_none"),
                           row.get("esop"))
+    lockup_total = row.get("lockup_total")
     parse_status = row.get("parse_status")
     # 공모 자체가 없는 상장(이전상장 등) — 결측이 아니라 개념상 해당 없음.
     # impl_reports.parse_status가 'na'로 명시된 경우를 우선 신뢰한다.
@@ -43,11 +53,14 @@ def compute_structure(row: dict) -> dict:
         return out
 
     if (total is None or inst is None or none_q is None or esop is None
+            or lockup_total is None
             or row.get("float_verdict") != "confident"
             or row.get("float_pct") is None):
-        return out
+        return _reject(out, "0_input")
 
-    b = inst - none_q                          # B 기관확약
+    # B는 확약표 안에서만 계산한다(계 − 미확약). 배정표의 기관배정은 게이트 ③에서
+    # 교차검증용으로만 쓴다 — B를 두 표에 걸쳐 정의하면 그 차이를 검증할 수 없다.
+    b = lockup_total - none_q                  # B 기관확약
     prospectus_float = row["float_pct"] / 100 * total   # 투설 유통가능 (A·C 제외분)
     a = total - prospectus_float - esop        # A 보호예수
     d = prospectus_float - b                   # D 실유통
@@ -63,23 +76,30 @@ def compute_structure(row: dict) -> dict:
 
     # ① 부호: 투설유통 < 확약이면 둘 중 하나가 틀렸다
     if a < 0 or b < 0 or d < 0:
-        return out
+        return _reject(out, "1_sign")
     # ② 범위: 보호예수 비율을 유통비율로 오채택한 케이스를 걸러낸다
     if not (FLOAT_MIN <= out["free_float_pct"] <= FLOAT_MAX):
-        return out
-    # ③ 확약 내부 정합
-    if b > inst:
-        return out
+        return _reject(out, "2_range")
+    # ③ 표 교차검증: 확약표의 계 == 배정표의 기관배정. 같은 문서의 서로 다른 두
+    #    표에서 나온 독립된 수치이므로 어느 한쪽 파싱이 틀리면 여기서 갈라진다.
+    if abs(lockup_total - inst) > GATE3_TOL:
+        return _reject(out, "3_tables")
     parts = sum(row.get(k) or 0 for k in
                 ("lockup_15d", "lockup_1m", "lockup_3m", "lockup_6m"))
-    if parts and abs(parts - b) > 1:           # 확약기간별 합 == B
-        return out
+    if parts and abs(parts - b) > 1:           # ③b 확약기간별 합 == B
+        return _reject(out, "3b_parts")
     # ④ 38 교차검증: 확약기관 우선배정 구조상 신청기준 > 배정기준은 불가능.
-    #    독립된 두 소스를 맞대는 유일한 외부 검증이다.
     lk38 = row.get("lockup_38")
     if (lk38 is not None and out["lockup_inst_pct"] is not None
             and lk38 > out["lockup_inst_pct"] + GATE4_TOL):
-        return out
+        return _reject(out, "4_38")
+    # ⑤ 공모총량 정합: 공모물량(우리사주+기관+일반)이 상장예정주식수의 절반을
+    #    넘을 수는 없다. total_shares(투설/KIND)에 상장후주식수가 아니라
+    #    공모주식수가 들어와 있는 오염 케이스를 DART 실적보고서로 교차검증한다.
+    offer_total = ((row.get("esop") or 0) + (row.get("inst_alloc") or 0)
+                   + (row.get("retail_alloc") or 0))
+    if offer_total and offer_total > total * GATE5_MAX_OFFER_RATIO:
+        return _reject(out, "5_offer")
 
     out["verdict"] = "auto_ok"
     return out
@@ -90,7 +110,8 @@ SELECT c.dart_corp_code AS corp_code, c.상장일 AS listing_date,
        c.상장후주식수 AS total_shares,
        c.의무보유확약비율 AS lockup_38,
        f.float_pct, f.verdict AS float_verdict, f.detail AS float_detail,
-       i.inst_alloc, i.esop, i.lockup_none, i.parse_status,
+       i.inst_alloc, i.esop, i.retail_alloc, i.lockup_none, i.lockup_total,
+       i.parse_status,
        i.lockup_15d, i.lockup_1m, i.lockup_3m, i.lockup_6m, i.rcept_no
 FROM ipo_companies c
 LEFT JOIN float_extractions f ON f.corp_code = c.dart_corp_code
@@ -105,9 +126,12 @@ def main():
     pc.ensure_tables(con)
     now = datetime.datetime.now().isoformat(timespec="seconds")
     src_rows = 0
+    gates = collections.Counter()
     for r in con.execute(SRC_SQL):
         src_rows += 1
         res = compute_structure(dict(r))
+        if res["gate"]:
+            gates[res["gate"]] += 1
         con.execute(
             """INSERT OR REPLACE INTO share_structure
                (corp_code, listing_date, total_shares, lockup_existing,
@@ -136,6 +160,9 @@ def main():
               f"(ipo_companies dart_corp_code 중복 {src_rows - total}행)")
     print(f"총 {total}사: " + ", ".join(
         f"{k}={v}({v/total*100:.1f}%)" for k, v in sorted(counts.items())))
+    # 게이트별 탈락 건수 (원행 기준 — 앞선 게이트가 잡으면 뒤는 평가되지 않는다)
+    print("게이트 탈락: " + ", ".join(
+        f"{k}={v}" for k, v in sorted(gates.items())))
 
 
 if __name__ == "__main__":
