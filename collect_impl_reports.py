@@ -11,6 +11,7 @@ import argparse
 import calendar
 import datetime
 import io
+import re
 import time
 import zipfile
 
@@ -23,6 +24,25 @@ from pipeline import DART_API_KEY
 LIST_URL = "https://opendart.fss.or.kr/api/list.json"
 DOC_URL = "https://opendart.fss.or.kr/api/document.xml"
 LIMIT_STATUSES = {"020", "800"}
+_XML_STATUS_RE = re.compile(r"<status>\s*([^<\s]+)\s*</status>", re.I)
+
+
+class DartStatusError(Exception):
+    """DART가 000/013이 아닌 status를 돌려줬다 — 공모 없음(na)과는 다른 사건.
+
+    RuntimeError를 상속하지 않는다. 한도류(RuntimeError)는 실행을 중단시켜야 하고,
+    이쪽은 회사별 error로 기록해 다음 실행에서 재시도해야 하기 때문이다.
+    """
+
+
+def _status_from_body(resp) -> str | None:
+    """에러 응답 본문(JSON 또는 XML)에서 status 코드를 뽑는다."""
+    try:
+        return resp.json().get("status")
+    except ValueError:
+        pass
+    m = _XML_STATUS_RE.search(resp.text)
+    return m.group(1) if m else None
 
 
 def _fetch_with_retry(url, params, timeout=30):
@@ -62,7 +82,13 @@ def search_window(listing_date: str) -> tuple[str, str]:
 
 
 def find_impl_report(corp_code: str, listing_date: str) -> dict | None:
-    """증권발행실적보고서를 찾는다. 정정본이 있으면 접수번호가 가장 큰 것."""
+    """증권발행실적보고서를 찾는다. 정정본이 있으면 접수번호가 가장 큰 것.
+
+    None은 오직 "공모가 없어 보고서가 존재하지 않는다"만 뜻한다(→ na).
+    한도류는 RuntimeError로 즉시 중단하고, 그 밖의 비정상 status도 RuntimeError로
+    올려 보내 호출부가 error로 기록·재시도하게 한다. na는 재시도 대상이 아니므로
+    API 이상을 na로 적으면 영구히 되돌릴 수 없다.
+    """
     bgn, end = search_window(listing_date)
     resp = _fetch_with_retry(LIST_URL, {
         "crtfc_key": DART_API_KEY, "corp_code": corp_code,
@@ -74,11 +100,12 @@ def find_impl_report(corp_code: str, listing_date: str) -> dict | None:
         raise RuntimeError(
             f"DART API 한도 초과 (status={status}, msg={data.get('message')}) "
             f"corp_code={corp_code}")
-    if status == "013":
+    if status == "013":                      # 정상: 조회 결과 없음
         return None
     if status != "000":
-        print(f"[WARN] DART status={status} corp_code={corp_code} — skip")
-        return None
+        raise DartStatusError(
+            f"DART list.json 비정상 status={status} "
+            f"msg={data.get('message')} corp_code={corp_code}")
     items = [x for x in data.get("list", [])
              if "증권발행실적" in x.get("report_nm", "")]
     if not items:
@@ -88,10 +115,25 @@ def find_impl_report(corp_code: str, listing_date: str) -> dict | None:
 
 
 def fetch_document(rcept_no: str) -> str:
-    """원문 zip을 받아 첫 xml을 디코딩해 반환."""
+    """원문 zip을 받아 첫 xml을 디코딩해 반환.
+
+    document.xml은 정상일 때 zip 바이너리를 돌려주지만, 한도 초과·키 오류 등에는
+    JSON/XML 에러 본문을 돌려준다. 그대로 unzip하면 BadZipFile이 나고 호출부의
+    광범위한 except가 이를 회사별 '파싱실패'로 적어버린다 — 한도 벽에 부딪힌 뒤
+    남은 전량이 조용히 오분류된다. 압축을 풀기 전에 본문을 먼저 확인한다.
+    """
     resp = _fetch_with_retry(DOC_URL, {
         "crtfc_key": DART_API_KEY, "rcept_no": rcept_no})
     time.sleep(0.15)
+    ctype = resp.headers.get("content-type", "").lower()
+    if ctype.startswith(("application/json", "text/")):
+        status = _status_from_body(resp)
+        if status in LIMIT_STATUSES:
+            raise RuntimeError(
+                f"DART API 한도 초과 (status={status}) rcept_no={rcept_no}")
+        raise DartStatusError(
+            f"DART document.xml 비정상 응답 (status={status}) "
+            f"rcept_no={rcept_no}: {resp.text[:200]}")
     zf = zipfile.ZipFile(io.BytesIO(resp.content))
     return irp.decode_document(zf.read(zf.namelist()[0]))
 
@@ -104,32 +146,42 @@ def main(limit=None):
            WHERE (상장유형 IS NULL OR 상장유형!='SPAC')
              AND dart_corp_code IS NOT NULL
            ORDER BY 상장일""").fetchall()
+    # 재개 규칙: 종결 상태(ok/na)는 건너뛴다. 단 ok 행이라도 현재 스키마의
+    # lockup_total이 비어 있으면(열 추가 이전에 수집된 행) 다시 받는다.
+    # 재수집하면 반드시 채워지는 값이라 이 조건은 한 번 돌면 수렴한다.
     done = {r[0] for r in con.execute(
-        "SELECT corp_code FROM impl_reports WHERE parse_status IN ('ok','na')")}
+        """SELECT corp_code FROM impl_reports
+           WHERE parse_status='na'
+              OR (parse_status='ok' AND lockup_total IS NOT NULL)""")}
     todo = [r for r in rows if r[0] not in done][:limit]
     print(f"대상 {len(todo)}사 (완료 {len(done)}사 스킵)")
 
     now = datetime.datetime.now().isoformat(timespec="seconds")
     for i, (corp, name, ld) in enumerate(todo, 1):
-        found = find_impl_report(corp, ld)
-        if found is None:
-            con.execute(
-                """INSERT OR REPLACE INTO impl_reports
-                   (corp_code, parse_status, fetched_at) VALUES (?,'na',?)""",
-                (corp, now))
-            con.commit()
-            print(f"[{i}/{len(todo)}] {name} — 실적보고서 없음(na)")
-            continue
+        found = None
         try:
+            found = find_impl_report(corp, ld)
+            if found is None:
+                con.execute(
+                    """INSERT OR REPLACE INTO impl_reports
+                       (corp_code, parse_status, fetched_at)
+                       VALUES (?,'na',?)""", (corp, now))
+                con.commit()
+                print(f"[{i}/{len(todo)}] {name} — 실적보고서 없음(na)")
+                continue
             text = fetch_document(found["rcept_no"])
             lock = irp.parse_lockup_table(text)
             alloc = irp.parse_allocation_table(text)
+        except RuntimeError:
+            # 한도 초과류 — 남은 전량을 오분류하며 소진시키지 않도록 즉시 중단한다.
+            raise
         except Exception as e:
             print(f"[{i}/{len(todo)}] {name} — 파싱실패: {type(e).__name__} {e}")
             con.execute(
                 """INSERT OR REPLACE INTO impl_reports
                    (corp_code, rcept_no, parse_status, fetched_at)
-                   VALUES (?,?,'error',?)""", (corp, found["rcept_no"], now))
+                   VALUES (?,?,'error',?)""",
+                (corp, (found or {}).get("rcept_no"), now))
             con.commit()
             continue
 
@@ -137,13 +189,14 @@ def main(limit=None):
         con.execute(
             """INSERT OR REPLACE INTO impl_reports
                (corp_code, rcept_no, report_nm, inst_alloc, esop, retail_alloc,
-                lockup_none, lockup_15d, lockup_1m, lockup_3m, lockup_6m,
-                parse_status, fetched_at)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                lockup_none, lockup_total, lockup_15d, lockup_1m, lockup_3m,
+                lockup_6m, parse_status, fetched_at)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (corp, found["rcept_no"], found["report_nm"],
              (alloc or {}).get("inst"), (alloc or {}).get("esop"),
              (alloc or {}).get("retail"),
-             (lock or {}).get("none"), (lock or {}).get("15d"),
+             (lock or {}).get("none"), (lock or {}).get("total"),
+             (lock or {}).get("15d"),
              (lock or {}).get("1m"), (lock or {}).get("3m"),
              (lock or {}).get("6m"), status, now))
         con.commit()

@@ -68,6 +68,7 @@ DDL = [
         esop INTEGER,
         retail_alloc INTEGER,
         lockup_none INTEGER,
+        lockup_total INTEGER,
         lockup_15d INTEGER,
         lockup_1m INTEGER,
         lockup_3m INTEGER,
@@ -98,7 +99,19 @@ DDL = [
 ]
 
 
+# 이미 만들어진 테이블에 열을 추가할 때 쓴다. CREATE TABLE IF NOT EXISTS는
+# 기존 테이블의 스키마를 갱신하지 않으므로 DDL만 고치면 기존 DB에는 반영되지 않는다.
+# (table, column, type) — 이미 있으면 조용히 건너뛴다.
+MIGRATIONS = [
+    ("impl_reports", "lockup_total", "INTEGER"),
+]
+
+
 def ensure_tables(con) -> None:
     for ddl in DDL:
         con.execute(ddl)
+    for table, column, coltype in MIGRATIONS:
+        cols = {r[1] for r in con.execute(f"PRAGMA table_info({table})")}
+        if column not in cols:
+            con.execute(f"ALTER TABLE {table} ADD COLUMN {column} {coltype}")
     con.commit()
