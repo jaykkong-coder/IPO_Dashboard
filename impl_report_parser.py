@@ -218,6 +218,11 @@ def _parse_allocation_table_acode(text: str) -> dict | None:
     계 행 체크섬은 여기서 불필요하다 — 열을 정확히 지목하기 때문에 자기검증할
     이유가 없고, 실문서의 계 행 비율이 정수 "100"이라 오히려 오탐을 냈다
     (positional 경로에서만 그 체크섬이 남아 있다).
+
+    반환 3종을 구분한다:
+      None : ACODE 체계가 아예 없는 문서 — positional 폴백 신호
+      {}   : ACODE 문서인데 필수 수량을 못 읽음 — 폴백 금지, 상위에서 partial 처리
+      dict : 정상 파싱
     """
     out = {}
     saw_acode = False
@@ -232,13 +237,23 @@ def _parse_allocation_table_acode(text: str) -> dict | None:
         key = ALLOC_LABELS.get(label)
         if key is None:
             continue
-        qty = parse_qty(acode_map.get(_ALLOC_QTY_ACODE, ""))
+        if _ALLOC_QTY_ACODE not in acode_map:
+            # 라벨은 인식했는데 수량 열 자체가 없다. 0으로 단정하면 기관배정
+            # 0주가 조용히 B와 확약률에 흘러 들어간다 — 모른다고 기록한다.
+            out[key] = None
+            continue
+        qty = parse_qty(acode_map[_ALLOC_QTY_ACODE])
+        # 셀이 존재하는데 '-'/빈칸이면 진짜 미배정이다 (우리사주 무배정 등) → 0.
         out[key] = qty if qty is not None else 0
 
     if not saw_acode:
         return None
-    if "inst" not in out:
-        return None
+    if out.get("inst") is None:
+        return {}
+    # 인식된 행의 수량을 하나라도 못 읽었으면 표 전체를 신뢰하지 않는다.
+    # ACODE 문서이므로 positional 폴백은 오답을 확신할 위험이 있어 쓰지 않는다.
+    if any(v is None for v in out.values()):
+        return {}
     out.setdefault("esop", 0)
     out.setdefault("retail", 0)
     return out
@@ -290,7 +305,9 @@ def parse_allocation_table(text: str) -> dict | None:
     ACODE(DST_CD/DV_ST_CNT)가 있으면 그 값을 직접 읽는다. 없으면(합성 <TD>
     fixture 등) 기존 위치 기반 경로(+계 행 체크섬)로 폴백한다.
 
-    반환: {"esop": int, "inst": int, "retail": int} 또는 None
+    반환: {"esop": int, "inst": int, "retail": int}
+          / 표 자체가 없으면 None
+          / ACODE 문서인데 수량을 못 읽었으면 {} (falsy — 호출부에서 partial)
     """
     out = _parse_allocation_table_acode(text)
     if out is not None:

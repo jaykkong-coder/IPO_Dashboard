@@ -404,3 +404,58 @@ def test_parse_lockup_table_falls_back_to_positional_when_no_acode():
     r = irp.parse_lockup_table(MAKINA_TABLE)
     assert r["total"] == 1_626_950
     assert r["none"] == 29_439
+
+
+# ============================================================================
+# 최종 리뷰 — 원장 #10/#14: ACODE 라벨은 인식됐는데 수량 ACODE가 없는 문서.
+#
+# 아래 두 fixture는 의도적으로 합성이다. "라벨 ACODE는 있는데 수량 ACODE가 없는
+# 문서"는 정상 실문서에는 존재하지 않는 상태(실측 발생 0건)이므로 실문서에서
+# 잘라낼 수 없다. 검증 대상은 문서의 진위가 아니라 결측 처리 규칙이다.
+# ============================================================================
+
+# 기관투자자 행에 DV_ST_CNT가 아예 없다 (수량 열 자체가 사라진 문서).
+ALLOC_NO_QTY_ACODE = """
+<TABLE><TR>
+<TE ACODE="DST_CD">우리사주조합</TE><TE ACODE="DV_ST_CNT">349,300</TE>
+</TR><TR>
+<TE ACODE="DST_CD">기관투자자</TE><TE ACODE="FST_DV_CNT">1,626,950</TE>
+</TR></TABLE>
+"""
+
+# 우리사주 배정이 실제로 없어서 '-'로 표기된 문서 (수량 열은 존재한다).
+ALLOC_DASH_QTY = """
+<TABLE><TR>
+<TE ACODE="DST_CD">우리사주조합</TE><TE ACODE="DV_ST_CNT">-</TE>
+</TR><TR>
+<TE ACODE="DST_CD">기관투자자</TE><TE ACODE="DV_ST_CNT">1,626,950</TE>
+</TR><TR>
+<TE ACODE="DST_CD">일반투자자</TE><TE ACODE="DV_ST_CNT">658,750</TE>
+</TR></TABLE>
+"""
+
+
+def test_allocation_missing_qty_acode_does_not_record_silent_zero():
+    """수량 ACODE가 없으면 0이 아니라 '모름'으로 처리한다 (원장 #10).
+
+    기관배정 0주가 조용히 기록되면 B = 확약표계 − 미확약, 확약률 = B/기관배정에
+    그대로 흘러 들어간다. 0은 "배정이 없었다"는 단정인데 근거가 없다.
+    falsy를 반환해 호출부(collect_impl_reports)가 partial로 적게 한다.
+
+    ACODE 문서이므로 positional 폴백도 타지 않는다 — 폴백은 열 위치를 추측하므로
+    오답을 확신할 수 있다(원장 #14).
+    """
+    r = irp.parse_allocation_table(ALLOC_NO_QTY_ACODE)
+    assert not r, f"수량 ACODE 결측인데 값을 만들어냈다: {r}"
+    assert r is not None, "ACODE를 본 문서는 폴백 신호(None)를 내면 안 된다"
+    assert (r or {}).get("inst") != 0
+
+
+def test_allocation_dash_quantity_is_genuine_zero_not_missing():
+    """'-'는 진짜 미배정(0)이다 — 결측과 구분한다.
+
+    우리사주 미배정은 흔하다. 이걸 결측으로 처리하면 정상 행이 전부 partial로
+    떨어진다. 셀이 존재하는데 '-'면 0, 셀 자체가 없으면 결측.
+    """
+    r = irp.parse_allocation_table(ALLOC_DASH_QTY)
+    assert r == {"esop": 0, "inst": 1_626_950, "retail": 658_750}
