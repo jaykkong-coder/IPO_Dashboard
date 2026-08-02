@@ -248,12 +248,15 @@ def _parse_allocation_table_acode(text: str) -> dict | None:
 
     if not saw_acode:
         return None
-    if out.get("inst") is None:
-        return {}
-    # 인식된 행의 수량을 하나라도 못 읽었으면 표 전체를 신뢰하지 않는다.
-    # ACODE 문서이므로 positional 폴백은 오답을 확신할 위험이 있어 쓰지 않는다.
+    # 라벨은 인식했는데 수량 열이 없는 행이 있으면 표 전체를 신뢰하지 않는다.
+    # 여기서만 폴백을 막는다 — positional 경로는 열 위치를 추측하므로 부분 ACODE
+    # 문서에서 오답을 확신할 수 있다(원장 #14). 그 밖의 경우는 종전과 동일하게
+    # 동작시킨다: 라벨 자체를 못 찾은 것(아래 "inst" not in out)은 라벨 변형일
+    # 수 있고, 그때의 폴백은 기존에 쓰이던 정상 경로다.
     if any(v is None for v in out.values()):
         return {}
+    if "inst" not in out:
+        return None
     out.setdefault("esop", 0)
     out.setdefault("retail", 0)
     return out

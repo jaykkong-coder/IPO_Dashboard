@@ -459,3 +459,22 @@ def test_allocation_dash_quantity_is_genuine_zero_not_missing():
     """
     r = irp.parse_allocation_table(ALLOC_DASH_QTY)
     assert r == {"esop": 0, "inst": 1_626_950, "retail": 658_750}
+
+
+# 라벨 변형만 있는 문서 (피씨엘 20170220000019 실측 구조: DST_CD 행이 '일반청약' 하나).
+# ALLOC_LABELS에 없는 라벨이라 기관배정을 못 찾는다.
+ALLOC_UNKNOWN_LABEL_ONLY = """
+<TABLE><TR>
+<TE ACODE="DST_CD">일반청약</TE><TE ACODE="DV_ST_CNT">1,200,000</TE>
+</TR></TABLE>
+"""
+
+
+def test_allocation_unrecognised_label_still_signals_fallback():
+    """라벨 자체를 못 찾은 경우는 종전대로 폴백 신호(None)를 낸다.
+
+    수량 열 결측({})과 구분해야 한다. 라벨 변형('기관청약자' 등)은 원장 #15의
+    별건이고 positional 폴백이 기존에 쓰이던 정상 경로다 — 여기까지 막으면
+    원장 #10 수정이 무관한 행을 partial로 떨어뜨리는 회귀가 된다.
+    """
+    assert irp._parse_allocation_table_acode(ALLOC_UNKNOWN_LABEL_ONLY) is None
