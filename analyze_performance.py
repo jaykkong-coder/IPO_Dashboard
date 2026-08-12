@@ -129,7 +129,37 @@ def _rate_pct(xs):
     return round(sum(xs) / len(xs) * 100, 1) if xs else None
 
 
-FACTORS = ["float_ratio", "inst_ratio", "lockup_ratio", "offer_size",
+def _rank(xs):
+    """평균 순위 (동점은 평균). spearman = 순위의 pearson (scipy 불요)."""
+    order = sorted(range(len(xs)), key=lambda i: xs[i])
+    ranks = [0.0] * len(xs)
+    i = 0
+    while i < len(order):
+        j = i
+        while j + 1 < len(order) and xs[order[j + 1]] == xs[order[i]]:
+            j += 1
+        avg = (i + j) / 2 + 1
+        for k in range(i, j + 1):
+            ranks[order[k]] = avg
+        i = j + 1
+    return ranks
+
+
+def spearman(x, y, min_n=10):
+    pairs = [(a, b) for a, b in zip(x, y) if a is not None and b is not None]
+    if len(pairs) < min_n:
+        return None
+    xs, ys = zip(*pairs)
+    if len(set(xs)) < 2 or len(set(ys)) < 2:
+        return None
+    return round(statistics.correlation(_rank(list(xs)), _rank(list(ys))), 3)
+
+
+# free_float_pct(실유통비율)·lockup_inst_pct(배정기준 확약률)는 v2 물량구조
+# 재정의 지표 — share_structure 게이트(auto_ok) 통과분만 사용한다.
+# float_ratio·lockup_ratio(38 신청기준)는 신구 비교 목적으로 유지.
+FACTORS = ["float_ratio", "free_float_pct", "inst_ratio", "lockup_ratio",
+           "lockup_inst_pct", "offer_size",
            "price_vs_band_top", "old_share_ratio", "estimate_achievement",
            "earnings_shock", "revenue_yoy_2q"]
 FACTOR_STAT = {"earnings_shock": _rate_pct}
@@ -146,6 +176,10 @@ def main():
         code = tickers.get(u["corp_code"])
         if not code:
             continue
+        # v2 물량구조 지표는 5중 게이트 통과분(auto_ok)만 신뢰한다
+        if u.get("structure_verdict") != "auto_ok":
+            u["free_float_pct"] = None
+            u["lockup_inst_pct"] = None
         perf = {}
         for r in con.execute(
                 """SELECT horizon, abs_return, excess_return FROM price_performance
@@ -212,11 +246,19 @@ def main():
             # Fix 2: 동점(wh == lh) 처리 - 동점 지평은 consistent에 포함하지 않음
             if wh is not None and lh is not None and wh != lh and (wh > lh) == direction:
                 consistent.append(h)
+        # 지평별 Spearman ρ (요인 vs 초과수익률, non-null 쌍 10개 이상일 때만)
+        spear = {}
+        for h, sub in groups_by_h.items():
+            rho = spearman([r[f] for r in sub],
+                           [r["perf"][h]["excess"] for r in sub])
+            if rho is not None:
+                spear[h] = rho
         # Fix 3: thin_sample 필드 추가 (W_n<10 or L_n<10이면 true)
         contrast.append({"factor": f, "W_median": w, "L_median": l,
                          "W_n": w_n, "L_n": l_n,
                          "thin_sample": w_n < 10 or l_n < 10,
-                         "consistent_horizons": consistent})
+                         "consistent_horizons": consistent,
+                         "spearman": spear})
     # --- 산출
     out = {
         "meta": {"asof": datetime.date.today().isoformat(),

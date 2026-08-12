@@ -1,6 +1,6 @@
 {
  "meta": {
-  "asof": "2026-07-24",
+  "asof": "2026-08-12",
   "universe_n": 172,
   "grouped_n": 153
  },
@@ -53,7 +53,33 @@
     "3M",
     "6M",
     "12M"
-   ]
+   ],
+   "spearman": {
+    "1M": -0.11,
+    "3M": -0.08,
+    "6M": -0.077,
+    "12M": -0.083
+   }
+  },
+  {
+   "factor": "free_float_pct",
+   "W_median": 27.1,
+   "L_median": 29.4,
+   "W_n": 41,
+   "L_n": 43,
+   "thin_sample": false,
+   "consistent_horizons": [
+    "1M",
+    "3M",
+    "6M",
+    "12M"
+   ],
+   "spearman": {
+    "1M": -0.313,
+    "3M": -0.246,
+    "6M": -0.094,
+    "12M": -0.088
+   }
   },
   {
    "factor": "inst_ratio",
@@ -66,7 +92,13 @@
     "1M",
     "3M",
     "6M"
-   ]
+   ],
+   "spearman": {
+    "1M": 0.225,
+    "3M": 0.187,
+    "6M": 0.13,
+    "12M": 0.055
+   }
   },
   {
    "factor": "lockup_ratio",
@@ -80,7 +112,33 @@
     "3M",
     "6M",
     "12M"
-   ]
+   ],
+   "spearman": {
+    "1M": 0.58,
+    "3M": 0.42,
+    "6M": 0.263,
+    "12M": 0.35
+   }
+  },
+  {
+   "factor": "lockup_inst_pct",
+   "W_median": 28.6,
+   "L_median": 9.2,
+   "W_n": 41,
+   "L_n": 43,
+   "thin_sample": false,
+   "consistent_horizons": [
+    "1M",
+    "3M",
+    "6M",
+    "12M"
+   ],
+   "spearman": {
+    "1M": 0.54,
+    "3M": 0.413,
+    "6M": 0.239,
+    "12M": 0.359
+   }
   },
   {
    "factor": "offer_size",
@@ -93,7 +151,13 @@
     "1M",
     "3M",
     "6M"
-   ]
+   ],
+   "spearman": {
+    "1M": 0.054,
+    "3M": 0.019,
+    "6M": 0.021,
+    "12M": 0.047
+   }
   },
   {
    "factor": "price_vs_band_top",
@@ -102,7 +166,13 @@
    "W_n": 47,
    "L_n": 50,
    "thin_sample": false,
-   "consistent_horizons": []
+   "consistent_horizons": [],
+   "spearman": {
+    "1M": -0.001,
+    "3M": -0.029,
+    "6M": 0.023,
+    "12M": 0.184
+   }
   },
   {
    "factor": "old_share_ratio",
@@ -111,7 +181,13 @@
    "W_n": 48,
    "L_n": 51,
    "thin_sample": false,
-   "consistent_horizons": []
+   "consistent_horizons": [],
+   "spearman": {
+    "1M": 0.142,
+    "3M": 0.056,
+    "6M": 0.094,
+    "12M": 0.111
+   }
   },
   {
    "factor": "estimate_achievement",
@@ -124,7 +200,13 @@
     "3M",
     "6M",
     "12M"
-   ]
+   ],
+   "spearman": {
+    "1M": -0.021,
+    "3M": -0.09,
+    "6M": -0.048,
+    "12M": -0.047
+   }
   },
   {
    "factor": "earnings_shock",
@@ -137,7 +219,8 @@
     "1M",
     "3M",
     "6M"
-   ]
+   ],
+   "spearman": {}
   },
   {
    "factor": "revenue_yoy_2q",
@@ -150,7 +233,13 @@
     "3M",
     "6M",
     "12M"
-   ]
+   ],
+   "spearman": {
+    "1M": -0.236,
+    "3M": 0.057,
+    "6M": 0.207,
+    "12M": 0.503
+   }
   }
  ],
  "industry_table": [

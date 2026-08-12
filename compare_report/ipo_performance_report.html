@@ -115,7 +115,7 @@
   <div style="text-align:left;width:100%;padding:0 25mm;position:absolute;top:24mm;left:0;z-index:1;">
     <div style="width:60px;height:4px;background:var(--meritz-orange);margin-bottom:16px;"></div>
     <div style="font-size:40pt;font-weight:800;color:var(--gray-900);line-height:1.15;letter-spacing:-1px;margin-bottom:10px;">IPO 주가 퍼포먼스 요인 분석</div>
-    <div style="font-size:18pt;font-weight:400;color:var(--gray-600);letter-spacing:-.5px;margin-bottom:22px;">2026.07 기준, 2024.1~2026.7 신규상장 172사 상장 후 6개월 초과수익률 결정요인 분석</div>
+    <div style="font-size:18pt;font-weight:400;color:var(--gray-600);letter-spacing:-.5px;margin-bottom:22px;">2026.08 기준, 2024.1~2026.7 신규상장 172사 상장 후 6개월 초과수익률 결정요인 분석</div>
     <div style="display:flex;gap:30px;">
       <div style="border-left:3px solid var(--meritz-orange);padding-left:14px;">
         <div style="font-size:10.5pt;color:var(--gray-500);font-weight:600;margin-bottom:2px;">분석 모집단</div>
@@ -173,7 +173,7 @@
       <div class="panel__title">W/L 핵심요인 스냅샷 (중앙값)<span class="panel__title-unit">6M</span></div>
       <table class="data-table" style="font-size:10pt;margin-top:2px">
         <thead><tr><th>요인</th><th class="num">W</th><th class="num">L</th><th class="num">격차</th></tr></thead>
-        <tbody><tr><td>의무보유확약비율</td><td class="num">8.6%</td><td class="num">3.2%</td><td class="num bold">+5.4%p</td></tr><tr><td>기관경쟁률</td><td class="num">965:1</td><td class="num">841:1</td><td class="num bold">+124</td></tr><tr><td>유통가능주식수비율</td><td class="num">30.5%</td><td class="num">32.1%</td><td class="num bold">-1.6%p (약한 역방향)</td></tr><tr><td>공모규모(억원)</td><td class="num">288.3억</td><td class="num">264.0억</td><td class="num bold">+24.3억</td></tr></tbody>
+        <tbody><tr><td>의무보유확약비율(배정기준)</td><td class="num">28.6%</td><td class="num">9.2%</td><td class="num bold">+19.4%p</td></tr><tr><td>기관경쟁률</td><td class="num">965:1</td><td class="num">841:1</td><td class="num bold">+124</td></tr><tr><td>실유통비율</td><td class="num">27.1%</td><td class="num">29.4%</td><td class="num bold">-2.3%p (역방향)</td></tr><tr><td>공모규모(억원)</td><td class="num">288.3억</td><td class="num">264.0억</td><td class="num bold">+24.3억</td></tr></tbody>
       </table>
       <div class="panel__bumper">요인 딥다이브(③)에서 지평 일관성·표본 건전성 기준으로 상세 검증</div>
     </div>
@@ -181,10 +181,10 @@
 
   <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px">
     <li><strong>극단값:</strong> 최고 프로티나 +429.7%(바이오/헬스케어), 우진엔텍 +334.3%(2차전지/에너지) vs 최저 씨케이솔루션 -113.2%(건설/인프라), 에이피알 -84.4%(화학/소재)로 동일 시장에서 성과 격차가 500%p 이상 벌어진다.</li>
-    <li><strong>수급·확약 우위:</strong> 의무보유확약비율과 기관경쟁률은 W군이 L군을 뚜렷하게 앞서지만, 유통가능주식수비율은 W 30.5% vs L 32.1%로 사실상 차이가 없다.</li>
+    <li><strong>수급·확약 우위:</strong> 의무보유확약비율(배정기준)은 W 28.6% vs L 9.2%로 3.1배 격차, 실유통비율은 W가 오히려 낮아(27.1% vs 29.4%) "유통물량이 적을수록 유리" 방향이 나타난다(③-3 상세).</li>
   </ul></div>
 
-<div class="page-footer"><div class="page-footer__source">Source: analysis_output.json companies(6M 그룹핑 대상), factor_contrast. 유통물량 통념 검증은 페이지 ③-3에서 상세</div><div class="page-footer__page">3</div></div>
+<div class="page-footer"><div class="page-footer__source">Source: analysis_output.json companies(6M 그룹핑 대상), factor_contrast. 확약·실유통은 물량구조 5중 게이트(auto_ok) 통과분 기준. 유통물량 통념 검증은 페이지 ③-3에서 상세</div><div class="page-footer__page">3</div></div>
 </div>
 
 <div class="page">
@@ -192,7 +192,7 @@
   <div class="slide-title"><div class="slide-title__main">의무보유확약비율과 기관경쟁률은 수요예측 단계에서 이미 승부를 가른다</div></div>
   <div class="content-grid content-grid--2col">
     <div class="panel">
-      <div class="panel__title">의무보유확약비율<span class="panel__title-unit">중앙값, %</span></div>
+      <div class="panel__title">의무보유확약비율(배정기준)<span class="panel__title-unit">중앙값, %</span></div>
       <div class="legend"><span class="legend__item"><span class="legend__dot" style="background:#2558A3"></span>W</span><span class="legend__item"><span class="legend__dot" style="background:#58534D"></span>L</span></div>
       <div class="consist"><span class="consist__dot on"><i></i>1M</span><span class="consist__dot on"><i></i>3M</span><span class="consist__dot on"><i></i>6M</span><span class="consist__dot on"><i></i>12M</span></div>
       <div class="panel__chart"><canvas id="c4a"></canvas></div>
@@ -206,12 +206,12 @@
   </div>
 
   <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px">
-    <li><strong>의무보유확약비율:</strong> W 8.6% vs L 3.2%로 2.7배 격차이며, 1M·3M·6M·12M 4개 지평 전부 방향이 일관된 유일한 요인이다.</li>
+    <li><strong>의무보유확약비율(배정기준):</strong> W 28.6% vs L 9.2%로 3.1배 격차이며 4개 지평 전부 방향이 일관된다. ρ는 1M +0.54로 정점을 찍고 6M +0.24까지 감쇠 — 초기 수급 효과 성격이 강하다.</li>
+    <li><strong>배정기준 vs 신청기준:</strong> 구정의(38커뮤니케이션 신청수량 기준)는 W 8.6% vs L 3.2%로 방향은 같으나, "자료없음"이 0으로 집계되는 결함이 있어 인용값은 DART 증권발행실적보고서의 배정수량 기준을 표준으로 한다.</li>
     <li><strong>기관경쟁률:</strong> W 965:1 vs L 841:1로 1M·3M·6M 3개 지평은 일관되나 12M에서는 방향이 이탈한다(④에서 상세).</li>
-    <li><strong>표본 건전성:</strong> 두 요인 모두 W_n·L_n이 51~50수준으로 thin_sample=false, 확정 요인으로 분류한다.</li>
   </ul></div>
 
-<div class="page-footer"><div class="page-footer__source">Source: 38커뮤니케이션 수요예측결과, factor_contrast.json (lockup_ratio W_n=51/L_n=49, inst_ratio W_n=50/L_n=49)</div><div class="page-footer__page">4</div></div>
+<div class="page-footer"><div class="page-footer__source">Source: DART 증권발행실적보고서(배정기준 확약, 5중 게이트 auto_ok), 38커뮤니케이션 수요예측결과. factor_contrast.json (lockup_inst_pct W_n=41/L_n=43, inst_ratio W_n=50/L_n=49)</div><div class="page-footer__page">4</div></div>
 </div>
 
 <div class="page">
@@ -248,7 +248,7 @@
 
 <div class="page">
 <div class="page-header"><div class="page-header__logo"><div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div><span class="page-header__company">③ 요인 딥다이브 · 업종/공모구조</span></div><div class="page-header__meta"><div class="page-header__confidential">Confidential</div><div>2026.07 | IPO 주가 퍼포먼스 요인 분석</div></div></div>
-  <div class="slide-title"><div class="slide-title__main">유통가능주식수비율은 원문 검증 후 승자군 30.5%, 패자군 32.1% — 통념 방향이나 격차는 작다</div></div>
+  <div class="slide-title"><div class="slide-title__main">확약물량을 걷어내면 유통물량 통념이 되살아난다 — 실유통비율 W 27.1% vs L 29.4%, 1M ρ -0.31</div></div>
   <div class="content-grid content-grid--60-40">
     <div class="panel">
       <div class="panel__title">업종별 6M 초과수익률 순위<span class="panel__title-unit">중앙값, 내림차순</span></div>
@@ -259,40 +259,42 @@
       <div class="panel__bumper">* n&lt;10 업종은 표본이 얇아 순위 해석에 유의</div>
     </div>
     <div class="panel">
-      <div class="panel__title">유통가능주식수비율<span class="panel__title-unit">중앙값, %</span></div>
+      <div class="panel__title">실유통비율<span class="panel__title-unit">중앙값, %</span></div>
       <div class="legend"><span class="legend__item"><span class="legend__dot" style="background:#2558A3"></span>W</span><span class="legend__item"><span class="legend__dot" style="background:#58534D"></span>L</span></div>
       <div class="consist"><span class="consist__dot on"><i></i>1M</span><span class="consist__dot on"><i></i>3M</span><span class="consist__dot on"><i></i>6M</span><span class="consist__dot on"><i></i>12M</span></div>
       <div class="panel__chart"><canvas id="c6a"></canvas></div>
-      <div class="panel__bumper">공모가밴드 상단대비 W/L 모두 100.0%, 구주매출비율 W/L 모두 0.0%로 지평 일관성 없음(consistent_horizons 0개). 공모구조 변수는 이 표본에서 승패와 무관</div>
+      <div class="panel__bumper">실유통 = 유통가능주식수 − 기관확약 − 우리사주. 공모가밴드 상단대비 W/L 모두 100.0%, 구주매출비율 W/L 모두 0.0%로 지평 일관성 없음. 공모구조 변수는 이 표본에서 승패와 무관</div>
     </div>
   </div>
 
   <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px">
     <li><strong>업종 스펙트럼:</strong> 바이오/헬스케어가 36사 중앙값 +7.1%로 대형 업종(n≥10) 중 유일하게 플러스, IT/소프트웨어·반도체/디스플레이가 최하위권이다.</li>
-    <li><strong>유통물량 통념 반전:</strong> 유통가능주식수비율은 W 30.5% vs L 32.1%로 격차 1.6%p에 불과하다. "유통물량이 적으면 오른다"는 통념이 이 표본에선 확인되지 않는다.</li>
+    <li><strong>유통물량 통념 복원:</strong> 실유통비율은 W 27.1% vs L 29.4%로 4개 지평 모두 역방향이 일관되며, 1M ρ -0.31는 구정의 유통가능주식수비율(-0.11) 대비 약 3배 강하다. 구정의는 상장일에 나오지 않는 기관확약 물량까지 유통가능으로 집계해 신호를 희석하고 있었다.</li>
+    <li><strong>신호의 시효:</strong> 실유통비율 ρ는 1M -0.31 → 3M -0.25 → 6M -0.09로 감쇠한다. 유통물량은 상장 초기 1~3개월의 수급 변수이며, 6개월 이후 성과는 다른 요인이 지배한다.</li>
     <li><strong>공모구조 무관:</strong> 공모가밴드 상단대비·구주매출비율은 W/L 중앙값이 동일하고 지평 일관성도 없어, 공모 설계보다 수요예측 단계 지표(③-1)가 결정적임을 재확인한다.</li>
   </ul></div>
 
-<div class="page-footer"><div class="page-footer__source">Source: industry_table(6M 그룹핑 153사 기준), factor_contrast.json (float_ratio W_n=48/L_n=51)</div><div class="page-footer__page">6</div></div>
+<div class="page-footer"><div class="page-footer__source">Source: industry_table(6M 그룹핑 153사 기준), factor_contrast.json (free_float_pct W_n=41/L_n=43, 물량구조 5중 게이트 auto_ok 통과분만)</div><div class="page-footer__page">6</div></div>
 </div>
 
 <div class="page">
 <div class="page-header"><div class="page-header__logo"><div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div><span class="page-header__company">④ 기간별 요인 전환</span></div><div class="page-header__meta"><div class="page-header__confidential">Confidential</div><div>2026.07 | IPO 주가 퍼포먼스 요인 분석</div></div></div>
-  <div class="slide-title"><div class="slide-title__main">의무보유확약비율만 12개월까지 유지되고 나머지 요인은 6개월 이후 약해진다</div></div>
+  <div class="slide-title"><div class="slide-title__main">확약비율과 실유통비율이 전 지평 일관 — 신호 강도는 1개월이 정점이다</div></div>
   <div class="content-grid content-grid--1col">
     <div class="panel">
       <div class="panel__title">요인별 지평 일관성 매트릭스<span class="panel__title-unit">● = 해당 지평에서 W/L 방향 일관 (consistent_horizons)</span></div>
       <table class="data-table" style="font-size:10pt;margin-top:2px">
         <thead><tr><th>요인</th><th>분류</th><th class="num">W 중앙값</th><th class="num">L 중앙값</th><th class="num">n(W/L)</th><th class="num">1M</th><th class="num">3M</th><th class="num">6M</th><th class="num">12M</th></tr></thead>
-        <tbody><tr><td class="bold">의무보유확약비율</td><td>확정</td><td class="num">8.6%</td><td class="num">3.2%</td><td class="num">51/49</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td></tr><tr><td class="bold">기관경쟁률</td><td>확정</td><td class="num">965:1</td><td class="num">841:1</td><td class="num">50/49</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#D6D6D6;">–</td></tr><tr><td class="bold">유통가능주식수비율</td><td>반전</td><td class="num">30.5%</td><td class="num">32.1%</td><td class="num">48/51</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td></tr><tr><td class="bold">추정치 달성률</td><td>반전</td><td class="num">-62.1%</td><td class="num">+24.5%</td><td class="num">15/27</td><td class="num" style="color:#D6D6D6;">–</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td></tr><tr><td class="bold">상장후 2Q 매출YoY</td><td>참고(n<10) (thin)</td><td class="num">+120.1%</td><td class="num">+21.8%</td><td class="num">5/3</td><td class="num" style="color:#D6D6D6;">–</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td></tr><tr><td class="bold">어닝쇼크</td><td>참고(n<10) (thin)</td><td class="num">0.0%</td><td class="num">+50.0%</td><td class="num">1/2</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#D6D6D6;">–</td></tr><tr><td class="bold">공모규모</td><td>보조</td><td class="num">288.3억</td><td class="num">264.0억</td><td class="num">50/51</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#D6D6D6;">–</td></tr><tr><td class="bold">공모가밴드 상단대비</td><td>무관</td><td class="num">100.0%</td><td class="num">100.0%</td><td class="num">47/50</td><td class="num" style="color:#D6D6D6;">–</td><td class="num" style="color:#D6D6D6;">–</td><td class="num" style="color:#D6D6D6;">–</td><td class="num" style="color:#D6D6D6;">–</td></tr><tr><td class="bold">구주매출비율</td><td>무관</td><td class="num">0.0%</td><td class="num">0.0%</td><td class="num">48/51</td><td class="num" style="color:#D6D6D6;">–</td><td class="num" style="color:#D6D6D6;">–</td><td class="num" style="color:#D6D6D6;">–</td><td class="num" style="color:#D6D6D6;">–</td></tr></tbody>
+        <tbody><tr><td class="bold">의무보유확약비율(배정기준)</td><td>확정</td><td class="num">28.6%</td><td class="num">9.2%</td><td class="num">41/43</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td></tr><tr><td class="bold">기관경쟁률</td><td>확정</td><td class="num">965:1</td><td class="num">841:1</td><td class="num">50/49</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#D6D6D6;">–</td></tr><tr><td class="bold">실유통비율</td><td>확정(역방향)</td><td class="num">27.1%</td><td class="num">29.4%</td><td class="num">41/43</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td></tr><tr><td class="bold">추정치 달성률</td><td>반전</td><td class="num">-62.1%</td><td class="num">+24.5%</td><td class="num">15/27</td><td class="num" style="color:#D6D6D6;">–</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td></tr><tr><td class="bold">상장후 2Q 매출YoY</td><td>참고(n<10) (thin)</td><td class="num">+120.1%</td><td class="num">+21.8%</td><td class="num">5/3</td><td class="num" style="color:#D6D6D6;">–</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td></tr><tr><td class="bold">어닝쇼크</td><td>참고(n<10) (thin)</td><td class="num">0.0%</td><td class="num">+50.0%</td><td class="num">1/2</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#D6D6D6;">–</td></tr><tr><td class="bold">공모규모</td><td>보조</td><td class="num">288.3억</td><td class="num">264.0억</td><td class="num">50/51</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#2558A3;font-weight:800;">●</td><td class="num" style="color:#D6D6D6;">–</td></tr><tr><td class="bold">공모가밴드 상단대비</td><td>무관</td><td class="num">100.0%</td><td class="num">100.0%</td><td class="num">47/50</td><td class="num" style="color:#D6D6D6;">–</td><td class="num" style="color:#D6D6D6;">–</td><td class="num" style="color:#D6D6D6;">–</td><td class="num" style="color:#D6D6D6;">–</td></tr><tr><td class="bold">구주매출비율</td><td>무관</td><td class="num">0.0%</td><td class="num">0.0%</td><td class="num">48/51</td><td class="num" style="color:#D6D6D6;">–</td><td class="num" style="color:#D6D6D6;">–</td><td class="num" style="color:#D6D6D6;">–</td><td class="num" style="color:#D6D6D6;">–</td></tr></tbody>
       </table>
     </div>
   </div>
 
   <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px">
-    <li><strong>단일 전(全)지평 요인:</strong> 9개 요인 중 의무보유확약비율만 1M~12M 4개 지평 모두 일관돼 가장 오래가는 사전 시그널이다. 기관경쟁률·공모규모는 6M까지는 유지되나 12M에서 방향이 이탈한다.</li>
-    <li><strong>실적계 요인은 후행 반영:</strong> 추정치 달성률·매출YoY(참고)는 1M에는 반영되지 않다가 3M부터 형성돼 12M까지 유지된다. 실적 발표 이후 누적 반영되는 패턴으로 해석된다.</li>
-    <li><strong>약한 신호 배제:</strong> 유통가능주식수비율은 3M만 이탈하지만 격차 자체가 1.6%p로 미미해 실질적 요인으로 보기 어렵다. 공모가밴드 상단대비·구주매출비율은 전 지평 일관성이 없다(consistent_horizons 0개).</li>
+    <li><strong>전(全)지평 일관 요인:</strong> 의무보유확약비율(배정기준)과 실유통비율(역방향)이 1M~12M 4개 지평 모두 방향을 유지하는 사전 시그널이다. 기관경쟁률·공모규모는 6M까지는 유지되나 12M에서 방향이 이탈한다.</li>
+    <li><strong>신호 강도는 1M 정점 후 감쇠:</strong> 확약 ρ +0.54 → 6M +0.24, 실유통 ρ -0.31 → 6M -0.09. 방향 일관성과 별개로 수급 효과의 크기는 시간이 갈수록 희석된다.</li>
+    <li><strong>실적계 요인은 후행 반영:</strong> 추정치 달성률·매출YoY(참고)는 1M에는 없다가 3M부터 형성돼 12M까지 유지된다. 실적 발표 이후 누적 반영되는 패턴이다.</li>
+    <li><strong>구정의와의 비교:</strong> 구정의(38신청 확약·유통가능주식수비율)도 방향은 같지만, 실유통 재정의로 1M 신호가 약 3배(-0.11 → -0.31) 강해졌다. 공모가밴드 상단대비·구주매출비율은 전 지평 일관성이 없다.</li>
   </ul></div>
 
 <div class="page-footer"><div class="page-footer__source">Source: factor_contrast.json (지평 1M/3M/6M/12M 각 그룹핑 재산출). thin_sample=true 요인은 방향 참고용, 결론 근거 아님</div><div class="page-footer__page">7</div></div>
@@ -300,19 +302,19 @@
 
 <div class="page">
 <div class="page-header"><div class="page-header__logo"><div class="page-header__logo-mark"><svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg"><text x="0" y="23" font-family="'Pretendard',Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="-1" fill="#EF3B24">meritz</text></svg></div><span class="page-header__company">⑤ 시사점</span></div><div class="page-header__meta"><div class="page-header__confidential">Confidential</div><div>2026.07 | IPO 주가 퍼포먼스 요인 분석</div></div></div>
-  <div class="slide-title"><div class="slide-title__main">수요예측 신호가 최선의 선행지표, 유통물량 통념은 이 표본에서 확인되지 않는다</div></div>
+  <div class="slide-title"><div class="slide-title__main">수요예측 신호가 최선의 선행지표, 유통물량 통념도 실유통 기준으로는 유효하다</div></div>
   <div class="content-grid content-grid--3col">
     <div class="takeaway">
       <div class="takeaway__head">확정 요인 · 수요예측이 선행지표</div>
       <ul class="commentary">
-        <li>의무보유확약비율(W 8.6% vs L 3.2%)과 기관경쟁률(W 965:1 vs L 841:1)은 상장 전 수요예측 결과다. 이 두 요인만 표본 건전성(n≈50/그룹)과 지평 일관성을 동시에 충족한다.</li>
-        <li>확약비율은 4개 지평 모두 방향을 유지해, 실사·주관 단계에서 가장 신뢰할 수 있는 선행 시그널로 활용 가능하다.</li>
+        <li>의무보유확약비율(배정기준 W 28.6% vs L 9.2%)과 기관경쟁률(W 965:1 vs L 841:1)은 상장 전 수요예측 결과다. 표본 건전성과 지평 일관성을 동시에 충족한다.</li>
+        <li>확약비율은 4개 지평 모두 방향을 유지해, 실사·주관 단계에서 가장 신뢰할 수 있는 선행 시그널로 활용 가능하다. 인용은 배정수량 기준(DART 증권발행실적보고서)을 표준으로 한다.</li>
       </ul>
     </div>
     <div class="takeaway">
-      <div class="takeaway__head">반전 발견 · 통념 재점검 필요</div>
+      <div class="takeaway__head">재정의 발견 · 실유통이 진짜 신호</div>
       <ul class="commentary">
-        <li>유통가능주식수비율은 W 30.5% vs L 32.1% — 투자설명서 원문 전수 검증(172사 중 49사 정정) 후 "유통물량이 적을수록 유리"라는 통념 방향이 4개 지평에서 일관되게 나타났다. 다만 격차가 확약비율 대비 크게 작아 독립 요인이라기보다 보조 신호로 보는 것이 타당하다.</li>
+        <li>실유통비율(유통가능 − 기관확약 − 우리사주)은 W 27.1% vs L 29.4%, 1M ρ -0.31 — 구정의 유통가능주식수비율(-0.11) 대비 약 3배 강한 역방향이다. "유통물량이 적을수록 유리"라는 통념은 확약물량을 걷어낸 실유통 기준으로 상장 초기에 유효하며, v1.1의 "약한 역방향" 결론은 확약물량 혼입에 의한 신호 희석이었다.</li>
         <li>추정치 달성률은 W -62.1% vs L +24.5%로 반직관적이다. 기술특례 성장주가 W군에 몰려 "이익보다 스토리"가 주가를 이끈 결과로 해석되며, 달성해도 못 오르는 L군도 있어 달성률 자체는 매수 신호로 부적합하다.</li>
       </ul>
     </div>
@@ -326,7 +328,7 @@
   </div>
 
   <div class="callout"><div class="callout__label">주관 업무 시사점</div><ul class="commentary" style="margin-top:4px">
-    <li>실사·수요예측 단계에서 의무보유확약비율과 기관경쟁률을 상장 후 성과의 1차 선행지표로 우선 확인한다. 유통물량 규제 설계만으로 상장 후 주가 방어를 기대하는 논리는 이 표본 근거로는 뒷받침되지 않는다.</li>
+    <li>실사·수요예측 단계에서 의무보유확약비율(배정기준)과 기관경쟁률을 상장 후 성과의 1차 선행지표로 우선 확인한다. 상장일 실유통 물량을 낮추는 설계(확약 유도 포함)는 상장 초기 1~3개월 주가에 유의미하게 작용하나, 6개월 이후 성과까지 보장하지는 않는다 — 초기 수급 관리와 중기 펀더멘털 논리를 구분해 제시해야 한다.</li>
   </ul></div>
 
 <div class="page-footer"><div class="page-footer__source">Source: analysis_output.json 종합. 방법론: 시장조정 ETF 프록시, 지평은 상장일+N캘린더월 첫 거래일 종가 기준, 분기실적은 DART 정기보고서 분기 단독값(연결 우선)</div><div class="page-footer__page">8</div></div>
@@ -374,7 +376,7 @@
 
   // ---- P4a: 의무보유확약비율 W/L ----
   new Chart(document.getElementById('c4a'),{type:'bar',data:{labels:['W (상위군)','L (하위군)'],datasets:[
-    {label:'중앙값',data:[8.6, 3.2],backgroundColor:[HL,C1],datalabels:DLpct}]},
+    {label:'중앙값',data:[28.6, 9.2],backgroundColor:[HL,C1],datalabels:DLpct}]},
     options:{responsive:true,maintainAspectRatio:false,
       scales:{y:{beginAtZero:true,ticks:{callback:v=>v+'%'}},x:{grid:{display:false}}},
       layout:{padding:{top:16}}}});
@@ -395,7 +397,7 @@
 
   // ---- P6a: 유통가능주식수비율 W/L ----
   new Chart(document.getElementById('c6a'),{type:'bar',data:{labels:['W (상위군)','L (하위군)'],datasets:[
-    {label:'중앙값',data:[30.5, 32.1],backgroundColor:[HL,C1],datalabels:DLpct}]},
+    {label:'중앙값',data:[27.1, 29.4],backgroundColor:[HL,C1],datalabels:DLpct}]},
     options:{responsive:true,maintainAspectRatio:false,
       scales:{y:{beginAtZero:true,max:40,ticks:{callback:v=>v+'%'}},x:{grid:{display:false}}},
       layout:{padding:{top:16}}}});

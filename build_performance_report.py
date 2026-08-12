@@ -56,21 +56,28 @@ extreme_colors = ["HL"] * 5 + ["C1"] * 5
 
 industries_sorted = sorted(industries, key=lambda x: x["median_excess_6m"], reverse=True)
 
-lock = fc["lockup_ratio"]
+lock = fc["lockup_ratio"]        # 구정의: 38커뮤니케이션 신청수량 기준
 inst = fc["inst_ratio"]
 est = fc["estimate_achievement"]
-flt = fc["float_ratio"]
+flt = fc["float_ratio"]          # 구정의: 투자설명서 유통가능주식수비율
 rev = fc["revenue_yoy_2q"]
 shock = fc["earnings_shock"]
 offer = fc["offer_size"]
 band = fc["price_vs_band_top"]
 old = fc["old_share_ratio"]
+# v2 물량구조 재정의 지표 (share_structure 5중 게이트 auto_ok 통과분만)
+lockb = fc["lockup_inst_pct"]    # 배정수량 기준 확약률 — 인용 표준
+ffloat = fc["free_float_pct"]    # 실유통비율 = 유통가능 - 기관확약 - 우리사주
+
+def rho(f, h):
+    """지평별 Spearman ρ 문자열"""
+    return f"{f['spearman'][h]:+.2f}"
 
 # consistency matrix rows: (label_kr, category, factor_obj, unit_fmt_fn)
 matrix_rows = [
-    ("의무보유확약비율", "확정", lock, lambda v: p(v, 1)),
+    ("의무보유확약비율(배정기준)", "확정", lockb, lambda v: p(v, 1)),
     ("기관경쟁률", "확정", inst, lambda v: ratio(v)),
-    ("유통가능주식수비율", "반전", flt, lambda v: p(v, 1)),
+    ("실유통비율", "확정(역방향)", ffloat, lambda v: p(v, 1)),
     ("추정치 달성률", "반전", est, lambda v: sp(v, 1)),
     ("상장후 2Q 매출YoY", "참고(n<10)", rev, lambda v: sp(v, 1)),
     ("어닝쇼크", "참고(n<10)", shock, lambda v: sp(v, 1)),
@@ -78,6 +85,8 @@ matrix_rows = [
     ("공모가밴드 상단대비", "무관", band, lambda v: p(v, 1)),
     ("구주매출비율", "무관", old, lambda v: p(v, 1)),
 ]
+# 구정의 지표(lock=38신청기준 확약, flt=유통가능주식수비율)는 매트릭스에서 제외
+# — 페이지 높이 제약. 신구 비교는 ④ Key Insight 불릿과 산점도팩에서 다룬다.
 
 
 # =====================================================================
@@ -275,9 +284,9 @@ PAGE2 = page_wrap(
 p3_headline = f"IPO 성과 스펙트럼은 최고 {sp(top5[0]['excess_6m'])}에서 최저 {sp(bot5[-1]['excess_6m'])}까지 벌어진다"
 
 snapshot_rows = [
-    ("의무보유확약비율", p(lock["W_median"]), p(lock["L_median"]), f"+{lock['W_median']-lock['L_median']:.1f}%p"),
+    ("의무보유확약비율(배정기준)", p(lockb["W_median"]), p(lockb["L_median"]), f"+{lockb['W_median']-lockb['L_median']:.1f}%p"),
     ("기관경쟁률", ratio(inst["W_median"]), ratio(inst["L_median"]), f"+{inst['W_median']-inst['L_median']:.0f}"),
-    ("유통가능주식수비율", p(flt["W_median"]), p(flt["L_median"]), f"{flt['W_median']-flt['L_median']:+.1f}%p (약한 역방향)"),
+    ("실유통비율", p(ffloat["W_median"]), p(ffloat["L_median"]), f"{ffloat['W_median']-ffloat['L_median']:+.1f}%p (역방향)"),
     ("공모규모(억원)", won(offer["W_median"]), won(offer["L_median"]), f"+{offer['W_median']-offer['L_median']:.1f}억"),
 ]
 snap_tr = "".join(
@@ -303,7 +312,7 @@ p3_body = f"""  <div class="content-grid content-grid--60-40">
 
   <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px">
     <li><strong>극단값:</strong> 최고 {top5[0]['name']} {sp(top5[0]['excess_6m'])}({top5[0]['industry']}), {top5[1]['name']} {sp(top5[1]['excess_6m'])}({top5[1]['industry']}) vs 최저 {bot5[-1]['name']} {sp(bot5[-1]['excess_6m'])}({bot5[-1]['industry']}), {bot5[-2]['name']} {sp(bot5[-2]['excess_6m'])}({bot5[-2]['industry']})로 동일 시장에서 성과 격차가 500%p 이상 벌어진다.</li>
-    <li><strong>수급·확약 우위:</strong> 의무보유확약비율과 기관경쟁률은 W군이 L군을 뚜렷하게 앞서지만, 유통가능주식수비율은 W {p(flt['W_median'])} vs L {p(flt['L_median'])}로 사실상 차이가 없다.</li>
+    <li><strong>수급·확약 우위:</strong> 의무보유확약비율(배정기준)은 W {p(lockb['W_median'])} vs L {p(lockb['L_median'])}로 {lockb['W_median']/lockb['L_median']:.1f}배 격차, 실유통비율은 W가 오히려 낮아({p(ffloat['W_median'])} vs {p(ffloat['L_median'])}) "유통물량이 적을수록 유리" 방향이 나타난다(③-3 상세).</li>
   </ul></div>
 """
 PAGE3 = page_wrap(
@@ -311,7 +320,7 @@ PAGE3 = page_wrap(
     DOCNAME,
     p3_headline,
     p3_body,
-    "analysis_output.json companies(6M 그룹핑 대상), factor_contrast. 유통물량 통념 검증은 페이지 ③-3에서 상세",
+    "analysis_output.json companies(6M 그룹핑 대상), factor_contrast. 확약·실유통은 물량구조 5중 게이트(auto_ok) 통과분 기준. 유통물량 통념 검증은 페이지 ③-3에서 상세",
     3,
 )
 
@@ -328,9 +337,9 @@ def consist_row(factor_obj):
 p4_headline = "의무보유확약비율과 기관경쟁률은 수요예측 단계에서 이미 승부를 가른다"
 p4_body = f"""  <div class="content-grid content-grid--2col">
     <div class="panel">
-      <div class="panel__title">의무보유확약비율<span class="panel__title-unit">중앙값, %</span></div>
+      <div class="panel__title">의무보유확약비율(배정기준)<span class="panel__title-unit">중앙값, %</span></div>
       <div class="legend"><span class="legend__item"><span class="legend__dot" style="background:#2558A3"></span>W</span><span class="legend__item"><span class="legend__dot" style="background:#58534D"></span>L</span></div>
-      {consist_row(lock)}
+      {consist_row(lockb)}
       <div class="panel__chart"><canvas id="c4a"></canvas></div>
     </div>
     <div class="panel">
@@ -342,9 +351,9 @@ p4_body = f"""  <div class="content-grid content-grid--2col">
   </div>
 
   <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px">
-    <li><strong>의무보유확약비율:</strong> W {p(lock['W_median'])} vs L {p(lock['L_median'])}로 {lock['W_median']/lock['L_median']:.1f}배 격차이며, 1M·3M·6M·12M 4개 지평 전부 방향이 일관된 유일한 요인이다.</li>
+    <li><strong>의무보유확약비율(배정기준):</strong> W {p(lockb['W_median'])} vs L {p(lockb['L_median'])}로 {lockb['W_median']/lockb['L_median']:.1f}배 격차이며 4개 지평 전부 방향이 일관된다. ρ는 1M {rho(lockb,'1M')}로 정점을 찍고 6M {rho(lockb,'6M')}까지 감쇠 — 초기 수급 효과 성격이 강하다.</li>
+    <li><strong>배정기준 vs 신청기준:</strong> 구정의(38커뮤니케이션 신청수량 기준)는 W {p(lock['W_median'])} vs L {p(lock['L_median'])}로 방향은 같으나, "자료없음"이 0으로 집계되는 결함이 있어 인용값은 DART 증권발행실적보고서의 배정수량 기준을 표준으로 한다.</li>
     <li><strong>기관경쟁률:</strong> W {ratio(inst['W_median'])} vs L {ratio(inst['L_median'])}로 1M·3M·6M 3개 지평은 일관되나 12M에서는 방향이 이탈한다(④에서 상세).</li>
-    <li><strong>표본 건전성:</strong> 두 요인 모두 W_n·L_n이 {lock['W_n']}~{inst['W_n']}수준으로 thin_sample=false, 확정 요인으로 분류한다.</li>
   </ul></div>
 """
 PAGE4 = page_wrap(
@@ -352,7 +361,7 @@ PAGE4 = page_wrap(
     DOCNAME,
     p4_headline,
     p4_body,
-    f"38커뮤니케이션 수요예측결과, factor_contrast.json (lockup_ratio W_n={lock['W_n']}/L_n={lock['L_n']}, inst_ratio W_n={inst['W_n']}/L_n={inst['L_n']})",
+    f"DART 증권발행실적보고서(배정기준 확약, 5중 게이트 auto_ok), 38커뮤니케이션 수요예측결과. factor_contrast.json (lockup_inst_pct W_n={lockb['W_n']}/L_n={lockb['L_n']}, inst_ratio W_n={inst['W_n']}/L_n={inst['L_n']})",
     4,
 )
 
@@ -407,7 +416,7 @@ def ind_row(i):
 
 ind_rows_html = "".join(ind_row(i) for i in industries_sorted)
 
-p6_headline = f"유통가능주식수비율은 원문 검증 후 승자군 {p(flt['W_median'])}, 패자군 {p(flt['L_median'])} — 통념 방향이나 격차는 작다"
+p6_headline = f"확약물량을 걷어내면 유통물량 통념이 되살아난다 — 실유통비율 W {p(ffloat['W_median'])} vs L {p(ffloat['L_median'])}, 1M ρ {rho(ffloat,'1M')}"
 p6_body = f"""  <div class="content-grid content-grid--60-40">
     <div class="panel">
       <div class="panel__title">업종별 6M 초과수익률 순위<span class="panel__title-unit">중앙값, 내림차순</span></div>
@@ -418,17 +427,18 @@ p6_body = f"""  <div class="content-grid content-grid--60-40">
       <div class="panel__bumper">* n&lt;10 업종은 표본이 얇아 순위 해석에 유의</div>
     </div>
     <div class="panel">
-      <div class="panel__title">유통가능주식수비율<span class="panel__title-unit">중앙값, %</span></div>
+      <div class="panel__title">실유통비율<span class="panel__title-unit">중앙값, %</span></div>
       <div class="legend"><span class="legend__item"><span class="legend__dot" style="background:#2558A3"></span>W</span><span class="legend__item"><span class="legend__dot" style="background:#58534D"></span>L</span></div>
-      {consist_row(flt)}
+      {consist_row(ffloat)}
       <div class="panel__chart"><canvas id="c6a"></canvas></div>
-      <div class="panel__bumper">공모가밴드 상단대비 W/L 모두 {p(band['W_median'])}, 구주매출비율 W/L 모두 {p(old['W_median'])}로 지평 일관성 없음(consistent_horizons 0개). 공모구조 변수는 이 표본에서 승패와 무관</div>
+      <div class="panel__bumper">실유통 = 유통가능주식수 − 기관확약 − 우리사주. 공모가밴드 상단대비 W/L 모두 {p(band['W_median'])}, 구주매출비율 W/L 모두 {p(old['W_median'])}로 지평 일관성 없음. 공모구조 변수는 이 표본에서 승패와 무관</div>
     </div>
   </div>
 
   <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px">
     <li><strong>업종 스펙트럼:</strong> 바이오/헬스케어가 {[i for i in industries_sorted if i['industry']=='바이오/헬스케어'][0]['n']}사 중앙값 {sp([i for i in industries_sorted if i['industry']=='바이오/헬스케어'][0]['median_excess_6m'])}로 대형 업종(n≥10) 중 유일하게 플러스, IT/소프트웨어·반도체/디스플레이가 최하위권이다.</li>
-    <li><strong>유통물량 통념 반전:</strong> 유통가능주식수비율은 W {p(flt['W_median'])} vs L {p(flt['L_median'])}로 격차 {abs(flt['W_median']-flt['L_median']):.1f}%p에 불과하다. "유통물량이 적으면 오른다"는 통념이 이 표본에선 확인되지 않는다.</li>
+    <li><strong>유통물량 통념 복원:</strong> 실유통비율은 W {p(ffloat['W_median'])} vs L {p(ffloat['L_median'])}로 4개 지평 모두 역방향이 일관되며, 1M ρ {rho(ffloat,'1M')}는 구정의 유통가능주식수비율({rho(flt,'1M')}) 대비 약 3배 강하다. 구정의는 상장일에 나오지 않는 기관확약 물량까지 유통가능으로 집계해 신호를 희석하고 있었다.</li>
+    <li><strong>신호의 시효:</strong> 실유통비율 ρ는 1M {rho(ffloat,'1M')} → 3M {rho(ffloat,'3M')} → 6M {rho(ffloat,'6M')}로 감쇠한다. 유통물량은 상장 초기 1~3개월의 수급 변수이며, 6개월 이후 성과는 다른 요인이 지배한다.</li>
     <li><strong>공모구조 무관:</strong> 공모가밴드 상단대비·구주매출비율은 W/L 중앙값이 동일하고 지평 일관성도 없어, 공모 설계보다 수요예측 단계 지표(③-1)가 결정적임을 재확인한다.</li>
   </ul></div>
 """
@@ -437,7 +447,7 @@ PAGE6 = page_wrap(
     DOCNAME,
     p6_headline,
     p6_body,
-    "industry_table(6M 그룹핑 153사 기준), factor_contrast.json (float_ratio W_n=%d/L_n=%d)" % (flt["W_n"], flt["L_n"]),
+    "industry_table(6M 그룹핑 153사 기준), factor_contrast.json (free_float_pct W_n=%d/L_n=%d, 물량구조 5중 게이트 auto_ok 통과분만)" % (ffloat["W_n"], ffloat["L_n"]),
     6,
 )
 
@@ -451,7 +461,8 @@ def matrix_row(label, cat, f, fmt):
             cells.append('<td class="num" style="color:#2558A3;font-weight:800;">●</td>')
         else:
             cells.append('<td class="num" style="color:#D6D6D6;">–</td>')
-    cat_cls = {"확정": "positive", "반전": "bold", "참고(n<10)": "", "보조": "", "무관": ""}.get(cat, "")
+    cat_cls = {"확정": "positive", "확정(역방향)": "positive", "반전": "bold",
+               "참고(n<10)": "", "보조": "", "무관": "", "구정의": ""}.get(cat, "")
     thin_flag = " (thin)" if f.get("thin_sample") else ""
     return (f'<tr><td class="bold">{label}</td><td>{cat}{thin_flag}</td>'
             f'<td class="num">{fmt(f["W_median"])}</td><td class="num">{fmt(f["L_median"])}</td>'
@@ -459,7 +470,7 @@ def matrix_row(label, cat, f, fmt):
 
 matrix_html = "".join(matrix_row(*row) for row in matrix_rows)
 
-p7_headline = "의무보유확약비율만 12개월까지 유지되고 나머지 요인은 6개월 이후 약해진다"
+p7_headline = "확약비율과 실유통비율이 전 지평 일관 — 신호 강도는 1개월이 정점이다"
 p7_body = f"""  <div class="content-grid content-grid--1col">
     <div class="panel">
       <div class="panel__title">요인별 지평 일관성 매트릭스<span class="panel__title-unit">● = 해당 지평에서 W/L 방향 일관 (consistent_horizons)</span></div>
@@ -471,9 +482,10 @@ p7_body = f"""  <div class="content-grid content-grid--1col">
   </div>
 
   <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px">
-    <li><strong>단일 전(全)지평 요인:</strong> 9개 요인 중 의무보유확약비율만 1M~12M 4개 지평 모두 일관돼 가장 오래가는 사전 시그널이다. 기관경쟁률·공모규모는 6M까지는 유지되나 12M에서 방향이 이탈한다.</li>
-    <li><strong>실적계 요인은 후행 반영:</strong> 추정치 달성률·매출YoY(참고)는 1M에는 반영되지 않다가 3M부터 형성돼 12M까지 유지된다. 실적 발표 이후 누적 반영되는 패턴으로 해석된다.</li>
-    <li><strong>약한 신호 배제:</strong> 유통가능주식수비율은 3M만 이탈하지만 격차 자체가 {abs(flt['W_median']-flt['L_median']):.1f}%p로 미미해 실질적 요인으로 보기 어렵다. 공모가밴드 상단대비·구주매출비율은 전 지평 일관성이 없다(consistent_horizons 0개).</li>
+    <li><strong>전(全)지평 일관 요인:</strong> 의무보유확약비율(배정기준)과 실유통비율(역방향)이 1M~12M 4개 지평 모두 방향을 유지하는 사전 시그널이다. 기관경쟁률·공모규모는 6M까지는 유지되나 12M에서 방향이 이탈한다.</li>
+    <li><strong>신호 강도는 1M 정점 후 감쇠:</strong> 확약 ρ {rho(lockb,'1M')} → 6M {rho(lockb,'6M')}, 실유통 ρ {rho(ffloat,'1M')} → 6M {rho(ffloat,'6M')}. 방향 일관성과 별개로 수급 효과의 크기는 시간이 갈수록 희석된다.</li>
+    <li><strong>실적계 요인은 후행 반영:</strong> 추정치 달성률·매출YoY(참고)는 1M에는 없다가 3M부터 형성돼 12M까지 유지된다. 실적 발표 이후 누적 반영되는 패턴이다.</li>
+    <li><strong>구정의와의 비교:</strong> 구정의(38신청 확약·유통가능주식수비율)도 방향은 같지만, 실유통 재정의로 1M 신호가 약 3배({rho(flt,'1M')} → {rho(ffloat,'1M')}) 강해졌다. 공모가밴드 상단대비·구주매출비율은 전 지평 일관성이 없다.</li>
   </ul></div>
 """
 PAGE7 = page_wrap(
@@ -488,19 +500,19 @@ PAGE7 = page_wrap(
 # =====================================================================
 # Page 8 — ⑤ 시사점
 # =====================================================================
-p8_headline = "수요예측 신호가 최선의 선행지표, 유통물량 통념은 이 표본에서 확인되지 않는다"
+p8_headline = "수요예측 신호가 최선의 선행지표, 유통물량 통념도 실유통 기준으로는 유효하다"
 p8_body = f"""  <div class="content-grid content-grid--3col">
     <div class="takeaway">
       <div class="takeaway__head">확정 요인 · 수요예측이 선행지표</div>
       <ul class="commentary">
-        <li>의무보유확약비율(W {p(lock['W_median'])} vs L {p(lock['L_median'])})과 기관경쟁률(W {ratio(inst['W_median'])} vs L {ratio(inst['L_median'])})은 상장 전 수요예측 결과다. 이 두 요인만 표본 건전성(n≈50/그룹)과 지평 일관성을 동시에 충족한다.</li>
-        <li>확약비율은 4개 지평 모두 방향을 유지해, 실사·주관 단계에서 가장 신뢰할 수 있는 선행 시그널로 활용 가능하다.</li>
+        <li>의무보유확약비율(배정기준 W {p(lockb['W_median'])} vs L {p(lockb['L_median'])})과 기관경쟁률(W {ratio(inst['W_median'])} vs L {ratio(inst['L_median'])})은 상장 전 수요예측 결과다. 표본 건전성과 지평 일관성을 동시에 충족한다.</li>
+        <li>확약비율은 4개 지평 모두 방향을 유지해, 실사·주관 단계에서 가장 신뢰할 수 있는 선행 시그널로 활용 가능하다. 인용은 배정수량 기준(DART 증권발행실적보고서)을 표준으로 한다.</li>
       </ul>
     </div>
     <div class="takeaway">
-      <div class="takeaway__head">반전 발견 · 통념 재점검 필요</div>
+      <div class="takeaway__head">재정의 발견 · 실유통이 진짜 신호</div>
       <ul class="commentary">
-        <li>유통가능주식수비율은 W {p(flt['W_median'])} vs L {p(flt['L_median'])} — 투자설명서 원문 전수 검증(172사 중 49사 정정) 후 "유통물량이 적을수록 유리"라는 통념 방향이 4개 지평에서 일관되게 나타났다. 다만 격차가 확약비율 대비 크게 작아 독립 요인이라기보다 보조 신호로 보는 것이 타당하다.</li>
+        <li>실유통비율(유통가능 − 기관확약 − 우리사주)은 W {p(ffloat['W_median'])} vs L {p(ffloat['L_median'])}, 1M ρ {rho(ffloat,'1M')} — 구정의 유통가능주식수비율({rho(flt,'1M')}) 대비 약 3배 강한 역방향이다. "유통물량이 적을수록 유리"라는 통념은 확약물량을 걷어낸 실유통 기준으로 상장 초기에 유효하며, v1.1의 "약한 역방향" 결론은 확약물량 혼입에 의한 신호 희석이었다.</li>
         <li>추정치 달성률은 W {sp(est['W_median'])} vs L {sp(est['L_median'])}로 반직관적이다. 기술특례 성장주가 W군에 몰려 "이익보다 스토리"가 주가를 이끈 결과로 해석되며, 달성해도 못 오르는 L군도 있어 달성률 자체는 매수 신호로 부적합하다.</li>
       </ul>
     </div>
@@ -514,7 +526,7 @@ p8_body = f"""  <div class="content-grid content-grid--3col">
   </div>
 
   <div class="callout"><div class="callout__label">주관 업무 시사점</div><ul class="commentary" style="margin-top:4px">
-    <li>실사·수요예측 단계에서 의무보유확약비율과 기관경쟁률을 상장 후 성과의 1차 선행지표로 우선 확인한다. 유통물량 규제 설계만으로 상장 후 주가 방어를 기대하는 논리는 이 표본 근거로는 뒷받침되지 않는다.</li>
+    <li>실사·수요예측 단계에서 의무보유확약비율(배정기준)과 기관경쟁률을 상장 후 성과의 1차 선행지표로 우선 확인한다. 상장일 실유통 물량을 낮추는 설계(확약 유도 포함)는 상장 초기 1~3개월 주가에 유의미하게 작용하나, 6개월 이후 성과까지 보장하지는 않는다 — 초기 수급 관리와 중기 펀더멘털 논리를 구분해 제시해야 한다.</li>
   </ul></div>
 """
 PAGE8 = page_wrap(
@@ -610,10 +622,10 @@ SCRIPT = (SCRIPT_TPL
     .replace("__EXT_LABELS__", js(extreme_labels))
     .replace("__EXT_VALS__", js(extreme_vals))
     .replace("__EXT_COLORS__", js(["#2558A3"] * 5 + ["#58534D"] * 5))
-    .replace("__LOCK_VALS__", js([lock["W_median"], lock["L_median"]]))
+    .replace("__LOCK_VALS__", js([lockb["W_median"], lockb["L_median"]]))
     .replace("__INST_VALS__", js([inst["W_median"], inst["L_median"]]))
     .replace("__EST_VALS__", js([est["W_median"], est["L_median"]]))
-    .replace("__FLT_VALS__", js([flt["W_median"], flt["L_median"]]))
+    .replace("__FLT_VALS__", js([ffloat["W_median"], ffloat["L_median"]]))
 )
 
 print("OK script built, len=", len(SCRIPT))
