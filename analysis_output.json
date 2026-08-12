@@ -247,12 +247,40 @@
   "categories": [
    {
     "label": "순수 AI 플랫폼",
-    "n": 3,
-    "median_per": 29.4,
+    "n": 19,
+    "median_per": 28.1,
     "companies": [
      {
       "name": "마키나락스",
       "per": 40.5
+     },
+     {
+      "name": "뷰노",
+      "per": 38.5
+     },
+     {
+      "name": "스트라드비젼",
+      "per": 37.5
+     },
+     {
+      "name": "와이즈넛",
+      "per": 35.6
+     },
+     {
+      "name": "마인즈랩",
+      "per": 35.4
+     },
+     {
+      "name": "루닛",
+      "per": 34.8
+     },
+     {
+      "name": "씨유박스",
+      "per": 31.8
+     },
+     {
+      "name": "심플랫폼",
+      "per": 31.0
      },
      {
       "name": "노타",
@@ -261,62 +289,98 @@
      {
       "name": "아크릴",
       "per": 28.1
+     },
+     {
+      "name": "코난테크놀로지",
+      "per": 27.9
+     },
+     {
+      "name": "딥노이드",
+      "per": 27.5
+     },
+     {
+      "name": "모아데이타",
+      "per": 27.4
+     },
+     {
+      "name": "뉴로핏",
+      "per": 22.6
+     },
+     {
+      "name": "뉴엔AI",
+      "per": 21.6
+     },
+     {
+      "name": "씨이랩",
+      "per": 21.0
+     },
+     {
+      "name": "핀텔",
+      "per": 20.5
+     },
+     {
+      "name": "에스투더블유",
+      "per": 19.4
+     },
+     {
+      "name": "온코크로스",
+      "per": 18.6
      }
     ]
    },
    {
     "label": "AI 관련 전체",
-    "n": 60,
+    "n": 74,
     "median_per": 27.4
    },
    {
     "label": "비AI 전체",
-    "n": 300,
-    "median_per": 24.2
+    "n": 286,
+    "median_per": 24.3
    }
   ],
   "yearly": [
    {
     "year": 2021,
-    "ai_n": 12,
-    "ai_median": 28.5,
-    "nonai_n": 63,
-    "nonai_median": 26.7
+    "ai_n": 18,
+    "ai_median": 29.8,
+    "nonai_n": 57,
+    "nonai_median": 26.1
    },
    {
     "year": 2022,
-    "ai_n": 8,
-    "ai_median": 29.4,
-    "nonai_n": 59,
-    "nonai_median": 22.4
+    "ai_n": 14,
+    "ai_median": 27.2,
+    "nonai_n": 53,
+    "nonai_median": 22.2
    },
    {
     "year": 2023,
-    "ai_n": 12,
-    "ai_median": 26.6,
-    "nonai_n": 64,
-    "nonai_median": 22.0
+    "ai_n": 15,
+    "ai_median": 22.6,
+    "nonai_n": 61,
+    "nonai_median": 22.3
    },
    {
     "year": 2024,
-    "ai_n": 11,
-    "ai_median": 26.7,
-    "nonai_n": 57,
-    "nonai_median": 25.3
+    "ai_n": 10,
+    "ai_median": 27.0,
+    "nonai_n": 58,
+    "nonai_median": 25.2
    },
    {
     "year": 2025,
-    "ai_n": 14,
-    "ai_median": 25.9,
-    "nonai_n": 45,
-    "nonai_median": 25.1
+    "ai_n": 13,
+    "ai_median": 26.2,
+    "nonai_n": 46,
+    "nonai_median": 24.9
    },
    {
     "year": 2026,
-    "ai_n": 3,
-    "ai_median": 37.5,
-    "nonai_n": 12,
-    "nonai_median": 24.9
+    "ai_n": 4,
+    "ai_median": 39.0,
+    "nonai_n": 11,
+    "nonai_median": 24.3
    }
   ]
  },

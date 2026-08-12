@@ -371,13 +371,16 @@ PAGE4 = page_wrap(
 aim = DATA["ai_multiple"]
 ai_pure_c, ai_rel_c, ai_non_c = aim["categories"]
 ai_prem = (ai_rel_c["median_per"] / ai_non_c["median_per"] - 1) * 100
+# 순수 AI 상위 3사만 개별 표기 (재검증 후 19사로 늘어 전부 나열 불가)
 ai_pure_list = " / ".join(f"{c['name']} {c['per']:.1f}배"
-                          for c in ai_pure_c["companies"])
+                          for c in ai_pure_c["companies"][:3])
 ai_top = ai_pure_c["companies"][0]
 ai_last_y = aim["yearly"][-1]
+ai_gap = {y["year"]: round(y["ai_median"] - y["nonai_median"], 1)
+          for y in aim["yearly"] if y["ai_median"] is not None}
 
 p5ai_headline = (f"AI 공모 PER 프리미엄은 +{ai_prem:.0f}% — "
-                 f"단, 밸류에이션이 뛰는 건 AI가 본업인 순수 플랫폼뿐이다")
+                 f"단, 상시가 아니라 AI 사이클을 타는 프리미엄이다")
 p5ai_body = f"""  <div class="content-grid content-grid--60-40">
     <div class="panel">
       <div class="panel__title">연도별 적용 PER 중앙값: AI 관련 vs 비AI<span class="panel__title-unit">배, 2021~{ai_last_y['year']}</span></div>
@@ -389,14 +392,14 @@ p5ai_body = f"""  <div class="content-grid content-grid--60-40">
       <div class="panel__title">구분별 적용 PER 중앙값<span class="panel__title-unit">배, 2021~ 누적</span></div>
       <div class="legend"><span class="legend__item"><span class="legend__dot" style="background:#2558A3"></span>순수 AI 플랫폼</span><span class="legend__item"><span class="legend__dot" style="background:#4A8EC2"></span>AI 관련 전체</span><span class="legend__item"><span class="legend__dot" style="background:#58534D"></span>비AI 전체</span></div>
       <div class="panel__chart"><canvas id="c5ai_b"></canvas></div>
-      <div class="panel__bumper">순수 AI 플랫폼 {ai_pure_c['n']}사 개별: {ai_pure_list}</div>
+      <div class="panel__bumper">순수 AI 플랫폼 {ai_pure_c['n']}사 상위: {ai_pure_list} 등. 전체 분류 근거는 AI분류_재검증.csv</div>
     </div>
   </div>
 
   <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px">
-    <li><strong>프리미엄은 존재:</strong> AI 관련 {ai_rel_c['n']}건 적용 PER {ai_rel_c['median_per']:.1f}배 vs 비AI {ai_non_c['n']}건 {ai_non_c['median_per']:.1f}배로 +{ai_prem:.0f}%. 순수 AI 플랫폼 {ai_pure_c['n']}사는 중앙값 {ai_pure_c['median_per']:.1f}배, {ai_top['name']}는 {ai_top['per']:.1f}배로 이 표본 최고 수준이다.</li>
-    <li><strong>갭의 시계열:</strong> AI-비AI 격차는 2022~23년 +4.6~7.0배 포인트로 가장 컸다가 2024~25년 +0.8~1.4배로 축소, {ai_last_y['year']}년은 순수 AI 플랫폼 상장이 몰리며 재확대({ai_last_y['ai_median']:.1f} vs {ai_last_y['nonai_median']:.1f}배)됐다.</li>
-    <li><strong>선별적 프리미엄:</strong> "AI 태그"만으로 공모 밸류에이션이 뛰지는 않는다 — 연도별 갭 축소가 보여주듯 AI 언급 기업이 늘수록 태그의 변별력은 희석되고, 프리미엄은 AI가 본업인 순수 플랫폼에 집중된다.</li>
+    <li><strong>프리미엄은 존재:</strong> AI 관련 {ai_rel_c['n']}건 적용 PER {ai_rel_c['median_per']:.1f}배 vs 비AI {ai_non_c['n']}건 {ai_non_c['median_per']:.1f}배로 +{ai_prem:.0f}%. 순수 AI 플랫폼 {ai_pure_c['n']}사는 {ai_pure_c['median_per']:.1f}배이며 최고는 {ai_top['name']} {ai_top['per']:.1f}배다.</li>
+    <li><strong>상시가 아닌 사이클:</strong> AI-비AI 격차는 2022년 +{ai_gap[2022]:.1f}배 포인트에서 2023년 +{ai_gap[2023]:.1f}배로 사실상 소멸했다가, 2024~25년 +{ai_gap[2024]:.1f}~+{ai_gap[2025]:.1f}배로 회복, {ai_last_y['year']}년 순수 AI 플랫폼 상장이 몰리며 +{ai_gap[ai_last_y['year']]:.1f}배({ai_last_y['ai_median']:.1f} vs {ai_last_y['nonai_median']:.1f}배)로 벌어졌다(n={ai_last_y['ai_n']} 유의).</li>
+    <li><strong>분류 신뢰성:</strong> 409건 투자설명서 원문 전수 재검증 기반 — AI 언급이 시장전망·R&D계획 수준인 18건(두산로보틱스·레인보우로보틱스 등)을 비AI로 강등하고, 원문 근거가 확인된 32건(오픈엣지·넥스트칩 등)을 신규 편입했다. 보정 후에도 +{ai_prem:.0f}% 프리미엄은 유지된다.</li>
   </ul></div>
 """
 PAGE5AI = page_wrap(
@@ -405,7 +408,7 @@ PAGE5AI = page_wrap(
     p5ai_headline,
     p5ai_body,
     f"ipo_companies 2021.1~ 공모 {ai_rel_c['n']+ai_non_c['n']}건(평가방법 PER·적용멀티플 보유·SPAC 제외). "
-    "분류: AI관련 태그 + 주요제품 AI·인공지능 키워드(단어경계 판정), 순수 AI 플랫폼 3사·세미파이브 수동 보정 — 모두싸인 IPO 제안 보고서(2026-08)와 동일 기준",
+    "분류: 투자설명서 원문 전수 재검증(2026-08-12, 409건) — 순수AI=AI SW·플랫폼 판매가 본업 / AI관련=제품 핵심 기능이 자체 AI / 비AI=언급이 전망·계획·수사에 그침. 근거 전문은 AI분류_재검증.csv",
     5,
 )
 

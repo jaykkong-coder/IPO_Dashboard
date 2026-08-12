@@ -17,7 +17,6 @@
 """
 import datetime
 import json
-import re
 import statistics
 
 import perf_common as pc
@@ -261,32 +260,23 @@ def main():
                          "consistent_horizons": consistent,
                          "spearman": spear})
     # --- AI 밸류에이션 비교 (2021+ 공모, 평가방법 PER 한정) — 리포트 AI 장표용
-    #     분류는 모두싸인 IPO 제안 보고서(2026-08)와 동일 기준:
-    #     순수 AI 플랫폼 3사 고정 + (AI관련 태그 'Y' 또는 주요제품에 AI·인공지능).
-    #     SQL LIKE '%AI%'는 대소문자를 무시해 "Main"/"REPAIR"가 오탐되므로
-    #     대문자 AI 단어경계 정규식으로 판정한다. AI관련 전체는 순수를 포함한다.
-    ai_pure_names = {"노타", "아크릴", "마키나락스"}
-    ai_manual = {"세미파이브"}  # 주요제품 무표기("반도체 설계 서비스") 수동 보정
-    ai_kw = re.compile(r"(?<![A-Za-z])AI(?![A-Za-z])")
+    #     분류는 ipo_companies.AI분류 컬럼 사용 — 2026-08-12 투자설명서 원문
+    #     전수 재검증 결과(409건, 근거는 AI분류_근거 컬럼).
+    #     순수AI = AI SW·플랫폼 자체 판매가 본업 / AI관련 = 제품 핵심 기능이
+    #     자체 AI 기술 / 비AI = 언급이 시장전망·R&D계획·홍보 수사에 그침.
+    #     구 AI관련 태그(생성 근거 미보존)는 폐기 — 사용 금지.
+    cat_map = {"순수AI": "pure", "AI관련": "ai", "비AI": "nonai"}
     ai_rows = []
     for r in con.execute(
-            """SELECT "회사명" name, "상장일" ld, "주요제품" prod,
-                      "적용멀티플" mult, "AI관련" tag
+            """SELECT "회사명" name, "상장일" ld, "적용멀티플" mult, "AI분류" cls
                FROM ipo_companies
                WHERE "상장일" >= '2021-01-01'
                  AND ("상장유형" IS NULL OR "상장유형" != 'SPAC')
                  AND "확정공모가" IS NOT NULL
                  AND "평가방법" = 'PER' AND "적용멀티플" IS NOT NULL"""):
-        if r["name"] in ai_pure_names:
-            c = "pure"
-        elif (r["name"] in ai_manual or r["tag"] == "Y"
-              or (r["prod"] and (ai_kw.search(r["prod"])
-                                 or "인공지능" in r["prod"]))):
-            c = "ai"
-        else:
-            c = "nonai"
         ai_rows.append({"name": r["name"], "year": int(r["ld"][:4]),
-                        "mult": r["mult"], "cat": c})
+                        "mult": r["mult"],
+                        "cat": cat_map.get(r["cls"], "nonai")})
     ai_pure = [r for r in ai_rows if r["cat"] == "pure"]
     ai_all = [r for r in ai_rows if r["cat"] in ("pure", "ai")]
     ai_non = [r for r in ai_rows if r["cat"] == "nonai"]
