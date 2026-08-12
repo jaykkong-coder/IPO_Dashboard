@@ -17,6 +17,7 @@
 """
 import datetime
 import json
+import re
 import statistics
 
 import perf_common as pc
@@ -259,6 +260,58 @@ def main():
                          "thin_sample": w_n < 10 or l_n < 10,
                          "consistent_horizons": consistent,
                          "spearman": spear})
+    # --- AI 밸류에이션 비교 (2021+ 공모, 평가방법 PER 한정) — 리포트 AI 장표용
+    #     분류는 모두싸인 IPO 제안 보고서(2026-08)와 동일 기준:
+    #     순수 AI 플랫폼 3사 고정 + (AI관련 태그 'Y' 또는 주요제품에 AI·인공지능).
+    #     SQL LIKE '%AI%'는 대소문자를 무시해 "Main"/"REPAIR"가 오탐되므로
+    #     대문자 AI 단어경계 정규식으로 판정한다. AI관련 전체는 순수를 포함한다.
+    ai_pure_names = {"노타", "아크릴", "마키나락스"}
+    ai_manual = {"세미파이브"}  # 주요제품 무표기("반도체 설계 서비스") 수동 보정
+    ai_kw = re.compile(r"(?<![A-Za-z])AI(?![A-Za-z])")
+    ai_rows = []
+    for r in con.execute(
+            """SELECT "회사명" name, "상장일" ld, "주요제품" prod,
+                      "적용멀티플" mult, "AI관련" tag
+               FROM ipo_companies
+               WHERE "상장일" >= '2021-01-01'
+                 AND ("상장유형" IS NULL OR "상장유형" != 'SPAC')
+                 AND "확정공모가" IS NOT NULL
+                 AND "평가방법" = 'PER' AND "적용멀티플" IS NOT NULL"""):
+        if r["name"] in ai_pure_names:
+            c = "pure"
+        elif (r["name"] in ai_manual or r["tag"] == "Y"
+              or (r["prod"] and (ai_kw.search(r["prod"])
+                                 or "인공지능" in r["prod"]))):
+            c = "ai"
+        else:
+            c = "nonai"
+        ai_rows.append({"name": r["name"], "year": int(r["ld"][:4]),
+                        "mult": r["mult"], "cat": c})
+    ai_pure = [r for r in ai_rows if r["cat"] == "pure"]
+    ai_all = [r for r in ai_rows if r["cat"] in ("pure", "ai")]
+    ai_non = [r for r in ai_rows if r["cat"] == "nonai"]
+    ai_multiple = {
+        "note": "2021+ 공모·평가방법 PER 한정. AI 관련 전체는 순수 AI 플랫폼 포함",
+        "categories": [
+            {"label": "순수 AI 플랫폼", "n": len(ai_pure),
+             "median_per": _median([r["mult"] for r in ai_pure]),
+             "companies": [{"name": r["name"], "per": round(r["mult"], 1)}
+                           for r in sorted(ai_pure, key=lambda x: -x["mult"])]},
+            {"label": "AI 관련 전체", "n": len(ai_all),
+             "median_per": _median([r["mult"] for r in ai_all])},
+            {"label": "비AI 전체", "n": len(ai_non),
+             "median_per": _median([r["mult"] for r in ai_non])},
+        ],
+        "yearly": [
+            {"year": y,
+             "ai_n": len([r for r in ai_all if r["year"] == y]),
+             "ai_median": _median([r["mult"] for r in ai_all if r["year"] == y]),
+             "nonai_n": len([r for r in ai_non if r["year"] == y]),
+             "nonai_median": _median(
+                 [r["mult"] for r in ai_non if r["year"] == y])}
+            for y in range(2021, int(datetime.date.today().year) + 1)
+        ],
+    }
     # --- 산출
     out = {
         "meta": {"asof": datetime.date.today().isoformat(),
@@ -274,6 +327,7 @@ def main():
                                if r["groups"]["6M"] == g])}
                       for g in ("W", "M", "L")},
         "factor_contrast": contrast,
+        "ai_multiple": ai_multiple,
         # 주의: median_industry_relative는 "업종 자체 중앙값 대비 전체 유니버스
         # 중앙값" 차이다. 업종별로 자기 업종 중앙값을 빼면(즉 industry_relative_6m을
         # 업종 내에서 다시 median 내면) 정의상 항상 0이 되므로(분포를 그 분포의

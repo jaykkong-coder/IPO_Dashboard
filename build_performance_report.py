@@ -312,7 +312,7 @@ p3_body = f"""  <div class="content-grid content-grid--60-40">
 
   <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px">
     <li><strong>극단값:</strong> 최고 {top5[0]['name']} {sp(top5[0]['excess_6m'])}({top5[0]['industry']}), {top5[1]['name']} {sp(top5[1]['excess_6m'])}({top5[1]['industry']}) vs 최저 {bot5[-1]['name']} {sp(bot5[-1]['excess_6m'])}({bot5[-1]['industry']}), {bot5[-2]['name']} {sp(bot5[-2]['excess_6m'])}({bot5[-2]['industry']})로 동일 시장에서 성과 격차가 500%p 이상 벌어진다.</li>
-    <li><strong>수급·확약 우위:</strong> 의무보유확약비율(배정기준)은 W {p(lockb['W_median'])} vs L {p(lockb['L_median'])}로 {lockb['W_median']/lockb['L_median']:.1f}배 격차, 실유통비율은 W가 오히려 낮아({p(ffloat['W_median'])} vs {p(ffloat['L_median'])}) "유통물량이 적을수록 유리" 방향이 나타난다(③-3 상세).</li>
+    <li><strong>수급·확약 우위:</strong> 의무보유확약비율(배정기준)은 W {p(lockb['W_median'])} vs L {p(lockb['L_median'])}로 {lockb['W_median']/lockb['L_median']:.1f}배 격차, 실유통비율은 W가 오히려 낮아({p(ffloat['W_median'])} vs {p(ffloat['L_median'])}) "유통물량이 적을수록 유리" 방향이 나타난다(③ 업종/공모구조 상세).</li>
   </ul></div>
 """
 PAGE3 = page_wrap(
@@ -320,7 +320,7 @@ PAGE3 = page_wrap(
     DOCNAME,
     p3_headline,
     p3_body,
-    "analysis_output.json companies(6M 그룹핑 대상), factor_contrast. 확약·실유통은 물량구조 5중 게이트(auto_ok) 통과분 기준. 유통물량 통념 검증은 페이지 ③-3에서 상세",
+    "analysis_output.json companies(6M 그룹핑 대상), factor_contrast. 확약·실유통은 물량구조 5중 게이트(auto_ok) 통과분 기준. 유통물량 통념 검증은 ③ 업종/공모구조 페이지에서 상세",
     3,
 )
 
@@ -366,7 +366,51 @@ PAGE4 = page_wrap(
 )
 
 # =====================================================================
-# Page 5 — ③-2 요인 딥다이브: 실적·달성률 반전
+# Page 5 — ③-2 AI 밸류에이션: 공모 PER 3단 비교 (2021+)
+# =====================================================================
+aim = DATA["ai_multiple"]
+ai_pure_c, ai_rel_c, ai_non_c = aim["categories"]
+ai_prem = (ai_rel_c["median_per"] / ai_non_c["median_per"] - 1) * 100
+ai_pure_list = " / ".join(f"{c['name']} {c['per']:.1f}배"
+                          for c in ai_pure_c["companies"])
+ai_top = ai_pure_c["companies"][0]
+ai_last_y = aim["yearly"][-1]
+
+p5ai_headline = (f"AI 공모 PER 프리미엄은 +{ai_prem:.0f}% — "
+                 f"단, 밸류에이션이 뛰는 건 AI가 본업인 순수 플랫폼뿐이다")
+p5ai_body = f"""  <div class="content-grid content-grid--60-40">
+    <div class="panel">
+      <div class="panel__title">연도별 적용 PER 중앙값: AI 관련 vs 비AI<span class="panel__title-unit">배, 2021~{ai_last_y['year']}</span></div>
+      <div class="legend"><span class="legend__item"><span class="legend__dot" style="background:#2558A3"></span>AI 관련</span><span class="legend__item"><span class="legend__dot" style="background:#58534D"></span>비AI</span></div>
+      <div class="panel__chart"><canvas id="c5ai_a"></canvas></div>
+      <div class="panel__bumper">{ai_last_y['year']}년 AI 관련은 n={ai_last_y['ai_n']}(순수 AI 플랫폼 상장 집중)으로 표본이 얇아 해석에 유의</div>
+    </div>
+    <div class="panel">
+      <div class="panel__title">구분별 적용 PER 중앙값<span class="panel__title-unit">배, 2021~ 누적</span></div>
+      <div class="legend"><span class="legend__item"><span class="legend__dot" style="background:#2558A3"></span>순수 AI 플랫폼</span><span class="legend__item"><span class="legend__dot" style="background:#4A8EC2"></span>AI 관련 전체</span><span class="legend__item"><span class="legend__dot" style="background:#58534D"></span>비AI 전체</span></div>
+      <div class="panel__chart"><canvas id="c5ai_b"></canvas></div>
+      <div class="panel__bumper">순수 AI 플랫폼 {ai_pure_c['n']}사 개별: {ai_pure_list}</div>
+    </div>
+  </div>
+
+  <div class="callout"><div class="callout__label">Key Insight</div><ul class="commentary" style="margin-top:4px">
+    <li><strong>프리미엄은 존재:</strong> AI 관련 {ai_rel_c['n']}건 적용 PER {ai_rel_c['median_per']:.1f}배 vs 비AI {ai_non_c['n']}건 {ai_non_c['median_per']:.1f}배로 +{ai_prem:.0f}%. 순수 AI 플랫폼 {ai_pure_c['n']}사는 중앙값 {ai_pure_c['median_per']:.1f}배, {ai_top['name']}는 {ai_top['per']:.1f}배로 이 표본 최고 수준이다.</li>
+    <li><strong>갭의 시계열:</strong> AI-비AI 격차는 2022~23년 +4.6~7.0배 포인트로 가장 컸다가 2024~25년 +0.8~1.4배로 축소, {ai_last_y['year']}년은 순수 AI 플랫폼 상장이 몰리며 재확대({ai_last_y['ai_median']:.1f} vs {ai_last_y['nonai_median']:.1f}배)됐다.</li>
+    <li><strong>선별적 프리미엄:</strong> "AI 태그"만으로 공모 밸류에이션이 뛰지는 않는다 — 연도별 갭 축소가 보여주듯 AI 언급 기업이 늘수록 태그의 변별력은 희석되고, 프리미엄은 AI가 본업인 순수 플랫폼에 집중된다.</li>
+  </ul></div>
+"""
+PAGE5AI = page_wrap(
+    "③ 요인 딥다이브 · AI 밸류에이션",
+    DOCNAME,
+    p5ai_headline,
+    p5ai_body,
+    f"ipo_companies 2021.1~ 공모 {ai_rel_c['n']+ai_non_c['n']}건(평가방법 PER·적용멀티플 보유·SPAC 제외). "
+    "분류: AI관련 태그 + 주요제품 AI·인공지능 키워드(단어경계 판정), 순수 AI 플랫폼 3사·세미파이브 수동 보정 — 모두싸인 IPO 제안 보고서(2026-08)와 동일 기준",
+    5,
+)
+
+# =====================================================================
+# Page 6 — ③-3 요인 딥다이브: 실적·달성률 반전 (구 Page 5)
 # =====================================================================
 p5_headline = "이익 추정치를 못 채운 승자군이 오히려 초과수익률에서 앞선다"
 p5_body = f"""  <div class="content-grid content-grid--60-40">
@@ -401,11 +445,11 @@ PAGE5 = page_wrap(
     p5_headline,
     p5_body,
     "DART 정기보고서(분기 단독값, 연결 우선), 투자설명서 적용이익. 분기실적은 상장 전후 재무제표 매칭 가능 회사만 산출",
-    5,
+    6,
 )
 
 # =====================================================================
-# Page 6 — ③-3 요인 딥다이브: 업종·공모구조 반전
+# Page 7 — ③-4 요인 딥다이브: 업종·공모구조 반전
 # =====================================================================
 def ind_row(i):
     cls = "positive" if i["median_excess_6m"] > 0 else "negative"
@@ -448,11 +492,11 @@ PAGE6 = page_wrap(
     p6_headline,
     p6_body,
     "industry_table(6M 그룹핑 153사 기준), factor_contrast.json (free_float_pct W_n=%d/L_n=%d, 물량구조 5중 게이트 auto_ok 통과분만)" % (ffloat["W_n"], ffloat["L_n"]),
-    6,
+    7,
 )
 
 # =====================================================================
-# Page 7 — ④ 기간별 요인 전환 (consistent_horizons 기반)
+# Page 8 — ④ 기간별 요인 전환 (consistent_horizons 기반)
 # =====================================================================
 def matrix_row(label, cat, f, fmt):
     cells = []
@@ -494,11 +538,11 @@ PAGE7 = page_wrap(
     p7_headline,
     p7_body,
     "factor_contrast.json (지평 1M/3M/6M/12M 각 그룹핑 재산출). thin_sample=true 요인은 방향 참고용, 결론 근거 아님",
-    7,
+    8,
 )
 
 # =====================================================================
-# Page 8 — ⑤ 시사점
+# Page 9 — ⑤ 시사점
 # =====================================================================
 p8_headline = "수요예측 신호가 최선의 선행지표, 유통물량 통념도 실유통 기준으로는 유효하다"
 p8_body = f"""  <div class="content-grid content-grid--3col">
@@ -535,7 +579,7 @@ PAGE8 = page_wrap(
     p8_headline,
     p8_body,
     "analysis_output.json 종합. 방법론: 시장조정 ETF 프록시, 지평은 상장일+N캘린더월 첫 거래일 종가 기준, 분기실적은 DART 정기보고서 분기 단독값(연결 우선)",
-    8,
+    9,
 )
 
 # =====================================================================
@@ -595,6 +639,25 @@ SCRIPT_TPL = """
       scales:{y:{beginAtZero:true,ticks:{callback:v=>v+':1'}},x:{grid:{display:false}}},
       layout:{padding:{top:16}}}});
 
+  // ---- P5ai_a: 연도별 AI vs 비AI 적용 PER ----
+  const DLmult={display:true,anchor:'end',align:'end',font:{size:10,weight:'700'},color:'#404040',
+    formatter:v=>v==null?'':v.toFixed(1)};
+  new Chart(document.getElementById('c5ai_a'),{type:'bar',data:{labels:__AIY_LABELS__,datasets:[
+    {label:'AI 관련',data:__AIY_AI__,backgroundColor:HL,datalabels:DLmult},
+    {label:'비AI',data:__AIY_NON__,backgroundColor:C1,datalabels:DLmult}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{y:{beginAtZero:true,suggestedMax:42,ticks:{callback:v=>v+'배'}},x:{grid:{display:false}}},
+      layout:{padding:{top:14}}}});
+
+  // ---- P5ai_b: 구분별 적용 PER ----
+  new Chart(document.getElementById('c5ai_b'),{type:'bar',data:{labels:__AICAT_LABELS__,datasets:[
+    {label:'적용 PER',data:__AICAT_VALS__,backgroundColor:[HL,C3,C1],
+     datalabels:{display:true,anchor:'end',align:'end',font:{size:11,weight:'700'},color:'#404040',
+       formatter:v=>v.toFixed(1)+'배'}}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{y:{beginAtZero:true,suggestedMax:34,ticks:{callback:v=>v+'배'}},x:{grid:{display:false},ticks:{font:{size:10.5}}}},
+      layout:{padding:{top:16}}}});
+
   // ---- P5a: 추정치 달성률 W/L ----
   new Chart(document.getElementById('c5a'),{type:'bar',data:{labels:['W (상위군)','L (하위군)'],datasets:[
     {label:'중앙값',data:__EST_VALS__,backgroundColor:[HL,C1],datalabels:DLpct}]},
@@ -614,7 +677,14 @@ SCRIPT_TPL = """
 def js(v):
     return json.dumps(v, ensure_ascii=False)
 
+ai_cat_labels = [["순수 AI", "플랫폼"], ["AI 관련", "전체"], ["비AI", "전체"]]
+
 SCRIPT = (SCRIPT_TPL
+    .replace("__AIY_LABELS__", js([str(y["year"]) for y in aim["yearly"]]))
+    .replace("__AIY_AI__", js([y["ai_median"] for y in aim["yearly"]]))
+    .replace("__AIY_NON__", js([y["nonai_median"] for y in aim["yearly"]]))
+    .replace("__AICAT_LABELS__", js(ai_cat_labels))
+    .replace("__AICAT_VALS__", js([c["median_per"] for c in aim["categories"]]))
     .replace("__HZ_LABELS__", js(horizons))
     .replace("__HZ_VALS__", js(hz_vals))
     .replace("__WML_LABELS__", js(["W", "M", "L"]))
@@ -650,6 +720,7 @@ HTML = f"""<!DOCTYPE html>
 {PAGE2}
 {PAGE3}
 {PAGE4}
+{PAGE5AI}
 {PAGE5}
 {PAGE6}
 {PAGE7}

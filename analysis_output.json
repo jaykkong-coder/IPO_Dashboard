@@ -242,6 +242,84 @@
    }
   }
  ],
+ "ai_multiple": {
+  "note": "2021+ 공모·평가방법 PER 한정. AI 관련 전체는 순수 AI 플랫폼 포함",
+  "categories": [
+   {
+    "label": "순수 AI 플랫폼",
+    "n": 3,
+    "median_per": 29.4,
+    "companies": [
+     {
+      "name": "마키나락스",
+      "per": 40.5
+     },
+     {
+      "name": "노타",
+      "per": 29.4
+     },
+     {
+      "name": "아크릴",
+      "per": 28.1
+     }
+    ]
+   },
+   {
+    "label": "AI 관련 전체",
+    "n": 60,
+    "median_per": 27.4
+   },
+   {
+    "label": "비AI 전체",
+    "n": 300,
+    "median_per": 24.2
+   }
+  ],
+  "yearly": [
+   {
+    "year": 2021,
+    "ai_n": 12,
+    "ai_median": 28.5,
+    "nonai_n": 63,
+    "nonai_median": 26.7
+   },
+   {
+    "year": 2022,
+    "ai_n": 8,
+    "ai_median": 29.4,
+    "nonai_n": 59,
+    "nonai_median": 22.4
+   },
+   {
+    "year": 2023,
+    "ai_n": 12,
+    "ai_median": 26.6,
+    "nonai_n": 64,
+    "nonai_median": 22.0
+   },
+   {
+    "year": 2024,
+    "ai_n": 11,
+    "ai_median": 26.7,
+    "nonai_n": 57,
+    "nonai_median": 25.3
+   },
+   {
+    "year": 2025,
+    "ai_n": 14,
+    "ai_median": 25.9,
+    "nonai_n": 45,
+    "nonai_median": 25.1
+   },
+   {
+    "year": 2026,
+    "ai_n": 3,
+    "ai_median": 37.5,
+    "nonai_n": 12,
+    "nonai_median": 24.9
+   }
+  ]
+ },
  "industry_table": [
   {
    "industry": "바이오/헬스케어",
