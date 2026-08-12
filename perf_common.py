@@ -14,8 +14,10 @@ SELECT dart_corp_code AS corp_code, "회사명" AS name, "상장일" AS listing_
        "기관경쟁률" AS inst_ratio, "의무보유확약비율" AS lockup_ratio,
        "적용이익_백만원" AS applied_profit_mm, "평가방법" AS valuation_method,
        "상단대비확정가비율" AS price_vs_band_top, "상장트랙" AS listing_track,
-       "확정공모금액_억원" AS offer_size, "신주" AS new_shares, "구주" AS old_shares
+       "확정공모금액_억원" AS offer_size, "신주" AS new_shares, "구주" AS old_shares,
+       s.free_float_pct, s.lockup_inst_pct, s.verdict AS structure_verdict
 FROM ipo_companies
+LEFT JOIN share_structure s ON s.corp_code = ipo_companies.dart_corp_code
 WHERE "상장일" >= '2024-01-01'
   AND ("상장유형" IS NULL OR "상장유형" != 'SPAC')
   AND "확정공모가" IS NOT NULL
@@ -58,10 +60,58 @@ DDL = [
         stock_code TEXT PRIMARY KEY, corp_code TEXT,
         group_6m TEXT, estimate_achievement REAL,
         earnings_shock INTEGER, industry_relative_6m REAL)""",
+    """CREATE TABLE IF NOT EXISTS impl_reports(
+        corp_code TEXT PRIMARY KEY,
+        rcept_no TEXT,
+        report_nm TEXT,
+        inst_alloc INTEGER,
+        esop INTEGER,
+        retail_alloc INTEGER,
+        lockup_none INTEGER,
+        lockup_total INTEGER,
+        lockup_15d INTEGER,
+        lockup_1m INTEGER,
+        lockup_3m INTEGER,
+        lockup_6m INTEGER,
+        parse_status TEXT,
+        fetched_at TEXT)""",
+    """CREATE TABLE IF NOT EXISTS share_structure(
+        corp_code TEXT PRIMARY KEY,
+        listing_date TEXT,
+        total_shares INTEGER,
+        lockup_existing INTEGER,
+        lockup_inst INTEGER,
+        esop INTEGER,
+        free_float INTEGER,
+        free_float_pct REAL,
+        inst_alloc INTEGER,
+        lockup_inst_pct REAL,
+        lockup_15d INTEGER,
+        lockup_1m INTEGER,
+        lockup_3m INTEGER,
+        lockup_6m INTEGER,
+        identity_gap REAL,
+        verdict TEXT,
+        src_impl_rcept TEXT,
+        src_prosp_rcept TEXT,
+        evidence TEXT,
+        updated_at TEXT)""",
+]
+
+
+# 이미 만들어진 테이블에 열을 추가할 때 쓴다. CREATE TABLE IF NOT EXISTS는
+# 기존 테이블의 스키마를 갱신하지 않으므로 DDL만 고치면 기존 DB에는 반영되지 않는다.
+# (table, column, type) — 이미 있으면 조용히 건너뛴다.
+MIGRATIONS = [
+    ("impl_reports", "lockup_total", "INTEGER"),
 ]
 
 
 def ensure_tables(con) -> None:
     for ddl in DDL:
         con.execute(ddl)
+    for table, column, coltype in MIGRATIONS:
+        cols = {r[1] for r in con.execute(f"PRAGMA table_info({table})")}
+        if column not in cols:
+            con.execute(f"ALTER TABLE {table} ADD COLUMN {column} {coltype}")
     con.commit()

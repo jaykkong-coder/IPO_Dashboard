@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
-docs/
+docs/*
+!docs/superpowers/
 CORPCODE.xml
 poc_*.py
 poc_docs/
